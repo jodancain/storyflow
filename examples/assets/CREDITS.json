@@ -1,0 +1,174 @@
+{
+  "template": "lupus-v6",
+  "notice": "参考图仅供源码示例的设计与审稿演示，不是当前影片人物或医学审定内容；按逐件许可保留署名。",
+  "files": [
+    {
+      "assetId": "REF-A-SYM-MALAR",
+      "path": "assets/malar-distribution-niams.jpg",
+      "sha256": "c014da692448862908438086bc0b50c4a7f89db0f5a7f2633abff5b3dca38ab6",
+      "mime": "image/jpeg",
+      "source": {
+        "url": "https://commons.wikimedia.org/wiki/File:Butterflyrash.jpg",
+        "author": "National Institute of Arthritis and Musculoskeletal and Skin Diseases (NIAMS)",
+        "license": "Public domain (US federal work; Commons PD-mark)",
+        "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。该图用来核对分布，不能代替女主症状成片。最终虚构人物应表现双颊+鼻梁的连续红斑，并避免鼻唇沟被整片涂红；外观不能确诊。"
+      },
+      "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+      "changes": "由 Wikimedia 提供的缩略图，仅尺寸缩小；未改变医学内容。"
+    },
+    {
+      "assetId": "REF-A-SYM-HAIR",
+      "path": "assets/shed-hair-from-comb.jpg",
+      "sha256": "c7cc471d1d1cdc49bc8b377730d84144f809869be50441f8aca02dce25f12617",
+      "mime": "image/jpeg",
+      "source": {
+        "url": "https://commons.wikimedia.org/wiki/File:Matted_clump_of_hair.jpg",
+        "author": "Ser Amantio di Nicolao",
+        "license": "CC BY-SA 4.0",
+        "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。数量无时间尺度、无正常基线；不能仅凭该发团声称异常脱发或狼疮。情节应表现“她发现比自己平时多”，不要把正常梳落头发当确诊指标。"
+      },
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "changes": "由 Wikimedia 提供的缩略图，仅尺寸缩小；未改变医学内容。"
+    },
+    {
+      "assetId": "REF-A-SYM-JOINT",
+      "path": "assets/joint-hands-action.jpg",
+      "sha256": "b9f2e0d3738f1fb29de83fb8c1c6123c246b3976d42ce73c8444de466ce85906",
+      "mime": "image/jpeg",
+      "source": {
+        "url": "https://commons.wikimedia.org/wiki/File:Arthritic_hands_in_pain.jpg",
+        "author": "Ian Furst",
+        "license": "CC BY-SA 4.0",
+        "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。原图描述关节炎疼痛，不能证明为狼疮。可指导“系蝴蝶结时手指停顿、轻揉关节”的动作；静态图本身不测量疼痛。"
+      },
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "changes": "由 Wikimedia 提供的缩略图，仅尺寸缩小；未改变医学内容。"
+    },
+    {
+      "assetId": "REF-A-SYM-ORAL",
+      "path": "assets/oral-palate-cc0.png",
+      "sha256": "dbd1789a112b3a9011b7e4091554352bce35be991db203805fcf5900ed58b04c",
+      "mime": "image/png",
+      "source": {
+        "url": "https://commons.wikimedia.org/wiki/File:Throat_Canker.png",
+        "author": "Elijah.wilhelm",
+        "license": "CC0 1.0",
+        "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。来源称普通 aphthous stomatitis。狼疮也可出现口腔病变，且常无痛、常见上腭；本图只能核对“口腔内真实损害”视觉，不能直接说此人/该溃疡由狼疮造成。"
+      },
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "changes": "由 Wikimedia 提供的缩略图，仅尺寸缩小；未改变医学内容。"
+    },
+    {
+      "assetId": "REF-REF-PAPER-NOTE-01",
+      "path": "assets/notebook-and-pen.jpg",
+      "sha256": "3b810f373822f8beace07d076f13f7a30b93e8d82aa91766f191c80b7a8b8adc",
+      "mime": "image/jpeg",
+      "source": {
+        "url": "https://commons.wikimedia.org/wiki/File:Woman_writing_on_a_notebook_with_a_pen.jpg",
+        "author": "Kristin Hardwick",
+        "license": "CC0 1.0 Universal Public Domain Dedication",
+        "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。仅参考纸本和握笔动作；不是女主，不含已核对的病史文字。原照戒指、指甲油、笔杆文字不沿用到专属镜头。"
+      },
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "changes": "Commons提供的缩略图，内容未修改，保持原比例。"
+    },
+    {
+      "assetId": "REF-A-TEST-BLOOD-TUBE",
+      "path": "assets/blood-sample-tube.png",
+      "sha256": "0dbffa1d621f295cc14954de8c2c015da22eef528d2c1df0557ec0e1f0316981",
+      "mime": "image/png",
+      "source": {
+        "url": "https://commons.wikimedia.org/wiki/File:Equipment_-_Blood_test_-_Tube_(7442)_--_Smart-Servier.png",
+        "author": "Laboratoires Servier / SMART-Servier Medical Art",
+        "license": "CC BY-SA 3.0 (this Commons file)",
+        "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。不能声称图内已经装有血样。S10最终血样应有合理内容、独立管架并与尿杯分隔。不能用管盖颜色推断诊断结果。"
+      },
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "changes": "Commons提供的PNG预览，未改内容。"
+    },
+    {
+      "assetId": "REF-A-MED-TEST",
+      "path": "assets/urine-test-equipment.png",
+      "sha256": "d474d8dc8bb09a44d62ef727b6d3b9e4d7919d4f3b7db481aad63466ec7d1c3b",
+      "mime": "image/png",
+      "source": {
+        "url": "https://commons.wikimedia.org/wiki/File:Equipment_-_Urine_test_--_Smart-Servier.png",
+        "author": "Laboratoires Servier / SMART-Servier Medical Art",
+        "license": "CC BY-SA 3.0 (this Commons file)",
+        "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。只能作“留尿检查”的物体图，严禁充当泡沫尿或阳性检验结果。"
+      },
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "changes": "由 Wikimedia 提供的缩略图，仅尺寸缩小；未改变医学内容。"
+    },
+    {
+      "assetId": "REF-P05",
+      "path": "assets/P05-sunscreen.jpg",
+      "sha256": "aec4a9011666199a9ef8fec10637ece6a80814bc692282b906b0c95205b19fe2",
+      "mime": "image/jpeg",
+      "source": {
+        "url": "https://commons.wikimedia.org/wiki/File:Woman_applying_sunscreen.jpg",
+        "author": "Bill Branson / National Cancer Institute",
+        "license": "Public domain — author release / NIH",
+        "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。模特不代表狼疮患者，不移植为本片女主身份；照片不是疗效或具体SPF证据。"
+      },
+      "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+      "changes": "Wikimedia supplied thumbnail downloaded unchanged; original aspect preserved"
+    },
+    {
+      "assetId": "REF-P04",
+      "path": "assets/P04-umbrella.jpg",
+      "sha256": "3294e4d45cdac003d19dec78c5f0ca4083487dd8aadc44bd21cc8a71fae84699",
+      "mime": "image/jpeg",
+      "source": {
+        "url": "https://commons.wikimedia.org/wiki/File:Umbrella_2010_Probably_Made_in_2009.JPG",
+        "author": "Matthew Paul Argall",
+        "license": "Public domain — author release",
+        "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。普通伞照片没有UPF/防紫外线性能认证，不能宣称该产品具有医学防晒效果。"
+      },
+      "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+      "changes": "Wikimedia supplied thumbnail downloaded unchanged; original aspect preserved"
+    },
+    {
+      "assetId": "REF-P06",
+      "path": "assets/P06-pill-organizer.png",
+      "sha256": "97772ae63e1db001131684d440b542e3f424a8a2307c5a340ed68c2459b1a5be",
+      "mime": "image/png",
+      "source": {
+        "url": "https://commons.wikimedia.org/wiki/File:Pill_organising_safe.png",
+        "author": "Ashashyou",
+        "license": "CC0 1.0",
+        "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。不是狼疮具体治疗方案；不能据图推荐品种、剂量或停药。"
+      },
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "changes": "Wikimedia supplied thumbnail downloaded unchanged; original aspect preserved"
+    },
+    {
+      "assetId": "REF-P03",
+      "path": "assets/P03-sunlit-room.jpg",
+      "sha256": "b325671fcf236a2f509fc6e142e7068a5cd5d8013316cf7f51d54e916a8d0be2",
+      "mime": "image/jpeg",
+      "source": {
+        "url": "https://commons.wikimedia.org/wiki/File:Family_room_sunlight_through_backdoor.jpg",
+        "author": "Zoe's Dog",
+        "license": "CC BY-SA 4.0",
+        "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。不是本片女主住所，不用阳光画面证明光敏反应；若改编本图须遵守同许可要求。"
+      },
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "changes": "Wikimedia supplied thumbnail downloaded unchanged; original aspect preserved"
+    },
+    {
+      "assetId": "REF-P07",
+      "path": "assets/P07-consultation.jpg",
+      "sha256": "33308b2d80b8b33d3312e65f2be21ff189908d9841013fb413e971d9a07ccc3f",
+      "mime": "image/jpeg",
+      "source": {
+        "url": "https://commons.wikimedia.org/wiki/File:Doctor_consults_with_patient_(8).jpg",
+        "author": "Bill Branson / National Cancer Institute",
+        "license": "Public domain — US NIH official work",
+        "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。公开图片仅作通用就诊构图，不指称其中人物患狼疮，不推断或扩写患者身份/病史。"
+      },
+      "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+      "changes": "Wikimedia supplied thumbnail downloaded unchanged; original aspect preserved"
+    }
+  ]
+}

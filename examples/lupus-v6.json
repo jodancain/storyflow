@@ -1,0 +1,4049 @@
+{
+  "schemaVersion": 1,
+  "title": "那个没系完的结 · V6医学故事模板",
+  "spec": {
+    "fps": 25,
+    "width": 1080,
+    "height": 1920,
+    "totalFrames": 1500
+  },
+  "entities": [
+    {
+      "id": "E-A-CHAR-P01",
+      "type": "character",
+      "label": "固定虚构女主身份锁",
+      "attributes": {
+        "description": "约26岁，及肩深棕发、米白针织衣、自然皮肤纹理；本轮专属正面/左右三分之二角度，先确认唯一身份，不混用旧生成不同面孔；居家/诊室/出门同一身份；出门加浅色长袖防晒外套",
+        "status": "planned",
+        "originalSlotId": "A-CHAR-P01",
+        "fictionNotice": "虚构成年人，尚未制作统一身份素材。"
+      },
+      "evidenceIds": [],
+      "fictional": true
+    },
+    {
+      "id": "E-A-CHAR-D00",
+      "type": "character",
+      "label": "医生角色（需自行绑定授权参考照）",
+      "attributes": {
+        "description": "医生形象由用户在新项目上传并确认；本源码包未包含指定医生原照。模型声音不是本人录音。",
+        "status": "planned",
+        "originalSlotId": "A-CHAR-D00",
+        "identitySource": "user-upload-required"
+      },
+      "evidenceIds": [],
+      "fictional": false
+    },
+    {
+      "id": "E-A-CHAR-F01",
+      "type": "character",
+      "label": "朋友接礼物的手和衣袖",
+      "attributes": {
+        "description": "不新增清晰第三张脸；普通浅灰衣袖与单手接物；不以他人声音说医生或女主台词",
+        "status": "planned",
+        "originalSlotId": "A-CHAR-F01"
+      },
+      "evidenceIds": [],
+      "fictional": true
+    },
+    {
+      "id": "E-A-SET-HOME",
+      "type": "scene",
+      "label": "同一居家桌面、镜子与卧室布局",
+      "attributes": {
+        "description": "浅木桌、右侧窗、米白墙、固定小镜；家居坐标一致；床枕与洗手间是同一居家空间的明确闪回；S07桌下抽屉内宽深须容下纸包书，尺寸为美术设定；抽屉初始半开避免3秒内多余开合动作。",
+        "status": "planned",
+        "originalSlotId": "A-SET-HOME"
+      },
+      "evidenceIds": [],
+      "fictional": false
+    },
+    {
+      "id": "E-A-SET-CLINIC",
+      "type": "scene",
+      "label": "同一诊室与化验区域布局",
+      "attributes": {
+        "description": "女主画左、医生画右；两人视线轴不越线；病历正面朝使用者；无新院名、姓名或虚假化验结果",
+        "status": "planned",
+        "originalSlotId": "A-SET-CLINIC"
+      },
+      "evidenceIds": [],
+      "fictional": false
+    },
+    {
+      "id": "E-A-SET-OUTSIDE",
+      "type": "scene",
+      "label": "家门口至阴凉会面处",
+      "attributes": {
+        "description": "普通明亮人行道与树荫，同一出门方向左至右；不在强光下故意停留演示光敏",
+        "status": "planned",
+        "originalSlotId": "A-SET-OUTSIDE"
+      },
+      "evidenceIds": [],
+      "fictional": false
+    },
+    {
+      "id": "E-A-PROP-GIFT",
+      "type": "prop",
+      "label": "未系好的礼物及同一蓝色丝带",
+      "attributes": {
+        "description": "一本已包浅牛皮纸的书，约20×14×3厘米，无品牌文字；同一包装折痕、小卡和蓝色缎带贯穿；开头结未完成，结尾完成后只交付一次；礼物不是鲜花，能合理跨检查/随访时间保存",
+        "status": "planned",
+        "originalSlotId": "A-PROP-GIFT"
+      },
+      "evidenceIds": [],
+      "fictional": false
+    },
+    {
+      "id": "E-A-PROP-NOTE",
+      "type": "prop",
+      "label": "一周症状记录与就诊页",
+      "attributes": {
+        "description": "只记录现象及时间，不自动打勾确诊；中文由后期精确排版：这一周／变化反复／就医评估；非真实患者病历，不显示姓名/电话/身份证",
+        "status": "planned",
+        "originalSlotId": "A-PROP-NOTE"
+      },
+      "evidenceIds": [],
+      "fictional": false
+    },
+    {
+      "id": "E-A-SYM-JOINT",
+      "type": "prop",
+      "label": "手指关节不适的具体动作",
+      "attributes": {
+        "description": "左手指关节清晰，尝试捏丝带后停下，右手轻托左指关节；可见动作中断与具体位置，不用单纯下楼代替；不夸张肿胀",
+        "status": "planned",
+        "originalSlotId": "A-SYM-JOINT"
+      },
+      "evidenceIds": [],
+      "fictional": false
+    },
+    {
+      "id": "E-A-SYM-MALAR",
+      "type": "prop",
+      "label": "双颊与鼻梁蝶形分布",
+      "attributes": {
+        "description": "正面脸部近景，双颊与鼻梁区域红斑分布可辨，鼻唇沟是否保留等细节须专门医学核对；不是两块腮红、蝶形贴纸或鼻尖单点；标签为情景示意，不能凭外观确诊",
+        "status": "planned",
+        "originalSlotId": "A-SYM-MALAR"
+      },
+      "evidenceIds": [],
+      "fictional": false
+    },
+    {
+      "id": "E-A-SYM-HAIR",
+      "type": "prop",
+      "label": "枕面脱落发丝观察",
+      "attributes": {
+        "description": "浅色枕面上能看见一组独立发丝，女主停下观察；与一周记录合读为她主观发现比平常多，不给正常根数阈值，不单凭发丝数诊断",
+        "status": "planned",
+        "originalSlotId": "A-SYM-HAIR"
+      },
+      "evidenceIds": [],
+      "fictional": false
+    },
+    {
+      "id": "E-A-SYM-ORAL",
+      "type": "prop",
+      "label": "口腔内上腭病灶示意",
+      "attributes": {
+        "description": "独立口腔内部近景，上腭局部可辨识黏膜破损/溃疡样病灶，位置、颜色及边界需医学图审；形态参考必须有可追溯来源；普通阿弗他图不可标作典型SLE；只作教学示意，不声称取自女主或真实患者；不配疼痛表演",
+        "status": "planned",
+        "originalSlotId": "A-SYM-ORAL"
+      },
+      "evidenceIds": [],
+      "fictional": false
+    },
+    {
+      "id": "E-A-SYM-FOAM",
+      "type": "prop",
+      "label": "可见尿液相关泡沫的非特异示意",
+      "attributes": {
+        "description": "仅拍便器水面，细小成簇泡沫可辨；不拍排尿或裸露；同镜限定：泡沫尿不等于肾损伤／需检查；不画泡沫到坏死肾的箭头；本镜2秒只说明画面有泡沫，不证明持续时间或一周反复；持续/反复若提及，仅来自明确标注的虚构记录。",
+        "status": "planned",
+        "originalSlotId": "A-SYM-FOAM"
+      },
+      "evidenceIds": [],
+      "fictional": false
+    },
+    {
+      "id": "E-A-TEST-BLOOD-URINE",
+      "type": "prop",
+      "label": "血液与尿样检测的对应素材",
+      "attributes": {
+        "description": "正规采样/检验托盘上可区分密封采血管与尿样杯，按检验流程分隔；只表示医生决定的检查，后期标签血液检查/尿液检查；无虚构阳性数值",
+        "status": "planned",
+        "originalSlotId": "A-TEST-BLOOD-URINE"
+      },
+      "evidenceIds": [],
+      "fictional": false
+    },
+    {
+      "id": "E-A-MED-AUTOIMMUNE",
+      "type": "prop",
+      "label": "非拟人自身免疫机制小图",
+      "attributes": {
+        "description": "简洁组织轮廓与免疫异常相互作用示意，不带人脸/武器；不遮医生嘴；标签机制简化示意；不画所有器官同时被毁",
+        "status": "planned",
+        "originalSlotId": "A-MED-AUTOIMMUNE"
+      },
+      "evidenceIds": [],
+      "fictional": false
+    },
+    {
+      "id": "E-A-CARE-PLAN",
+      "type": "prop",
+      "label": "个体随访计划与处方提醒",
+      "attributes": {
+        "description": "纸面复查安排与无品牌关闭药盒分别可辨；随访日按医生实际安排，不给统一周期/药名/剂量；药盒不打开、不表演停药",
+        "status": "planned",
+        "originalSlotId": "A-CARE-PLAN"
+      },
+      "evidenceIds": [],
+      "fictional": false
+    },
+    {
+      "id": "E-A-CARE-SUN",
+      "type": "prop",
+      "label": "防晒乳、长袖和遮阳伞",
+      "attributes": {
+        "description": "无品牌防晒乳涂在前臂，可见手与皮肤接触；已开浅色伞罩头肩，长袖；不是只拍瓶子；防晒不暗示100%阻断或疾病治愈",
+        "status": "planned",
+        "originalSlotId": "A-CARE-SUN"
+      },
+      "evidenceIds": [],
+      "fictional": false
+    },
+    {
+      "id": "E-A-CHAR-LAB-HANDS",
+      "type": "character",
+      "label": "检验人员的手与衣袖",
+      "attributes": {
+        "description": "仅匿名检验人员双手及袖口，按实际操作条件使用合适防护；正确握持密封采血管/样本杯，无多指和混用医生/患者身份",
+        "status": "planned",
+        "originalSlotId": "A-CHAR-LAB-HANDS"
+      },
+      "evidenceIds": [],
+      "fictional": true
+    },
+    {
+      "id": "E-A-PROP-BLOOD-TUBE",
+      "type": "prop",
+      "label": "密封采血管",
+      "attributes": {
+        "description": "符合采血管形态的密封容器，无姓名及虚构检验数值；须与尿样杯独立可辨；不拿同一尿杯同时代表查血",
+        "status": "planned",
+        "originalSlotId": "A-PROP-BLOOD-TUBE"
+      },
+      "evidenceIds": [],
+      "fictional": false
+    },
+    {
+      "id": "E-A-PROP-URINE-CUP",
+      "type": "prop",
+      "label": "密封尿标本杯",
+      "attributes": {
+        "description": "样本杯与密封盖尺寸匹配，无个人标签；容器图不证明泡沫尿或蛋白尿",
+        "status": "planned",
+        "originalSlotId": "A-PROP-URINE-CUP"
+      },
+      "evidenceIds": [],
+      "fictional": false
+    },
+    {
+      "id": "E-A-PROP-LAB-TRAY",
+      "type": "prop",
+      "label": "分隔检验托盘",
+      "attributes": {
+        "description": "血样管和尿杯有各自稳定隔位；台面和容器受重力支持，容器不凭空消失",
+        "status": "planned",
+        "originalSlotId": "A-PROP-LAB-TRAY"
+      },
+      "evidenceIds": [],
+      "fictional": false
+    },
+    {
+      "id": "E-A-PROP-PEN",
+      "type": "prop",
+      "label": "记录用笔",
+      "attributes": {
+        "description": "同一支无品牌笔，右手握姿与纸面接触成立；不由模型生成药名或剂量",
+        "status": "planned",
+        "originalSlotId": "A-PROP-PEN"
+      },
+      "evidenceIds": [],
+      "fictional": false
+    },
+    {
+      "id": "E-A-PROP-FOLLOWUP-BOOK",
+      "type": "prop",
+      "label": "个人随访计划簿",
+      "attributes": {
+        "description": "同一计划簿及纸张布局、个体复查记录；日期/文字由后期精确排版，未定不虚构统一周期",
+        "status": "planned",
+        "originalSlotId": "A-PROP-FOLLOWUP-BOOK"
+      },
+      "evidenceIds": [],
+      "fictional": false
+    },
+    {
+      "id": "E-A-PROP-REMINDER-CARD",
+      "type": "prop",
+      "label": "处方提醒卡",
+      "attributes": {
+        "description": "只出现按医嘱用药的精确提醒，不含药物剂量；与复查页可辨，不用未审药名填满卡面",
+        "status": "planned",
+        "originalSlotId": "A-PROP-REMINDER-CARD"
+      },
+      "evidenceIds": [],
+      "fictional": false
+    },
+    {
+      "id": "E-A-PROP-PILLBOX",
+      "type": "prop",
+      "label": "关闭的无品牌药盒",
+      "attributes": {
+        "description": "关闭、完整、无品牌的药盒；不打开药格或拍自行增减药；分格药盒图仅为结构参考",
+        "status": "planned",
+        "originalSlotId": "A-PROP-PILLBOX"
+      },
+      "evidenceIds": [],
+      "fictional": false
+    },
+    {
+      "id": "E-A-PROP-SUNSCREEN",
+      "type": "prop",
+      "label": "防晒瓶与瓶盖",
+      "attributes": {
+        "description": "无品牌瓶，盖与瓶口匹配；少量乳液实际接触前臂；透明胶圈/悬浮液滴不作有效涂抹",
+        "status": "planned",
+        "originalSlotId": "A-PROP-SUNSCREEN"
+      },
+      "evidenceIds": [],
+      "fictional": false
+    },
+    {
+      "id": "E-A-WARDROBE-OUTER",
+      "type": "prop",
+      "label": "浅色长袖防晒外套",
+      "attributes": {
+        "description": "同一件浅色长袖，S16在旁、S18/S19穿着；与米白针织上衣和肩包不穿模",
+        "status": "planned",
+        "originalSlotId": "A-WARDROBE-OUTER"
+      },
+      "evidenceIds": [],
+      "fictional": false
+    },
+    {
+      "id": "E-A-PROP-UMBRELLA",
+      "type": "prop",
+      "label": "浅色遮阳伞",
+      "attributes": {
+        "description": "S18已开并实际握柄、伞骨完整，覆盖头肩；S19到达后已收靠在屋檐左侧；此为省略切，不悬浮在身后",
+        "status": "planned",
+        "originalSlotId": "A-PROP-UMBRELLA"
+      },
+      "evidenceIds": [],
+      "fictional": false
+    },
+    {
+      "id": "E-A-PROP-SHOULDER-BAG",
+      "type": "prop",
+      "label": "浅色肩包",
+      "attributes": {
+        "description": "固定浅色帆布肩包，左肩背带；开口可容20×14×3厘米礼物；包口和礼物边缘能对应，不在S19突然换包/换肩",
+        "status": "planned",
+        "originalSlotId": "A-PROP-SHOULDER-BAG"
+      },
+      "evidenceIds": [],
+      "fictional": false
+    },
+    {
+      "id": "E-A-PROP-WRAPPED-BOOK",
+      "type": "prop",
+      "label": "牛皮纸包书",
+      "attributes": {
+        "description": "约20×14×3厘米仅为美术设定；不能从参考照片断言内部是书；固定牛皮纸折痕和边角，横竖尺寸与手部比例合理",
+        "status": "planned",
+        "originalSlotId": "A-PROP-WRAPPED-BOOK"
+      },
+      "evidenceIds": [],
+      "fictional": false
+    },
+    {
+      "id": "E-A-PROP-BLUE-RIBBON",
+      "type": "prop",
+      "label": "同一蓝色丝带",
+      "attributes": {
+        "description": "蓝色及宽度固定，保留未完成结/松开/最后收紧/交付的明确状态；不把粉色已打好结的参考称作同条蓝丝带",
+        "status": "planned",
+        "originalSlotId": "A-PROP-BLUE-RIBBON"
+      },
+      "evidenceIds": [],
+      "fictional": false
+    },
+    {
+      "id": "E-A-PROP-GIFT-CARD",
+      "type": "prop",
+      "label": "无署名小卡",
+      "attributes": {
+        "description": "同一小卡固定在包装上、无品牌署名；若出现文字，后期排版且不写虚构朋友个人资料",
+        "status": "planned",
+        "originalSlotId": "A-PROP-GIFT-CARD"
+      },
+      "evidenceIds": [],
+      "fictional": false
+    },
+    {
+      "id": "E-C-JOINT",
+      "type": "medical-fact",
+      "label": "关节疼痛或晨僵可以是就医线索，但此动作不能诊断SLE。",
+      "attributes": {
+        "statement": "关节疼痛或晨僵可以是就医线索，但此动作不能诊断SLE。",
+        "reviewStatus": "requires-domain-review"
+      },
+      "evidenceIds": [
+        "EV-NIAMS-OVERVIEW"
+      ]
+    },
+    {
+      "id": "E-C-MALAR",
+      "type": "medical-fact",
+      "label": "跨鼻梁与双颊的红斑可见于SLE；并非所有类似红斑均为狼疮。",
+      "attributes": {
+        "statement": "跨鼻梁与双颊的红斑可见于SLE；并非所有类似红斑均为狼疮。",
+        "reviewStatus": "requires-domain-review"
+      },
+      "evidenceIds": [
+        "EV-NIAMS-OVERVIEW"
+      ]
+    },
+    {
+      "id": "E-C-HAIR",
+      "type": "medical-fact",
+      "label": "脱发可以是症状之一；少量正常脱落不能据此判病。",
+      "attributes": {
+        "statement": "脱发可以是症状之一；少量正常脱落不能据此判病。",
+        "reviewStatus": "requires-domain-review"
+      },
+      "evidenceIds": [
+        "EV-NIAMS-OVERVIEW"
+      ]
+    },
+    {
+      "id": "E-C-ORAL",
+      "type": "medical-fact",
+      "label": "口鼻黏膜病灶可能出现，常无痛；本镜不把一般阿弗他溃疡特指为SLE。",
+      "attributes": {
+        "statement": "口鼻黏膜病灶可能出现，常无痛；本镜不把一般阿弗他溃疡特指为SLE。",
+        "reviewStatus": "requires-domain-review"
+      },
+      "evidenceIds": [
+        "EV-NIAMS-OVERVIEW"
+      ]
+    },
+    {
+      "id": "E-C-FOAM",
+      "type": "medical-fact",
+      "label": "反复泡沫尿应让医生评估，不等于肾损伤或狼疮肾炎诊断。",
+      "attributes": {
+        "statement": "反复泡沫尿应让医生评估，不等于肾损伤或狼疮肾炎诊断。",
+        "reviewStatus": "requires-domain-review"
+      },
+      "evidenceIds": [
+        "EV-NIDDK-RENAL"
+      ]
+    },
+    {
+      "id": "E-C-FOAM-OBSERVATION-LIMIT",
+      "type": "medical-fact",
+      "label": "2秒水面镜头不能证明持续或反复，更不能证明蛋白尿或肾损伤；这里只是教学情景示意。",
+      "attributes": {
+        "statement": "2秒水面镜头不能证明持续或反复，更不能证明蛋白尿或肾损伤；这里只是教学情景示意。",
+        "reviewStatus": "requires-domain-review"
+      },
+      "evidenceIds": [
+        "EV-NIDDK-RENAL"
+      ]
+    },
+    {
+      "id": "E-C-NONDIAGNOSTIC",
+      "type": "medical-fact",
+      "label": "症状用于描述问题，不用于自我确诊。",
+      "attributes": {
+        "statement": "症状用于描述问题，不用于自我确诊。",
+        "reviewStatus": "requires-domain-review"
+      },
+      "evidenceIds": [
+        "EV-NIAMS-DIAGNOSIS"
+      ]
+    },
+    {
+      "id": "E-C-EVALUATION",
+      "type": "medical-fact",
+      "label": "需结合病史、体检和必要血尿等检查；没有单一确诊试验。",
+      "attributes": {
+        "statement": "需结合病史、体检和必要血尿等检查；没有单一确诊试验。",
+        "reviewStatus": "requires-domain-review"
+      },
+      "evidenceIds": [
+        "EV-NIAMS-DIAGNOSIS"
+      ]
+    },
+    {
+      "id": "E-C-FICTIONAL-DIAGNOSIS",
+      "type": "medical-fact",
+      "label": "本镜为虚构病例中的综合判断，不是对真人女主或照片医生的诊疗记录；不是所有所示症状组合都会诊断为狼疮。",
+      "attributes": {
+        "statement": "本镜为虚构病例中的综合判断，不是对真人女主或照片医生的诊疗记录；不是所有所示症状组合都会诊断为狼疮。",
+        "reviewStatus": "requires-domain-review"
+      },
+      "evidenceIds": [
+        "EV-NIAMS-DIAGNOSIS"
+      ]
+    },
+    {
+      "id": "E-C-AUTOIMMUNE",
+      "type": "medical-fact",
+      "label": "SLE属于慢性自身免疫疾病；图示不承诺每个人器官受累相同。",
+      "attributes": {
+        "statement": "SLE属于慢性自身免疫疾病；图示不承诺每个人器官受累相同。",
+        "reviewStatus": "requires-domain-review"
+      },
+      "evidenceIds": [
+        "EV-NIAMS-OVERVIEW"
+      ]
+    },
+    {
+      "id": "E-C-MANAGEMENT",
+      "type": "medical-fact",
+      "label": "规范管理、复查与不自行停药；方案与复查时间需个体化。",
+      "attributes": {
+        "statement": "规范管理、复查与不自行停药；方案与复查时间需个体化。",
+        "reviewStatus": "requires-domain-review"
+      },
+      "evidenceIds": [
+        "EV-NIAMS-DIAGNOSIS"
+      ]
+    },
+    {
+      "id": "E-C-SUN",
+      "type": "medical-fact",
+      "label": "采取衣物、遮阳和防晒措施；不暗示必须闭门不出或百分百保护。",
+      "attributes": {
+        "statement": "采取衣物、遮阳和防晒措施；不暗示必须闭门不出或百分百保护。",
+        "reviewStatus": "requires-domain-review"
+      },
+      "evidenceIds": [
+        "EV-NIAMS-DIAGNOSIS"
+      ]
+    },
+    {
+      "id": "E-C-LIFE",
+      "type": "medical-fact",
+      "label": "管理期间可在医生指导下安排生活；此例不保证人人同样恢复，也无固定恢复期限。",
+      "attributes": {
+        "statement": "管理期间可在医生指导下安排生活；此例不保证人人同样恢复，也无固定恢复期限。",
+        "reviewStatus": "requires-domain-review"
+      },
+      "evidenceIds": [
+        "EV-NIAMS-DIAGNOSIS"
+      ]
+    },
+    {
+      "id": "E-ACTION-S01",
+      "type": "action",
+      "label": "女主坐在窗边，望着一份没有系完丝带的礼物，说完轻拉丝带。",
+      "attributes": {
+        "startState": "女主坐定，蓝丝带两端分开放在礼物上。",
+        "endState": "右手捏右带端，左手准备捏左带端；结还未完成。",
+        "repeatInFinalAllowed": false,
+        "sceneId": "home",
+        "transitionMethod": "reaction-or-scale-change",
+        "matchRequired": false,
+        "stateToMatch": "女主坐定，蓝丝带两端分开放在礼物上。"
+      },
+      "evidenceIds": []
+    },
+    {
+      "id": "E-ACTION-S02",
+      "type": "action",
+      "label": "左手捏带时停下，右手放下丝带，轻托左指关节。",
+      "attributes": {
+        "startState": "延续S01同一双手、同一丝带交叉阶段。",
+        "endState": "礼物仍在桌上，蓝丝带松开；左手被轻托。",
+        "repeatInFinalAllowed": false,
+        "sceneId": "home",
+        "transitionMethod": "action-match",
+        "matchRequired": true,
+        "stateToMatch": "延续S01同一双手、同一丝带交叉阶段。",
+        "predecessorShotId": "S01"
+      },
+      "evidenceIds": []
+    },
+    {
+      "id": "E-ACTION-S03",
+      "type": "action",
+      "label": "女主放下手，向桌边镜子看去，镜旁机位清楚显示双颊与鼻梁红斑分布。",
+      "attributes": {
+        "startState": "她仍坐在原桌位置，礼物在下方虚化处。",
+        "endState": "目光停在镜中的脸；不涂抹遮瑕作诊断实验。",
+        "repeatInFinalAllowed": false,
+        "sceneId": "home",
+        "transitionMethod": "reaction-or-scale-change",
+        "matchRequired": true,
+        "stateToMatch": "她仍坐在原桌位置，礼物在下方虚化处。",
+        "predecessorShotId": "S02"
+      },
+      "evidenceIds": []
+    },
+    {
+      "id": "E-ACTION-S04",
+      "type": "action",
+      "label": "女主早晨抬头后，看到浅色枕面上可辨的脱落发丝，手停在枕边。",
+      "attributes": {
+        "startState": "时间明确回到这一周的某次早晨。",
+        "endState": "发丝仍在枕面，未突然大量增加；她观察而不下结论。",
+        "repeatInFinalAllowed": false,
+        "sceneId": "home_flashback",
+        "transitionMethod": "time-ellipsis",
+        "matchRequired": false,
+        "stateToMatch": "时间明确回到这一周的某次早晨。",
+        "predecessorShotId": "S03"
+      },
+      "evidenceIds": []
+    },
+    {
+      "id": "E-ACTION-S05",
+      "type": "action",
+      "label": "克制、清楚地展示口腔上腭的局部溃疡样病灶，作为一周观察的教学插入画面。",
+      "attributes": {
+        "startState": "开镜即见已审核、无血腥的口腔内病灶。",
+        "endState": "病灶位置与大小稳定，无白球生长或形变。",
+        "repeatInFinalAllowed": false,
+        "sceneId": "medical_teaching_insert",
+        "transitionMethod": "time-ellipsis",
+        "matchRequired": false,
+        "stateToMatch": "开镜即见已审核、无血腥的口腔内病灶。",
+        "predecessorShotId": "S04"
+      },
+      "evidenceIds": []
+    },
+    {
+      "id": "E-ACTION-S06",
+      "type": "action",
+      "label": "水面可见细密成簇泡沫，画面不做肾病结论。",
+      "attributes": {
+        "startState": "闪回某次如厕后的观察，不显示裸体或排尿过程。",
+        "endState": "泡沫自然缓慢变化，不能用消失/增加作为诊断。",
+        "repeatInFinalAllowed": false,
+        "sceneId": "home_flashback",
+        "transitionMethod": "time-ellipsis",
+        "matchRequired": false,
+        "stateToMatch": "闪回某次如厕后的观察，不显示裸体或排尿过程。",
+        "predecessorShotId": "S05"
+      },
+      "evidenceIds": []
+    },
+    {
+      "id": "E-ACTION-S07",
+      "type": "action",
+      "label": "回到桌前，她把未系完的礼物放入抽屉，拿起症状记录，决定就医。",
+      "attributes": {
+        "startState": "回到现在；蓝色丝带未系完，仍与S02一致。",
+        "endState": "礼物收好但未放弃；女主手持记录向门口看。",
+        "repeatInFinalAllowed": false,
+        "sceneId": "home",
+        "transitionMethod": "reaction-or-scale-change",
+        "matchRequired": true,
+        "stateToMatch": "回到现在；蓝色丝带未系完，仍与S02一致。",
+        "predecessorShotId": "S06"
+      },
+      "evidenceIds": []
+    },
+    {
+      "id": "E-ACTION-S08",
+      "type": "action",
+      "label": "女主把记录推到桌子中间，向指定医生说出持续时间。",
+      "attributes": {
+        "startState": "初诊；女主画左、医生画右，桌面只有记录与病历。",
+        "endState": "记录停在两人中间，医生接下话题。",
+        "repeatInFinalAllowed": false,
+        "sceneId": "clinic_first",
+        "transitionMethod": "time-ellipsis",
+        "matchRequired": true,
+        "stateToMatch": "初诊；女主画左、医生画右，桌面只有记录与病历。",
+        "predecessorShotId": "S07"
+      },
+      "evidenceIds": []
+    },
+    {
+      "id": "E-ACTION-S09",
+      "type": "action",
+      "label": "医生先看记录，再看向女主，用一整句解释需要检查。",
+      "attributes": {
+        "startState": "病历在医生左前方，双手静置桌面。",
+        "endState": "整句说完才轻点病历；闭口留至少0.24秒。",
+        "repeatInFinalAllowed": false,
+        "sceneId": "clinic_first",
+        "transitionMethod": "reaction-or-scale-change",
+        "matchRequired": true,
+        "stateToMatch": "病历在医生左前方，双手静置桌面。",
+        "predecessorShotId": "S08"
+      },
+      "evidenceIds": []
+    },
+    {
+      "id": "E-ACTION-S10",
+      "type": "action",
+      "label": "工作人员把分隔摆放的血样管与尿样杯放入对应检验托盘。",
+      "attributes": {
+        "startState": "时间压缩：按医嘱检查，两个密封容器已有对应隔位。",
+        "endState": "容器放稳；不显示阳性数值，不生成报告结论。",
+        "repeatInFinalAllowed": false,
+        "sceneId": "laboratory",
+        "transitionMethod": "time-ellipsis",
+        "matchRequired": false,
+        "stateToMatch": "时间压缩：按医嘱检查，两个密封容器已有对应隔位。",
+        "predecessorShotId": "S09"
+      },
+      "evidenceIds": []
+    },
+    {
+      "id": "E-ACTION-S11",
+      "type": "action",
+      "label": "经过检查与随访后，医生合上已有记录，向女主解释综合判断。",
+      "attributes": {
+        "startState": "明确时间跳跃；非上午初诊后立即确诊。",
+        "endState": "完整病名说完，视线仍向女主，不切走遮口型。",
+        "repeatInFinalAllowed": false,
+        "sceneId": "clinic_followup",
+        "transitionMethod": "time-ellipsis",
+        "matchRequired": true,
+        "stateToMatch": "明确时间跳跃；非上午初诊后立即确诊。",
+        "predecessorShotId": "S10"
+      },
+      "evidenceIds": []
+    },
+    {
+      "id": "E-ACTION-S12",
+      "type": "action",
+      "label": "医生继续解释疾病性质及规范治疗，旁边出现不遮嘴的简化免疫图。",
+      "attributes": {
+        "startState": "延续S11医生姿态、病历位置与灯光。",
+        "endState": "医生句尾闭口；图示保持简洁，不演成全身器官被破坏。",
+        "repeatInFinalAllowed": false,
+        "sceneId": "clinic_followup",
+        "transitionMethod": "reaction-or-scale-change",
+        "matchRequired": true,
+        "stateToMatch": "延续S11医生姿态、病历位置与灯光。",
+        "predecessorShotId": "S11"
+      },
+      "evidenceIds": []
+    },
+    {
+      "id": "E-ACTION-S13",
+      "type": "action",
+      "label": "女主认真点头，在自己的计划簿上记下需要做的事情。",
+      "attributes": {
+        "startState": "计划簿摊开，表情认真而非突然大笑。",
+        "endState": "笔停下，她抬头继续听，纸面不生成药名剂量。",
+        "repeatInFinalAllowed": false,
+        "sceneId": "clinic_followup",
+        "transitionMethod": "reaction-or-scale-change",
+        "matchRequired": true,
+        "stateToMatch": "计划簿摊开，表情认真而非突然大笑。",
+        "predecessorShotId": "S12"
+      },
+      "evidenceIds": []
+    },
+    {
+      "id": "E-ACTION-S14",
+      "type": "action",
+      "label": "医生看向女主，平稳说完防晒、复查和不自行停药。",
+      "attributes": {
+        "startState": "同一诊室同一医生，桌面计划簿位置不变。",
+        "endState": "句子完整闭合、嘴自然停下，不留半句待剪。",
+        "repeatInFinalAllowed": false,
+        "sceneId": "clinic_followup",
+        "transitionMethod": "reaction-or-scale-change",
+        "matchRequired": true,
+        "stateToMatch": "同一诊室同一医生，桌面计划簿位置不变。",
+        "predecessorShotId": "S13"
+      },
+      "evidenceIds": []
+    },
+    {
+      "id": "E-ACTION-S15",
+      "type": "action",
+      "label": "随访期间，她确认个人复查记录，把处方提醒卡放在关闭的无品牌药盒旁。",
+      "attributes": {
+        "startState": "明确又一时间省略，遵医嘱管理期间，不给一周治愈时间。",
+        "endState": "复查记录与关闭药盒均保留；不表演自行增减药。",
+        "repeatInFinalAllowed": false,
+        "sceneId": "home_later",
+        "transitionMethod": "time-ellipsis",
+        "matchRequired": false,
+        "stateToMatch": "明确又一时间省略，遵医嘱管理期间，不给一周治愈时间。",
+        "predecessorShotId": "S14"
+      },
+      "evidenceIds": []
+    },
+    {
+      "id": "E-ACTION-S16",
+      "type": "action",
+      "label": "她用右手把防晒乳轻抹在左前臂，浅色长袖外套放在一旁。",
+      "attributes": {
+        "startState": "无品牌瓶打开，前臂少量乳液已点上。",
+        "endState": "乳液抹匀，瓶盖放回原处，下一镜不重复同动作。",
+        "repeatInFinalAllowed": false,
+        "sceneId": "home_later",
+        "transitionMethod": "reaction-or-scale-change",
+        "matchRequired": false,
+        "stateToMatch": "无品牌瓶打开，前臂少量乳液已点上。",
+        "predecessorShotId": "S15"
+      },
+      "evidenceIds": []
+    },
+    {
+      "id": "E-ACTION-S17",
+      "type": "action",
+      "label": "她轻轻拉紧已绕好的蓝丝带最后一圈，完成开头没系好的结。",
+      "attributes": {
+        "startState": "同一礼物、包装折痕与丝带；当前结已绕好，只差最后轻拉。",
+        "endState": "蝴蝶结成形但不夸张紧勒；双手自然，没有治愈式特效。",
+        "repeatInFinalAllowed": false,
+        "sceneId": "home_later",
+        "transitionMethod": "action-match",
+        "matchRequired": true,
+        "stateToMatch": "同一礼物、包装折痕与丝带；当前结已绕好，只差最后轻拉。",
+        "predecessorShotId": "S16"
+      },
+      "evidenceIds": []
+    },
+    {
+      "id": "E-ACTION-S18",
+      "type": "action",
+      "label": "她穿好长袖，在已打开的浅色伞下出门，礼物在肩包里可辨。",
+      "attributes": {
+        "startState": "伞在室外已经打开，不在室内重复开伞。",
+        "endState": "向画右走入树荫；遮阳伞覆盖头肩。",
+        "repeatInFinalAllowed": false,
+        "sceneId": "outside",
+        "transitionMethod": "time-ellipsis",
+        "matchRequired": false,
+        "stateToMatch": "伞在室外已经打开，不在室内重复开伞。",
+        "predecessorShotId": "S17"
+      },
+      "evidenceIds": []
+    },
+    {
+      "id": "E-ACTION-S19",
+      "type": "action",
+      "label": "女主看着朋友，在说话的同时缓慢把已举起的礼物向前送；朋友从下方托住，句尾双方已经共同持礼物。",
+      "attributes": {
+        "startState": "到达屋檐下，伞已收起靠在左侧；女主已把礼物举到胸前，两手托住，朋友的手在下方准备接；长袖和肩包不变。",
+        "endState": "句尾朋友已稳定托住礼物底部，女主手只轻触侧边，尚未松手；交接的最后释放留给S20。",
+        "repeatInFinalAllowed": false,
+        "sceneId": "outside",
+        "transitionMethod": "time-ellipsis",
+        "matchRequired": true,
+        "stateToMatch": "到达屋檐下，伞已收起靠在左侧；女主已把礼物举到胸前，两手托住，朋友的手在下方准备接；长袖和肩包不变。",
+        "predecessorShotId": "S18"
+      },
+      "evidenceIds": []
+    },
+    {
+      "id": "E-ACTION-S20",
+      "type": "action",
+      "label": "朋友已经托稳，女主用整段自然动作从礼物侧面缓慢松手；礼物保持在朋友手中，蓝色结在画面中央，不重新递出。",
+      "attributes": {
+        "startState": "接S19句尾：朋友已稳定托住礼物底部，女主只轻触侧边；礼物位置、蓝丝带结、两只手与伞/衣袖状态不变。",
+        "endState": "朋友独立持礼物，女主手自然退出；包装和结保持原状，无重复交接或治愈式特效。",
+        "repeatInFinalAllowed": false,
+        "sceneId": "outside",
+        "transitionMethod": "action-match",
+        "matchRequired": true,
+        "stateToMatch": "接S19句尾：朋友已稳定托住礼物底部，女主只轻触侧边；礼物位置、蓝丝带结、两只手与伞/衣袖状态不变。",
+        "predecessorShotId": "S19"
+      },
+      "evidenceIds": []
+    }
+  ],
+  "relations": [
+    {
+      "id": "REL-DEPICTS-A-CHAR-P01",
+      "type": "depicts",
+      "from": "A-CHAR-P01",
+      "to": "E-A-CHAR-P01",
+      "projection": "together"
+    },
+    {
+      "id": "REL-DEPICTS-A-CHAR-D00",
+      "type": "depicts",
+      "from": "A-CHAR-D00",
+      "to": "E-A-CHAR-D00",
+      "projection": "together"
+    },
+    {
+      "id": "REL-DEPICTS-A-CHAR-F01",
+      "type": "depicts",
+      "from": "A-CHAR-F01",
+      "to": "E-A-CHAR-F01",
+      "projection": "together"
+    },
+    {
+      "id": "REL-DEPICTS-A-SET-HOME",
+      "type": "depicts",
+      "from": "A-SET-HOME",
+      "to": "E-A-SET-HOME",
+      "projection": "together"
+    },
+    {
+      "id": "REL-REFERENCE-A-SET-HOME",
+      "type": "depicts",
+      "from": "REF-P03",
+      "to": "E-A-SET-HOME",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-DEPICTS-A-SET-CLINIC",
+      "type": "depicts",
+      "from": "A-SET-CLINIC",
+      "to": "E-A-SET-CLINIC",
+      "projection": "together"
+    },
+    {
+      "id": "REL-REFERENCE-A-SET-CLINIC",
+      "type": "depicts",
+      "from": "REF-P07",
+      "to": "E-A-SET-CLINIC",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-DEPICTS-A-SET-OUTSIDE",
+      "type": "depicts",
+      "from": "A-SET-OUTSIDE",
+      "to": "E-A-SET-OUTSIDE",
+      "projection": "together"
+    },
+    {
+      "id": "REL-DEPICTS-A-PROP-GIFT",
+      "type": "depicts",
+      "from": "A-PROP-GIFT",
+      "to": "E-A-PROP-GIFT",
+      "projection": "together"
+    },
+    {
+      "id": "REL-DEPICTS-A-PROP-NOTE",
+      "type": "depicts",
+      "from": "A-PROP-NOTE",
+      "to": "E-A-PROP-NOTE",
+      "projection": "together"
+    },
+    {
+      "id": "REL-REFERENCE-A-PROP-NOTE",
+      "type": "depicts",
+      "from": "REF-REF-PAPER-NOTE-01",
+      "to": "E-A-PROP-NOTE",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-DEPICTS-A-SYM-JOINT",
+      "type": "depicts",
+      "from": "A-SYM-JOINT",
+      "to": "E-A-SYM-JOINT",
+      "projection": "together"
+    },
+    {
+      "id": "REL-REFERENCE-A-SYM-JOINT",
+      "type": "depicts",
+      "from": "REF-A-SYM-JOINT",
+      "to": "E-A-SYM-JOINT",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-DEPICTS-A-SYM-MALAR",
+      "type": "depicts",
+      "from": "A-SYM-MALAR",
+      "to": "E-A-SYM-MALAR",
+      "projection": "together"
+    },
+    {
+      "id": "REL-REFERENCE-A-SYM-MALAR",
+      "type": "depicts",
+      "from": "REF-A-SYM-MALAR",
+      "to": "E-A-SYM-MALAR",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-DEPICTS-A-SYM-HAIR",
+      "type": "depicts",
+      "from": "A-SYM-HAIR",
+      "to": "E-A-SYM-HAIR",
+      "projection": "together"
+    },
+    {
+      "id": "REL-REFERENCE-A-SYM-HAIR",
+      "type": "depicts",
+      "from": "REF-A-SYM-HAIR",
+      "to": "E-A-SYM-HAIR",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-DEPICTS-A-SYM-ORAL",
+      "type": "depicts",
+      "from": "A-SYM-ORAL",
+      "to": "E-A-SYM-ORAL",
+      "projection": "together"
+    },
+    {
+      "id": "REL-REFERENCE-A-SYM-ORAL",
+      "type": "depicts",
+      "from": "REF-A-SYM-ORAL",
+      "to": "E-A-SYM-ORAL",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-DEPICTS-A-SYM-FOAM",
+      "type": "depicts",
+      "from": "A-SYM-FOAM",
+      "to": "E-A-SYM-FOAM",
+      "projection": "together"
+    },
+    {
+      "id": "REL-DEPICTS-A-TEST-BLOOD-URINE",
+      "type": "depicts",
+      "from": "A-TEST-BLOOD-URINE",
+      "to": "E-A-TEST-BLOOD-URINE",
+      "projection": "together"
+    },
+    {
+      "id": "REL-REFERENCE-A-TEST-BLOOD-URINE",
+      "type": "depicts",
+      "from": "REF-A-MED-TEST",
+      "to": "E-A-TEST-BLOOD-URINE",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-DEPICTS-A-MED-AUTOIMMUNE",
+      "type": "depicts",
+      "from": "A-MED-AUTOIMMUNE",
+      "to": "E-A-MED-AUTOIMMUNE",
+      "projection": "together"
+    },
+    {
+      "id": "REL-DEPICTS-A-CARE-PLAN",
+      "type": "depicts",
+      "from": "A-CARE-PLAN",
+      "to": "E-A-CARE-PLAN",
+      "projection": "together"
+    },
+    {
+      "id": "REL-REFERENCE-A-CARE-PLAN",
+      "type": "depicts",
+      "from": "REF-REF-PAPER-NOTE-01",
+      "to": "E-A-CARE-PLAN",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-DEPICTS-A-CARE-SUN",
+      "type": "depicts",
+      "from": "A-CARE-SUN",
+      "to": "E-A-CARE-SUN",
+      "projection": "together"
+    },
+    {
+      "id": "REL-REFERENCE-A-CARE-SUN",
+      "type": "depicts",
+      "from": "REF-P05",
+      "to": "E-A-CARE-SUN",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-DEPICTS-A-CHAR-LAB-HANDS",
+      "type": "depicts",
+      "from": "A-CHAR-LAB-HANDS",
+      "to": "E-A-CHAR-LAB-HANDS",
+      "projection": "together"
+    },
+    {
+      "id": "REL-DEPICTS-A-PROP-BLOOD-TUBE",
+      "type": "depicts",
+      "from": "A-PROP-BLOOD-TUBE",
+      "to": "E-A-PROP-BLOOD-TUBE",
+      "projection": "together"
+    },
+    {
+      "id": "REL-REFERENCE-A-PROP-BLOOD-TUBE",
+      "type": "depicts",
+      "from": "REF-A-TEST-BLOOD-TUBE",
+      "to": "E-A-PROP-BLOOD-TUBE",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-DEPICTS-A-PROP-URINE-CUP",
+      "type": "depicts",
+      "from": "A-PROP-URINE-CUP",
+      "to": "E-A-PROP-URINE-CUP",
+      "projection": "together"
+    },
+    {
+      "id": "REL-REFERENCE-A-PROP-URINE-CUP",
+      "type": "depicts",
+      "from": "REF-A-MED-TEST",
+      "to": "E-A-PROP-URINE-CUP",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-DEPICTS-A-PROP-LAB-TRAY",
+      "type": "depicts",
+      "from": "A-PROP-LAB-TRAY",
+      "to": "E-A-PROP-LAB-TRAY",
+      "projection": "together"
+    },
+    {
+      "id": "REL-DEPICTS-A-PROP-PEN",
+      "type": "depicts",
+      "from": "A-PROP-PEN",
+      "to": "E-A-PROP-PEN",
+      "projection": "together"
+    },
+    {
+      "id": "REL-REFERENCE-A-PROP-PEN",
+      "type": "depicts",
+      "from": "REF-REF-PAPER-NOTE-01",
+      "to": "E-A-PROP-PEN",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-DEPICTS-A-PROP-FOLLOWUP-BOOK",
+      "type": "depicts",
+      "from": "A-PROP-FOLLOWUP-BOOK",
+      "to": "E-A-PROP-FOLLOWUP-BOOK",
+      "projection": "together"
+    },
+    {
+      "id": "REL-REFERENCE-A-PROP-FOLLOWUP-BOOK",
+      "type": "depicts",
+      "from": "REF-REF-PAPER-NOTE-01",
+      "to": "E-A-PROP-FOLLOWUP-BOOK",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-DEPICTS-A-PROP-REMINDER-CARD",
+      "type": "depicts",
+      "from": "A-PROP-REMINDER-CARD",
+      "to": "E-A-PROP-REMINDER-CARD",
+      "projection": "together"
+    },
+    {
+      "id": "REL-DEPICTS-A-PROP-PILLBOX",
+      "type": "depicts",
+      "from": "A-PROP-PILLBOX",
+      "to": "E-A-PROP-PILLBOX",
+      "projection": "together"
+    },
+    {
+      "id": "REL-REFERENCE-A-PROP-PILLBOX",
+      "type": "depicts",
+      "from": "REF-P06",
+      "to": "E-A-PROP-PILLBOX",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-DEPICTS-A-PROP-SUNSCREEN",
+      "type": "depicts",
+      "from": "A-PROP-SUNSCREEN",
+      "to": "E-A-PROP-SUNSCREEN",
+      "projection": "together"
+    },
+    {
+      "id": "REL-REFERENCE-A-PROP-SUNSCREEN",
+      "type": "depicts",
+      "from": "REF-P05",
+      "to": "E-A-PROP-SUNSCREEN",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-DEPICTS-A-WARDROBE-OUTER",
+      "type": "depicts",
+      "from": "A-WARDROBE-OUTER",
+      "to": "E-A-WARDROBE-OUTER",
+      "projection": "together"
+    },
+    {
+      "id": "REL-DEPICTS-A-PROP-UMBRELLA",
+      "type": "depicts",
+      "from": "A-PROP-UMBRELLA",
+      "to": "E-A-PROP-UMBRELLA",
+      "projection": "together"
+    },
+    {
+      "id": "REL-REFERENCE-A-PROP-UMBRELLA",
+      "type": "depicts",
+      "from": "REF-P04",
+      "to": "E-A-PROP-UMBRELLA",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-DEPICTS-A-PROP-SHOULDER-BAG",
+      "type": "depicts",
+      "from": "A-PROP-SHOULDER-BAG",
+      "to": "E-A-PROP-SHOULDER-BAG",
+      "projection": "together"
+    },
+    {
+      "id": "REL-DEPICTS-A-PROP-WRAPPED-BOOK",
+      "type": "depicts",
+      "from": "A-PROP-WRAPPED-BOOK",
+      "to": "E-A-PROP-WRAPPED-BOOK",
+      "projection": "together"
+    },
+    {
+      "id": "REL-DEPICTS-A-PROP-BLUE-RIBBON",
+      "type": "depicts",
+      "from": "A-PROP-BLUE-RIBBON",
+      "to": "E-A-PROP-BLUE-RIBBON",
+      "projection": "together"
+    },
+    {
+      "id": "REL-DEPICTS-A-PROP-GIFT-CARD",
+      "type": "depicts",
+      "from": "A-PROP-GIFT-CARD",
+      "to": "E-A-PROP-GIFT-CARD",
+      "projection": "together"
+    },
+    {
+      "id": "REL-E-C-JOINT-EV-NIAMS-OVERVIEW",
+      "type": "supported_by",
+      "from": "E-C-JOINT",
+      "to": "EV-NIAMS-OVERVIEW",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-E-C-MALAR-EV-NIAMS-OVERVIEW",
+      "type": "supported_by",
+      "from": "E-C-MALAR",
+      "to": "EV-NIAMS-OVERVIEW",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-E-C-HAIR-EV-NIAMS-OVERVIEW",
+      "type": "supported_by",
+      "from": "E-C-HAIR",
+      "to": "EV-NIAMS-OVERVIEW",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-E-C-ORAL-EV-NIAMS-OVERVIEW",
+      "type": "supported_by",
+      "from": "E-C-ORAL",
+      "to": "EV-NIAMS-OVERVIEW",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-E-C-FOAM-EV-NIDDK-RENAL",
+      "type": "supported_by",
+      "from": "E-C-FOAM",
+      "to": "EV-NIDDK-RENAL",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-E-C-FOAM-OBSERVATION-LIMIT-EV-NIDDK-RENAL",
+      "type": "supported_by",
+      "from": "E-C-FOAM-OBSERVATION-LIMIT",
+      "to": "EV-NIDDK-RENAL",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-E-C-NONDIAGNOSTIC-EV-NIAMS-DIAGNOSIS",
+      "type": "supported_by",
+      "from": "E-C-NONDIAGNOSTIC",
+      "to": "EV-NIAMS-DIAGNOSIS",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-E-C-EVALUATION-EV-NIAMS-DIAGNOSIS",
+      "type": "supported_by",
+      "from": "E-C-EVALUATION",
+      "to": "EV-NIAMS-DIAGNOSIS",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-E-C-FICTIONAL-DIAGNOSIS-EV-NIAMS-DIAGNOSIS",
+      "type": "supported_by",
+      "from": "E-C-FICTIONAL-DIAGNOSIS",
+      "to": "EV-NIAMS-DIAGNOSIS",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-E-C-AUTOIMMUNE-EV-NIAMS-OVERVIEW",
+      "type": "supported_by",
+      "from": "E-C-AUTOIMMUNE",
+      "to": "EV-NIAMS-OVERVIEW",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-E-C-MANAGEMENT-EV-NIAMS-DIAGNOSIS",
+      "type": "supported_by",
+      "from": "E-C-MANAGEMENT",
+      "to": "EV-NIAMS-DIAGNOSIS",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-E-C-SUN-EV-NIAMS-DIAGNOSIS",
+      "type": "supported_by",
+      "from": "E-C-SUN",
+      "to": "EV-NIAMS-DIAGNOSIS",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-E-C-LIFE-EV-NIAMS-DIAGNOSIS",
+      "type": "supported_by",
+      "from": "E-C-LIFE",
+      "to": "EV-NIAMS-DIAGNOSIS",
+      "projection": "footnote"
+    },
+    {
+      "id": "REL-PART-A-PROP-WRAPPED-BOOK",
+      "type": "part_of",
+      "from": "E-A-PROP-WRAPPED-BOOK",
+      "to": "E-A-PROP-GIFT",
+      "projection": "together"
+    },
+    {
+      "id": "REL-PART-A-PROP-BLUE-RIBBON",
+      "type": "part_of",
+      "from": "E-A-PROP-BLUE-RIBBON",
+      "to": "E-A-PROP-GIFT",
+      "projection": "together"
+    },
+    {
+      "id": "REL-PART-A-PROP-GIFT-CARD",
+      "type": "part_of",
+      "from": "E-A-PROP-GIFT-CARD",
+      "to": "E-A-PROP-GIFT",
+      "projection": "together"
+    },
+    {
+      "id": "REL-PART-A-PROP-BLOOD-TUBE",
+      "type": "part_of",
+      "from": "E-A-PROP-BLOOD-TUBE",
+      "to": "E-A-TEST-BLOOD-URINE",
+      "projection": "together"
+    },
+    {
+      "id": "REL-PART-A-PROP-URINE-CUP",
+      "type": "part_of",
+      "from": "E-A-PROP-URINE-CUP",
+      "to": "E-A-TEST-BLOOD-URINE",
+      "projection": "together"
+    },
+    {
+      "id": "REL-DEP-S02",
+      "type": "depends_on",
+      "from": "S02",
+      "to": "S01",
+      "projection": "sequence"
+    },
+    {
+      "id": "REL-DEP-S03",
+      "type": "depends_on",
+      "from": "S03",
+      "to": "S02",
+      "projection": "sequence"
+    },
+    {
+      "id": "REL-DEP-S04",
+      "type": "depends_on",
+      "from": "S04",
+      "to": "S03",
+      "projection": "sequence"
+    },
+    {
+      "id": "REL-DEP-S05",
+      "type": "depends_on",
+      "from": "S05",
+      "to": "S04",
+      "projection": "sequence"
+    },
+    {
+      "id": "REL-DEP-S06",
+      "type": "depends_on",
+      "from": "S06",
+      "to": "S05",
+      "projection": "sequence"
+    },
+    {
+      "id": "REL-DEP-S07",
+      "type": "depends_on",
+      "from": "S07",
+      "to": "S06",
+      "projection": "sequence"
+    },
+    {
+      "id": "REL-DEP-S08",
+      "type": "depends_on",
+      "from": "S08",
+      "to": "S07",
+      "projection": "sequence"
+    },
+    {
+      "id": "REL-DEP-S09",
+      "type": "depends_on",
+      "from": "S09",
+      "to": "S08",
+      "projection": "sequence"
+    },
+    {
+      "id": "REL-DEP-S10",
+      "type": "depends_on",
+      "from": "S10",
+      "to": "S09",
+      "projection": "sequence"
+    },
+    {
+      "id": "REL-DEP-S11",
+      "type": "depends_on",
+      "from": "S11",
+      "to": "S10",
+      "projection": "sequence"
+    },
+    {
+      "id": "REL-DEP-S12",
+      "type": "depends_on",
+      "from": "S12",
+      "to": "S11",
+      "projection": "sequence"
+    },
+    {
+      "id": "REL-DEP-S13",
+      "type": "depends_on",
+      "from": "S13",
+      "to": "S12",
+      "projection": "sequence"
+    },
+    {
+      "id": "REL-DEP-S14",
+      "type": "depends_on",
+      "from": "S14",
+      "to": "S13",
+      "projection": "sequence"
+    },
+    {
+      "id": "REL-DEP-S15",
+      "type": "depends_on",
+      "from": "S15",
+      "to": "S14",
+      "projection": "sequence"
+    },
+    {
+      "id": "REL-DEP-S16",
+      "type": "depends_on",
+      "from": "S16",
+      "to": "S15",
+      "projection": "sequence"
+    },
+    {
+      "id": "REL-DEP-S17",
+      "type": "depends_on",
+      "from": "S17",
+      "to": "S16",
+      "projection": "sequence"
+    },
+    {
+      "id": "REL-DEP-S18",
+      "type": "depends_on",
+      "from": "S18",
+      "to": "S17",
+      "projection": "sequence"
+    },
+    {
+      "id": "REL-DEP-S19",
+      "type": "depends_on",
+      "from": "S19",
+      "to": "S18",
+      "projection": "sequence"
+    },
+    {
+      "id": "REL-DEP-S20",
+      "type": "depends_on",
+      "from": "S20",
+      "to": "S19",
+      "projection": "sequence"
+    }
+  ],
+  "assets": [
+    {
+      "id": "REF-A-SYM-MALAR",
+      "label": "蝶形红斑｜NIAMS 分布结构图",
+      "kind": "image",
+      "purpose": "reference",
+      "sha256": "c014da692448862908438086bc0b50c4a7f89db0f5a7f2633abff5b3dca38ab6",
+      "gap": false,
+      "source": {
+        "url": "https://commons.wikimedia.org/wiki/File:Butterflyrash.jpg",
+        "author": "National Institute of Arthritis and Musculoskeletal and Skin Diseases (NIAMS)",
+        "license": "Public domain (US federal work; Commons PD-mark)",
+        "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。该图用来核对分布，不能代替女主症状成片。最终虚构人物应表现双颊+鼻梁的连续红斑，并避免鼻唇沟被整片涂红；外观不能确诊。"
+      },
+      "mustShow": [],
+      "rejectIf": [
+        "不得直接冒充本片人物身份、患者照片或已生成动态镜头"
+      ]
+    },
+    {
+      "id": "REF-A-SYM-HAIR",
+      "label": "掉发｜梳子取出的可见发丝团",
+      "kind": "image",
+      "purpose": "reference",
+      "sha256": "c7cc471d1d1cdc49bc8b377730d84144f809869be50441f8aca02dce25f12617",
+      "gap": false,
+      "source": {
+        "url": "https://commons.wikimedia.org/wiki/File:Matted_clump_of_hair.jpg",
+        "author": "Ser Amantio di Nicolao",
+        "license": "CC BY-SA 4.0",
+        "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。数量无时间尺度、无正常基线；不能仅凭该发团声称异常脱发或狼疮。情节应表现“她发现比自己平时多”，不要把正常梳落头发当确诊指标。"
+      },
+      "mustShow": [],
+      "rejectIf": [
+        "不得直接冒充本片人物身份、患者照片或已生成动态镜头"
+      ]
+    },
+    {
+      "id": "REF-A-SYM-JOINT",
+      "label": "关节不适｜手指根部按揉动作参考",
+      "kind": "image",
+      "purpose": "reference",
+      "sha256": "b9f2e0d3738f1fb29de83fb8c1c6123c246b3976d42ce73c8444de466ce85906",
+      "gap": false,
+      "source": {
+        "url": "https://commons.wikimedia.org/wiki/File:Arthritic_hands_in_pain.jpg",
+        "author": "Ian Furst",
+        "license": "CC BY-SA 4.0",
+        "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。原图描述关节炎疼痛，不能证明为狼疮。可指导“系蝴蝶结时手指停顿、轻揉关节”的动作；静态图本身不测量疼痛。"
+      },
+      "mustShow": [],
+      "rejectIf": [
+        "不得直接冒充本片人物身份、患者照片或已生成动态镜头"
+      ]
+    },
+    {
+      "id": "REF-A-SYM-ORAL",
+      "label": "口腔溃疡｜真实上腭局部形态参考",
+      "kind": "image",
+      "purpose": "reference",
+      "sha256": "dbd1789a112b3a9011b7e4091554352bce35be991db203805fcf5900ed58b04c",
+      "gap": false,
+      "source": {
+        "url": "https://commons.wikimedia.org/wiki/File:Throat_Canker.png",
+        "author": "Elijah.wilhelm",
+        "license": "CC0 1.0",
+        "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。来源称普通 aphthous stomatitis。狼疮也可出现口腔病变，且常无痛、常见上腭；本图只能核对“口腔内真实损害”视觉，不能直接说此人/该溃疡由狼疮造成。"
+      },
+      "mustShow": [],
+      "rejectIf": [
+        "不得直接冒充本片人物身份、患者照片或已生成动态镜头"
+      ]
+    },
+    {
+      "id": "REF-REF-PAPER-NOTE-01",
+      "label": "纸质记录本与写字笔｜物件和握笔参考",
+      "kind": "image",
+      "purpose": "reference",
+      "sha256": "3b810f373822f8beace07d076f13f7a30b93e8d82aa91766f191c80b7a8b8adc",
+      "gap": false,
+      "source": {
+        "url": "https://commons.wikimedia.org/wiki/File:Woman_writing_on_a_notebook_with_a_pen.jpg",
+        "author": "Kristin Hardwick",
+        "license": "CC0 1.0 Universal Public Domain Dedication",
+        "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。仅参考纸本和握笔动作；不是女主，不含已核对的病史文字。原照戒指、指甲油、笔杆文字不沿用到专属镜头。"
+      },
+      "mustShow": [],
+      "rejectIf": [
+        "不得直接冒充本片人物身份、患者照片或已生成动态镜头"
+      ]
+    },
+    {
+      "id": "REF-A-TEST-BLOOD-TUBE",
+      "label": "血液检查｜密封采血管物体参考",
+      "kind": "image",
+      "purpose": "reference",
+      "sha256": "0dbffa1d621f295cc14954de8c2c015da22eef528d2c1df0557ec0e1f0316981",
+      "gap": false,
+      "source": {
+        "url": "https://commons.wikimedia.org/wiki/File:Equipment_-_Blood_test_-_Tube_(7442)_--_Smart-Servier.png",
+        "author": "Laboratoires Servier / SMART-Servier Medical Art",
+        "license": "CC BY-SA 3.0 (this Commons file)",
+        "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。不能声称图内已经装有血样。S10最终血样应有合理内容、独立管架并与尿杯分隔。不能用管盖颜色推断诊断结果。"
+      },
+      "mustShow": [],
+      "rejectIf": [
+        "不得直接冒充本片人物身份、患者照片或已生成动态镜头"
+      ]
+    },
+    {
+      "id": "REF-A-MED-TEST",
+      "label": "检查｜尿标本容器外形",
+      "kind": "image",
+      "purpose": "reference",
+      "sha256": "d474d8dc8bb09a44d62ef727b6d3b9e4d7919d4f3b7db481aad63466ec7d1c3b",
+      "gap": false,
+      "source": {
+        "url": "https://commons.wikimedia.org/wiki/File:Equipment_-_Urine_test_--_Smart-Servier.png",
+        "author": "Laboratoires Servier / SMART-Servier Medical Art",
+        "license": "CC BY-SA 3.0 (this Commons file)",
+        "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。只能作“留尿检查”的物体图，严禁充当泡沫尿或阳性检验结果。"
+      },
+      "mustShow": [],
+      "rejectIf": [
+        "不得直接冒充本片人物身份、患者照片或已生成动态镜头"
+      ]
+    },
+    {
+      "id": "REF-P05",
+      "label": "涂抹防晒动作参考",
+      "kind": "image",
+      "purpose": "reference",
+      "sha256": "aec4a9011666199a9ef8fec10637ece6a80814bc692282b906b0c95205b19fe2",
+      "gap": false,
+      "source": {
+        "url": "https://commons.wikimedia.org/wiki/File:Woman_applying_sunscreen.jpg",
+        "author": "Bill Branson / National Cancer Institute",
+        "license": "Public domain — author release / NIH",
+        "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。模特不代表狼疮患者，不移植为本片女主身份；照片不是疗效或具体SPF证据。"
+      },
+      "mustShow": [],
+      "rejectIf": [
+        "不得直接冒充本片人物身份、患者照片或已生成动态镜头"
+      ]
+    },
+    {
+      "id": "REF-P04",
+      "label": "伞的道具形态",
+      "kind": "image",
+      "purpose": "reference",
+      "sha256": "3294e4d45cdac003d19dec78c5f0ca4083487dd8aadc44bd21cc8a71fae84699",
+      "gap": false,
+      "source": {
+        "url": "https://commons.wikimedia.org/wiki/File:Umbrella_2010_Probably_Made_in_2009.JPG",
+        "author": "Matthew Paul Argall",
+        "license": "Public domain — author release",
+        "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。普通伞照片没有UPF/防紫外线性能认证，不能宣称该产品具有医学防晒效果。"
+      },
+      "mustShow": [],
+      "rejectIf": [
+        "不得直接冒充本片人物身份、患者照片或已生成动态镜头"
+      ]
+    },
+    {
+      "id": "REF-P06",
+      "label": "分格药盒道具",
+      "kind": "image",
+      "purpose": "reference",
+      "sha256": "97772ae63e1db001131684d440b542e3f424a8a2307c5a340ed68c2459b1a5be",
+      "gap": false,
+      "source": {
+        "url": "https://commons.wikimedia.org/wiki/File:Pill_organising_safe.png",
+        "author": "Ashashyou",
+        "license": "CC0 1.0",
+        "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。不是狼疮具体治疗方案；不能据图推荐品种、剂量或停药。"
+      },
+      "mustShow": [],
+      "rejectIf": [
+        "不得直接冒充本片人物身份、患者照片或已生成动态镜头"
+      ]
+    },
+    {
+      "id": "REF-P03",
+      "label": "自然光与窗边生活场景",
+      "kind": "image",
+      "purpose": "reference",
+      "sha256": "b325671fcf236a2f509fc6e142e7068a5cd5d8013316cf7f51d54e916a8d0be2",
+      "gap": false,
+      "source": {
+        "url": "https://commons.wikimedia.org/wiki/File:Family_room_sunlight_through_backdoor.jpg",
+        "author": "Zoe's Dog",
+        "license": "CC BY-SA 4.0",
+        "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。不是本片女主住所，不用阳光画面证明光敏反应；若改编本图须遵守同许可要求。"
+      },
+      "mustShow": [],
+      "rejectIf": [
+        "不得直接冒充本片人物身份、患者照片或已生成动态镜头"
+      ]
+    },
+    {
+      "id": "REF-P07",
+      "label": "就诊沟通构图",
+      "kind": "image",
+      "purpose": "reference",
+      "sha256": "33308b2d80b8b33d3312e65f2be21ff189908d9841013fb413e971d9a07ccc3f",
+      "gap": false,
+      "source": {
+        "url": "https://commons.wikimedia.org/wiki/File:Doctor_consults_with_patient_(8).jpg",
+        "author": "Bill Branson / National Cancer Institute",
+        "license": "Public domain — US NIH official work",
+        "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。公开图片仅作通用就诊构图，不指称其中人物患狼疮，不推断或扩写患者身份/病史。"
+      },
+      "mustShow": [],
+      "rejectIf": [
+        "不得直接冒充本片人物身份、患者照片或已生成动态镜头"
+      ]
+    },
+    {
+      "id": "A-CHAR-P01",
+      "label": "固定虚构女主身份锁",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "约26岁，及肩深棕发、米白针织衣、自然皮肤纹理",
+        "本轮专属正面/左右三分之二角度，先确认唯一身份，不混用旧生成不同面孔",
+        "居家/诊室/出门同一身份；出门加浅色长袖防晒外套"
+      ],
+      "rejectIf": []
+    },
+    {
+      "id": "A-CHAR-D00",
+      "label": "同一指定医生身份锁",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "只用原始指定医生照片作身份来源，长卷发、白袍浅蓝内搭",
+        "新的正面与三分之二角度先审，不从照片猜姓名/科室/职称",
+        "AI演绎标签；不克隆未经提供的本人声纹"
+      ],
+      "rejectIf": []
+    },
+    {
+      "id": "A-CHAR-F01",
+      "label": "朋友接礼物的手和衣袖",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "不新增清晰第三张脸；普通浅灰衣袖与单手接物",
+        "不以他人声音说医生或女主台词"
+      ],
+      "rejectIf": []
+    },
+    {
+      "id": "A-SET-HOME",
+      "label": "同一居家桌面、镜子与卧室布局",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "浅木桌、右侧窗、米白墙、固定小镜；家居坐标一致",
+        "床枕与洗手间是同一居家空间的明确闪回",
+        "S07桌下抽屉内宽深须容下纸包书，尺寸为美术设定；抽屉初始半开避免3秒内多余开合动作。"
+      ],
+      "rejectIf": []
+    },
+    {
+      "id": "A-SET-CLINIC",
+      "label": "同一诊室与化验区域布局",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "女主画左、医生画右；两人视线轴不越线",
+        "病历正面朝使用者；无新院名、姓名或虚假化验结果"
+      ],
+      "rejectIf": []
+    },
+    {
+      "id": "A-SET-OUTSIDE",
+      "label": "家门口至阴凉会面处",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "普通明亮人行道与树荫，同一出门方向左至右",
+        "不在强光下故意停留演示光敏"
+      ],
+      "rejectIf": []
+    },
+    {
+      "id": "A-PROP-GIFT",
+      "label": "未系好的礼物及同一蓝色丝带",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "一本已包浅牛皮纸的书，约20×14×3厘米，无品牌文字",
+        "同一包装折痕、小卡和蓝色缎带贯穿；开头结未完成，结尾完成后只交付一次",
+        "礼物不是鲜花，能合理跨检查/随访时间保存"
+      ],
+      "rejectIf": []
+    },
+    {
+      "id": "A-PROP-NOTE",
+      "label": "一周症状记录与就诊页",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "只记录现象及时间，不自动打勾确诊",
+        "中文由后期精确排版：这一周／变化反复／就医评估",
+        "非真实患者病历，不显示姓名/电话/身份证"
+      ],
+      "rejectIf": []
+    },
+    {
+      "id": "A-SYM-JOINT",
+      "label": "手指关节不适的具体动作",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "左手指关节清晰，尝试捏丝带后停下，右手轻托左指关节",
+        "可见动作中断与具体位置，不用单纯下楼代替；不夸张肿胀"
+      ],
+      "rejectIf": [
+        "只有扶栏/走路",
+        "六指、关节方向错误",
+        "把痛感强弱当诊断"
+      ]
+    },
+    {
+      "id": "A-SYM-MALAR",
+      "label": "双颊与鼻梁蝶形分布",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "正面脸部近景，双颊与鼻梁区域红斑分布可辨，鼻唇沟是否保留等细节须专门医学核对",
+        "不是两块腮红、蝶形贴纸或鼻尖单点；标签为情景示意，不能凭外观确诊"
+      ],
+      "rejectIf": [
+        "只有双颊腮红且鼻梁无对应变化",
+        "美容滤镜掩盖分布",
+        "以遮瑕能否盖住作为诊断"
+      ]
+    },
+    {
+      "id": "A-SYM-HAIR",
+      "label": "枕面脱落发丝观察",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "浅色枕面上能看见一组独立发丝，女主停下观察",
+        "与一周记录合读为她主观发现比平常多，不给正常根数阈值，不单凭发丝数诊断"
+      ],
+      "rejectIf": [
+        "只做梳头动作无任何可见脱落发丝",
+        "大把头发瞬间出现",
+        "暗示掉几根头发就患狼疮"
+      ]
+    },
+    {
+      "id": "A-SYM-ORAL",
+      "label": "口腔内上腭病灶示意",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "独立口腔内部近景，上腭局部可辨识黏膜破损/溃疡样病灶，位置、颜色及边界需医学图审",
+        "形态参考必须有可追溯来源；普通阿弗他图不可标作典型SLE",
+        "只作教学示意，不声称取自女主或真实患者；不配疼痛表演"
+      ],
+      "rejectIf": [
+        "闭嘴摸下巴",
+        "舌上白色圆球/下唇串珠",
+        "明显血腥、整口腐烂",
+        "无许可临床图直接入片"
+      ]
+    },
+    {
+      "id": "A-SYM-FOAM",
+      "label": "可见尿液相关泡沫的非特异示意",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "仅拍便器水面，细小成簇泡沫可辨；不拍排尿或裸露",
+        "同镜限定：泡沫尿不等于肾损伤／需检查；不画泡沫到坏死肾的箭头",
+        "本镜2秒只说明画面有泡沫，不证明持续时间或一周反复；持续/反复若提及，仅来自明确标注的虚构记录。"
+      ],
+      "rejectIf": [
+        "清水孤立气泡假称病变",
+        "泡沫多少直接确诊",
+        "直接接肾脏衰竭动画"
+      ]
+    },
+    {
+      "id": "A-TEST-BLOOD-URINE",
+      "label": "血液与尿样检测的对应素材",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "正规采样/检验托盘上可区分密封采血管与尿样杯，按检验流程分隔",
+        "只表示医生决定的检查，后期标签血液检查/尿液检查；无虚构阳性数值"
+      ],
+      "rejectIf": [
+        "一张纸出现阳性即可确诊",
+        "混放开口污染样本",
+        "将一次尿常规等同全部诊断"
+      ]
+    },
+    {
+      "id": "A-MED-AUTOIMMUNE",
+      "label": "非拟人自身免疫机制小图",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "简洁组织轮廓与免疫异常相互作用示意，不带人脸/武器",
+        "不遮医生嘴；标签机制简化示意；不画所有器官同时被毁"
+      ],
+      "rejectIf": []
+    },
+    {
+      "id": "A-CARE-PLAN",
+      "label": "个体随访计划与处方提醒",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "纸面复查安排与无品牌关闭药盒分别可辨",
+        "随访日按医生实际安排，不给统一周期/药名/剂量；药盒不打开、不表演停药"
+      ],
+      "rejectIf": []
+    },
+    {
+      "id": "A-CARE-SUN",
+      "label": "防晒乳、长袖和遮阳伞",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "无品牌防晒乳涂在前臂，可见手与皮肤接触",
+        "已开浅色伞罩头肩，长袖；不是只拍瓶子",
+        "防晒不暗示100%阻断或疾病治愈"
+      ],
+      "rejectIf": []
+    },
+    {
+      "id": "A-PLATE-S01",
+      "label": "礼物还差一个结专属动态底片",
+      "kind": "video",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。这是本镜输出槽，不是生成输入。"
+      },
+      "mustShow": [
+        "女主坐在窗边，望着一份没有系完丝带的礼物，说完轻拉丝带。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "A-PLATE-S02",
+      "label": "手指把动作打断专属动态底片",
+      "kind": "video",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。这是本镜输出槽，不是生成输入。"
+      },
+      "mustShow": [
+        "左手捏带时停下，右手放下丝带，轻托左指关节。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "A-PLATE-S03",
+      "label": "她想到这一周专属动态底片",
+      "kind": "video",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。这是本镜输出槽，不是生成输入。"
+      },
+      "mustShow": [
+        "女主放下手，向桌边镜子看去，镜旁机位清楚显示双颊与鼻梁红斑分布。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "A-PLATE-S04",
+      "label": "枕头上的变化专属动态底片",
+      "kind": "video",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。这是本镜输出槽，不是生成输入。"
+      },
+      "mustShow": [
+        "女主早晨抬头后，看到浅色枕面上可辨的脱落发丝，手停在枕边。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "A-PLATE-S05",
+      "label": "嘴里也有变化专属动态底片",
+      "kind": "video",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。这是本镜输出槽，不是生成输入。"
+      },
+      "mustShow": [
+        "克制、清楚地展示口腔上腭的局部溃疡样病灶，作为一周观察的教学插入画面。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "A-PLATE-S06",
+      "label": "不能自行解释的泡沫专属动态底片",
+      "kind": "video",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。这是本镜输出槽，不是生成输入。"
+      },
+      "mustShow": [
+        "水面可见细密成簇泡沫，画面不做肾病结论。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "A-PLATE-S07",
+      "label": "先照顾自己专属动态底片",
+      "kind": "video",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。这是本镜输出槽，不是生成输入。"
+      },
+      "mustShow": [
+        "回到桌前，她把未系完的礼物放入抽屉，拿起症状记录，决定就医。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "A-PLATE-S08",
+      "label": "把一周讲给医生听专属动态底片",
+      "kind": "video",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。这是本镜输出槽，不是生成输入。"
+      },
+      "mustShow": [
+        "女主把记录推到桌子中间，向指定医生说出持续时间。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "A-PLATE-S09",
+      "label": "医生先评估专属动态底片",
+      "kind": "video",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。这是本镜输出槽，不是生成输入。"
+      },
+      "mustShow": [
+        "医生先看记录，再看向女主，用一整句解释需要检查。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "A-PLATE-S10",
+      "label": "检查不是看脸下结论专属动态底片",
+      "kind": "video",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。这是本镜输出槽，不是生成输入。"
+      },
+      "mustShow": [
+        "工作人员把分隔摆放的血样管与尿样杯放入对应检验托盘。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "A-PLATE-S11",
+      "label": "隔了一段时间，医生解释专属动态底片",
+      "kind": "video",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。这是本镜输出槽，不是生成输入。"
+      },
+      "mustShow": [
+        "经过检查与随访后，医生合上已有记录，向女主解释综合判断。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "A-PLATE-S12",
+      "label": "不是一句病名结束专属动态底片",
+      "kind": "video",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。这是本镜输出槽，不是生成输入。"
+      },
+      "mustShow": [
+        "医生继续解释疾病性质及规范治疗，旁边出现不遮嘴的简化免疫图。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "A-PLATE-S13",
+      "label": "她把计划记下来专属动态底片",
+      "kind": "video",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。这是本镜输出槽，不是生成输入。"
+      },
+      "mustShow": [
+        "女主认真点头，在自己的计划簿上记下需要做的事情。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "A-PLATE-S14",
+      "label": "三件具体的事专属动态底片",
+      "kind": "video",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。这是本镜输出槽，不是生成输入。"
+      },
+      "mustShow": [
+        "医生看向女主，平稳说完防晒、复查和不自行停药。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "A-PLATE-S15",
+      "label": "把医嘱放进日常专属动态底片",
+      "kind": "video",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。这是本镜输出槽，不是生成输入。"
+      },
+      "mustShow": [
+        "随访期间，她确认个人复查记录，把处方提醒卡放在关闭的无品牌药盒旁。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "A-PLATE-S16",
+      "label": "出门前的保护专属动态底片",
+      "kind": "video",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。这是本镜输出槽，不是生成输入。"
+      },
+      "mustShow": [
+        "她用右手把防晒乳轻抹在左前臂，浅色长袖外套放在一旁。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "A-PLATE-S17",
+      "label": "把未完成的结系好专属动态底片",
+      "kind": "video",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。这是本镜输出槽，不是生成输入。"
+      },
+      "mustShow": [
+        "她轻轻拉紧已绕好的蓝丝带最后一圈，完成开头没系好的结。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "A-PLATE-S18",
+      "label": "换一种方式出发专属动态底片",
+      "kind": "video",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。这是本镜输出槽，不是生成输入。"
+      },
+      "mustShow": [
+        "她穿好长袖，在已打开的浅色伞下出门，礼物在肩包里可辨。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "A-PLATE-S19",
+      "label": "把心意递出去专属动态底片",
+      "kind": "video",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。这是本镜输出槽，不是生成输入。"
+      },
+      "mustShow": [
+        "有遮挡的会面处，女主看向朋友，说完把礼物递过去，朋友的手接住。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "A-PLATE-S20",
+      "label": "生活继续，管理也继续专属动态底片",
+      "kind": "video",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。这是本镜输出槽，不是生成输入。"
+      },
+      "mustShow": [
+        "女主从已被朋友托住的礼物侧面松手，蓝色蝴蝶结居中，画面停在真实自然动作。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "A-CHAR-LAB-HANDS",
+      "label": "检验人员的手与衣袖",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "仅匿名检验人员双手及袖口，按实际操作条件使用合适防护",
+        "正确握持密封采血管/样本杯，无多指和混用医生/患者身份"
+      ],
+      "rejectIf": [
+        "只因母槽已有参考即声称本组件完成"
+      ]
+    },
+    {
+      "id": "A-PROP-BLOOD-TUBE",
+      "label": "密封采血管",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "符合采血管形态的密封容器，无姓名及虚构检验数值",
+        "须与尿样杯独立可辨；不拿同一尿杯同时代表查血"
+      ],
+      "rejectIf": [
+        "只因母槽已有参考即声称本组件完成"
+      ]
+    },
+    {
+      "id": "A-PROP-URINE-CUP",
+      "label": "密封尿标本杯",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "样本杯与密封盖尺寸匹配，无个人标签",
+        "容器图不证明泡沫尿或蛋白尿"
+      ],
+      "rejectIf": [
+        "只因母槽已有参考即声称本组件完成"
+      ]
+    },
+    {
+      "id": "A-PROP-LAB-TRAY",
+      "label": "分隔检验托盘",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "血样管和尿杯有各自稳定隔位",
+        "台面和容器受重力支持，容器不凭空消失"
+      ],
+      "rejectIf": [
+        "只因母槽已有参考即声称本组件完成"
+      ]
+    },
+    {
+      "id": "A-PROP-PEN",
+      "label": "记录用笔",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "同一支无品牌笔，右手握姿与纸面接触成立",
+        "不由模型生成药名或剂量"
+      ],
+      "rejectIf": [
+        "只因母槽已有参考即声称本组件完成"
+      ]
+    },
+    {
+      "id": "A-PROP-FOLLOWUP-BOOK",
+      "label": "个人随访计划簿",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "同一计划簿及纸张布局、个体复查记录",
+        "日期/文字由后期精确排版，未定不虚构统一周期"
+      ],
+      "rejectIf": [
+        "只因母槽已有参考即声称本组件完成"
+      ]
+    },
+    {
+      "id": "A-PROP-REMINDER-CARD",
+      "label": "处方提醒卡",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "只出现按医嘱用药的精确提醒，不含药物剂量",
+        "与复查页可辨，不用未审药名填满卡面"
+      ],
+      "rejectIf": [
+        "只因母槽已有参考即声称本组件完成"
+      ]
+    },
+    {
+      "id": "A-PROP-PILLBOX",
+      "label": "关闭的无品牌药盒",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "关闭、完整、无品牌的药盒",
+        "不打开药格或拍自行增减药；分格药盒图仅为结构参考"
+      ],
+      "rejectIf": [
+        "只因母槽已有参考即声称本组件完成"
+      ]
+    },
+    {
+      "id": "A-PROP-SUNSCREEN",
+      "label": "防晒瓶与瓶盖",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "无品牌瓶，盖与瓶口匹配；少量乳液实际接触前臂",
+        "透明胶圈/悬浮液滴不作有效涂抹"
+      ],
+      "rejectIf": [
+        "只因母槽已有参考即声称本组件完成"
+      ]
+    },
+    {
+      "id": "A-WARDROBE-OUTER",
+      "label": "浅色长袖防晒外套",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "同一件浅色长袖，S16在旁、S18/S19穿着",
+        "与米白针织上衣和肩包不穿模"
+      ],
+      "rejectIf": [
+        "只因母槽已有参考即声称本组件完成"
+      ]
+    },
+    {
+      "id": "A-PROP-UMBRELLA",
+      "label": "浅色遮阳伞",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "S18已开并实际握柄、伞骨完整，覆盖头肩",
+        "S19到达后已收靠在屋檐左侧；此为省略切，不悬浮在身后"
+      ],
+      "rejectIf": [
+        "只因母槽已有参考即声称本组件完成"
+      ]
+    },
+    {
+      "id": "A-PROP-SHOULDER-BAG",
+      "label": "浅色肩包",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "固定浅色帆布肩包，左肩背带；开口可容20×14×3厘米礼物",
+        "包口和礼物边缘能对应，不在S19突然换包/换肩"
+      ],
+      "rejectIf": [
+        "只因母槽已有参考即声称本组件完成"
+      ]
+    },
+    {
+      "id": "A-PROP-WRAPPED-BOOK",
+      "label": "牛皮纸包书",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "约20×14×3厘米仅为美术设定；不能从参考照片断言内部是书",
+        "固定牛皮纸折痕和边角，横竖尺寸与手部比例合理"
+      ],
+      "rejectIf": [
+        "只因母槽已有参考即声称本组件完成"
+      ]
+    },
+    {
+      "id": "A-PROP-BLUE-RIBBON",
+      "label": "同一蓝色丝带",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "蓝色及宽度固定，保留未完成结/松开/最后收紧/交付的明确状态",
+        "不把粉色已打好结的参考称作同条蓝丝带"
+      ],
+      "rejectIf": [
+        "只因母槽已有参考即声称本组件完成"
+      ]
+    },
+    {
+      "id": "A-PROP-GIFT-CARD",
+      "label": "无署名小卡",
+      "kind": "image",
+      "purpose": "production",
+      "gap": true,
+      "source": {
+        "use": "待用户在新项目中制作或绑定并审核。"
+      },
+      "mustShow": [
+        "同一小卡固定在包装上、无品牌署名",
+        "若出现文字，后期排版且不写虚构朋友个人资料"
+      ],
+      "rejectIf": [
+        "只因母槽已有参考即声称本组件完成"
+      ]
+    }
+  ],
+  "anchors": [
+    {
+      "id": "ANC-A-CHAR-P01",
+      "entityId": "E-A-CHAR-P01",
+      "assetId": "A-CHAR-P01",
+      "state": "待绑定并审核的身份参考",
+      "role": "identity"
+    },
+    {
+      "id": "ANC-A-CHAR-D00",
+      "entityId": "E-A-CHAR-D00",
+      "assetId": "A-CHAR-D00",
+      "state": "待绑定并审核的身份参考",
+      "role": "identity"
+    },
+    {
+      "id": "ANC-A-CHAR-F01",
+      "entityId": "E-A-CHAR-F01",
+      "assetId": "A-CHAR-F01",
+      "state": "待绑定并审核的身份参考",
+      "role": "identity"
+    },
+    {
+      "id": "ANC-A-CHAR-LAB-HANDS",
+      "entityId": "E-A-CHAR-LAB-HANDS",
+      "assetId": "A-CHAR-LAB-HANDS",
+      "state": "待绑定并审核的身份参考",
+      "role": "identity"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EV-NIAMS-OVERVIEW",
+      "title": "NIAMS-OVERVIEW",
+      "url": "https://www.niams.nih.gov/health-topics/lupus",
+      "excerpt": "自身免疫病；皮肤、关节等症状可不同；口腔病灶常无痛、常见于上腭；治疗可帮助管理，非保证治愈。",
+      "locator": "资料模板来源记录；引述范围需随制作复核"
+    },
+    {
+      "id": "EV-NIAMS-DIAGNOSIS",
+      "title": "NIAMS-DIAGNOSIS",
+      "url": "https://www.niams.nih.gov/health-topics/lupus/diagnosis-treatment-and-steps-to-take",
+      "excerpt": "诊断综合病史、体检和血尿等检查，无单一确诊试验；防晒、规律随访，不自行停药。",
+      "locator": "资料模板来源记录；引述范围需随制作复核"
+    },
+    {
+      "id": "EV-NIDDK-RENAL",
+      "title": "NIDDK-RENAL",
+      "url": "https://www.niddk.nih.gov/health-information/kidney-disease/lupus-nephritis",
+      "excerpt": "泡沫尿可与尿中蛋白相关，病因需要检查评估；画面不能单独诊断狼疮肾炎。",
+      "locator": "资料模板来源记录；引述范围需随制作复核"
+    }
+  ],
+  "shots": [
+    {
+      "id": "S01",
+      "title": "礼物还差一个结",
+      "startFrame": 0,
+      "endFrame": 75,
+      "entityIds": [
+        "E-A-CHAR-P01",
+        "E-A-SET-HOME",
+        "E-A-PROP-GIFT",
+        "E-A-PROP-WRAPPED-BOOK",
+        "E-A-PROP-BLUE-RIBBON",
+        "E-A-PROP-GIFT-CARD",
+        "E-ACTION-S01"
+      ],
+      "requiredAssetIds": [
+        "A-CHAR-P01",
+        "A-SET-HOME",
+        "A-PROP-GIFT",
+        "A-PROP-WRAPPED-BOOK",
+        "A-PROP-BLUE-RIBBON",
+        "A-PROP-GIFT-CARD"
+      ],
+      "evidenceIds": [],
+      "action": "女主坐在窗边，望着一份没有系完丝带的礼物，说完轻拉丝带。",
+      "startState": "女主坐定，蓝丝带两端分开放在礼物上。",
+      "endState": "右手捏右带端，左手准备捏左带端；结还未完成。",
+      "scale": "中近景",
+      "camera": "右前方30度、眼平固定；50；固定或极轻自然呼吸，未指定不加运镜；home保持窗在右；clinic女主左/医生右；outside左至右",
+      "dialogue": [
+        {
+          "id": "P-L01",
+          "speakerId": "E-A-CHAR-P01",
+          "text": "说好亲手送给她。",
+          "startFrame": 6,
+          "endFrame": 69
+        }
+      ],
+      "subtitles": [
+        {
+          "id": "CAP-P-L01",
+          "text": "说好亲手送给她。",
+          "startFrame": 6,
+          "endFrame": 69
+        }
+      ],
+      "dependencies": [],
+      "route": "seedance",
+      "prompt": "原生9:16竖屏，写实真人健康科普故事，home。只表现这个瞬间：女主坐在窗边，望着一份没有系完丝带的礼物，说完轻拉丝带。\n\n站位与构图：前景手或桌缘引导至中景人物，背景只保留空间出处；主动作在画幅横向0.45、纵向0.52附近，嘴和双手离边缘至少8%。 起始状态：女主坐定，蓝丝带两端分开放在礼物上。 结束状态：右手捏右带端，左手准备捏左带端；结还未完成。\n\n机位：右前方30度、眼平固定；50毫米全画幅等效镜头，中近景。焦点在本镜主动作及其接触点；医生/患者说话镜头嘴部全程可见，不用极浅景深掩盖嘴唇。\n\n光线、色彩与材质：右侧真实窗光作大面积柔光，米白与浅木为中性底，浅蓝只来自丝带/衣物；正常肤色、保留纹理，亮而不过曝。 布料、纸、皮肤和物件重力自然。清晰干净的数字摄影质感，不添加风格化炫光或重颗粒。\n\n情绪与限制：克制、生活化，把承诺和未完成动作先交给观众。 不生成中文字、品牌、医院标识、无关人物、诊断结论水印或字幕；不改变身份，不夸张症状，不以口外摸脸代替口腔内病灶。",
+      "mustShow": [
+        "女主坐在窗边，望着一份没有系完丝带的礼物，说完轻拉丝带。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "S02",
+      "title": "手指把动作打断",
+      "startFrame": 75,
+      "endFrame": 125,
+      "entityIds": [
+        "E-A-CHAR-P01",
+        "E-A-SET-HOME",
+        "E-A-PROP-GIFT",
+        "E-A-SYM-JOINT",
+        "E-A-PROP-WRAPPED-BOOK",
+        "E-A-PROP-BLUE-RIBBON",
+        "E-C-JOINT",
+        "E-ACTION-S02"
+      ],
+      "requiredAssetIds": [
+        "A-CHAR-P01",
+        "A-SET-HOME",
+        "A-PROP-GIFT",
+        "A-SYM-JOINT",
+        "A-PROP-WRAPPED-BOOK",
+        "A-PROP-BLUE-RIBBON"
+      ],
+      "evidenceIds": [
+        "EV-NIAMS-OVERVIEW"
+      ],
+      "action": "左手捏带时停下，右手放下丝带，轻托左指关节。",
+      "startState": "延续S01同一双手、同一丝带交叉阶段。",
+      "endState": "礼物仍在桌上，蓝丝带松开；左手被轻托。",
+      "scale": "手部特写",
+      "camera": "从女主右肩上方俯20度固定；85；固定或极轻自然呼吸，未指定不加运镜；home保持窗在右；clinic女主左/医生右；outside左至右",
+      "dialogue": [],
+      "subtitles": [],
+      "dependencies": [
+        "S01"
+      ],
+      "route": "seedance",
+      "prompt": "原生9:16竖屏，写实真人健康科普故事，home。只表现这个瞬间：左手捏带时停下，右手放下丝带，轻托左指关节。\n\n站位与构图：单一细节占中间约55%画幅，周边留足上下文；不拼图，不以大标题遮挡病灶、关节或动作接触点。 起始状态：延续S01同一双手、同一丝带交叉阶段。 结束状态：礼物仍在桌上，蓝丝带松开；左手被轻托。\n\n机位：从女主右肩上方俯20度固定；85毫米全画幅等效镜头，手部特写。焦点在本镜主动作及其接触点；医生/患者说话镜头嘴部全程可见，不用极浅景深掩盖嘴唇。\n\n光线、色彩与材质：右侧真实窗光作大面积柔光，米白与浅木为中性底，浅蓝只来自丝带/衣物；正常肤色、保留纹理，亮而不过曝。 布料、纸、皮肤和物件重力自然。清晰干净的数字摄影质感，不添加风格化炫光或重颗粒。\n\n情绪与限制：克制、生活化，具体关节位置与动作受阻发生因果关系。 不生成中文字、品牌、医院标识、无关人物、诊断结论水印或字幕；不改变身份，不夸张症状，不以口外摸脸代替口腔内病灶。",
+      "mustShow": [
+        "左手捏带时停下，右手放下丝带，轻托左指关节。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "S03",
+      "title": "她想到这一周",
+      "startFrame": 125,
+      "endFrame": 200,
+      "entityIds": [
+        "E-A-CHAR-P01",
+        "E-A-SET-HOME",
+        "E-A-PROP-GIFT",
+        "E-A-SYM-MALAR",
+        "E-A-PROP-WRAPPED-BOOK",
+        "E-A-PROP-BLUE-RIBBON",
+        "E-A-PROP-GIFT-CARD",
+        "E-C-MALAR",
+        "E-ACTION-S03"
+      ],
+      "requiredAssetIds": [
+        "A-CHAR-P01",
+        "A-SET-HOME",
+        "A-PROP-GIFT",
+        "A-SYM-MALAR",
+        "A-PROP-WRAPPED-BOOK",
+        "A-PROP-BLUE-RIBBON",
+        "A-PROP-GIFT-CARD"
+      ],
+      "evidenceIds": [
+        "EV-NIAMS-OVERVIEW"
+      ],
+      "action": "女主放下手，向桌边镜子看去，镜旁机位清楚显示双颊与鼻梁红斑分布。",
+      "startState": "她仍坐在原桌位置，礼物在下方虚化处。",
+      "endState": "目光停在镜中的脸；不涂抹遮瑕作诊断实验。",
+      "scale": "正面脸部近景",
+      "camera": "镜面旁眼平，不拍不可能的双重反射；85；固定或极轻自然呼吸，未指定不加运镜；home保持窗在右；clinic女主左/医生右；outside左至右",
+      "dialogue": [],
+      "subtitles": [],
+      "dependencies": [
+        "S02"
+      ],
+      "route": "seedance",
+      "prompt": "原生9:16竖屏，写实真人健康科普故事，home。只表现这个瞬间：女主放下手，向桌边镜子看去，镜旁机位清楚显示双颊与鼻梁红斑分布。\n\n站位与构图：前景手或桌缘引导至中景人物，背景只保留空间出处；主动作在画幅横向0.45、纵向0.52附近，嘴和双手离边缘至少8%。 起始状态：她仍坐在原桌位置，礼物在下方虚化处。 结束状态：目光停在镜中的脸；不涂抹遮瑕作诊断实验。\n\n机位：镜面旁眼平，不拍不可能的双重反射；85毫米全画幅等效镜头，正面脸部近景。焦点在本镜主动作及其接触点；医生/患者说话镜头嘴部全程可见，不用极浅景深掩盖嘴唇。\n\n光线、色彩与材质：右侧真实窗光作大面积柔光，米白与浅木为中性底，浅蓝只来自丝带/衣物；正常肤色、保留纹理，亮而不过曝。 布料、纸、皮肤和物件重力自然。清晰干净的数字摄影质感，不添加风格化炫光或重颗粒。\n\n情绪与限制：克制、生活化，用看镜动作触发此前一周的观察闪回。 不生成中文字、品牌、医院标识、无关人物、诊断结论水印或字幕；不改变身份，不夸张症状，不以口外摸脸代替口腔内病灶。",
+      "mustShow": [
+        "女主放下手，向桌边镜子看去，镜旁机位清楚显示双颊与鼻梁红斑分布。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "S04",
+      "title": "枕头上的变化",
+      "startFrame": 200,
+      "endFrame": 250,
+      "entityIds": [
+        "E-A-CHAR-P01",
+        "E-A-SET-HOME",
+        "E-A-SYM-HAIR",
+        "E-A-PROP-NOTE",
+        "E-C-HAIR",
+        "E-ACTION-S04"
+      ],
+      "requiredAssetIds": [
+        "A-CHAR-P01",
+        "A-SET-HOME",
+        "A-SYM-HAIR",
+        "A-PROP-NOTE"
+      ],
+      "evidenceIds": [
+        "EV-NIAMS-OVERVIEW"
+      ],
+      "action": "女主早晨抬头后，看到浅色枕面上可辨的脱落发丝，手停在枕边。",
+      "startState": "时间明确回到这一周的某次早晨。",
+      "endState": "发丝仍在枕面，未突然大量增加；她观察而不下结论。",
+      "scale": "枕面与手的细节",
+      "camera": "床侧俯30度固定；85；固定或极轻自然呼吸，未指定不加运镜；home保持窗在右；clinic女主左/医生右；outside左至右",
+      "dialogue": [],
+      "subtitles": [],
+      "dependencies": [
+        "S03"
+      ],
+      "route": "seedance",
+      "prompt": "原生9:16竖屏，写实真人健康科普故事，home_flashback。只表现这个瞬间：女主早晨抬头后，看到浅色枕面上可辨的脱落发丝，手停在枕边。\n\n站位与构图：单一细节占中间约55%画幅，周边留足上下文；不拼图，不以大标题遮挡病灶、关节或动作接触点。 起始状态：时间明确回到这一周的某次早晨。 结束状态：发丝仍在枕面，未突然大量增加；她观察而不下结论。\n\n机位：床侧俯30度固定；85毫米全画幅等效镜头，枕面与手的细节。焦点在本镜主动作及其接触点；医生/患者说话镜头嘴部全程可见，不用极浅景深掩盖嘴唇。\n\n光线、色彩与材质：右侧真实窗光作大面积柔光，米白与浅木为中性底，浅蓝只来自丝带/衣物；正常肤色、保留纹理，亮而不过曝。 布料、纸、皮肤和物件重力自然。清晰干净的数字摄影质感，不添加风格化炫光或重颗粒。\n\n情绪与限制：克制、生活化，一周记录中的具体观察，不是普通梳头占位。 不生成中文字、品牌、医院标识、无关人物、诊断结论水印或字幕；不改变身份，不夸张症状，不以口外摸脸代替口腔内病灶。",
+      "mustShow": [
+        "女主早晨抬头后，看到浅色枕面上可辨的脱落发丝，手停在枕边。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "S05",
+      "title": "嘴里也有变化",
+      "startFrame": 250,
+      "endFrame": 300,
+      "entityIds": [
+        "E-A-SYM-ORAL",
+        "E-C-ORAL",
+        "E-ACTION-S05"
+      ],
+      "requiredAssetIds": [
+        "A-SYM-ORAL"
+      ],
+      "evidenceIds": [
+        "EV-NIAMS-OVERVIEW"
+      ],
+      "action": "克制、清楚地展示口腔上腭的局部溃疡样病灶，作为一周观察的教学插入画面。",
+      "startState": "开镜即见已审核、无血腥的口腔内病灶。",
+      "endState": "病灶位置与大小稳定，无白球生长或形变。",
+      "scale": "口腔内部教学特写",
+      "camera": "口腔正前稍低视轴对上腭，固定；100；固定或极轻自然呼吸，未指定不加运镜；home保持窗在右；clinic女主左/医生右；outside左至右",
+      "dialogue": [],
+      "subtitles": [],
+      "dependencies": [
+        "S04"
+      ],
+      "route": "seedance",
+      "prompt": "原生9:16竖屏，写实真人健康科普故事，medical_teaching_insert。只表现这个瞬间：克制、清楚地展示口腔上腭的局部溃疡样病灶，作为一周观察的教学插入画面。\n\n站位与构图：单一细节占中间约55%画幅，周边留足上下文；不拼图，不以大标题遮挡病灶、关节或动作接触点。 起始状态：开镜即见已审核、无血腥的口腔内病灶。 结束状态：病灶位置与大小稳定，无白球生长或形变。\n\n机位：口腔正前稍低视轴对上腭，固定；100毫米全画幅等效镜头，口腔内部教学特写。焦点在本镜主动作及其接触点；医生/患者说话镜头嘴部全程可见，不用极浅景深掩盖嘴唇。\n\n光线、色彩与材质：均匀柔和医学观察光，真实黏膜颜色与细纹，局部曝光保守；无血腥、无美容滤镜。 布料、纸、皮肤和物件重力自然。清晰干净的数字摄影质感，不添加风格化炫光或重颗粒。\n\n情绪与限制：克制、生活化，实际可见口腔内病灶，明确教学示意而非真实患者记录。 不生成中文字、品牌、医院标识、无关人物、诊断结论水印或字幕；不改变身份，不夸张症状，不以口外摸脸代替口腔内病灶。",
+      "mustShow": [
+        "克制、清楚地展示口腔上腭的局部溃疡样病灶，作为一周观察的教学插入画面。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "S06",
+      "title": "不能自行解释的泡沫",
+      "startFrame": 300,
+      "endFrame": 350,
+      "entityIds": [
+        "E-A-SET-HOME",
+        "E-A-SYM-FOAM",
+        "E-A-PROP-NOTE",
+        "E-C-FOAM",
+        "E-C-FOAM-OBSERVATION-LIMIT",
+        "E-ACTION-S06"
+      ],
+      "requiredAssetIds": [
+        "A-SET-HOME",
+        "A-SYM-FOAM",
+        "A-PROP-NOTE"
+      ],
+      "evidenceIds": [
+        "EV-NIDDK-RENAL"
+      ],
+      "action": "水面可见细密成簇泡沫，画面不做肾病结论。",
+      "startState": "闪回某次如厕后的观察，不显示裸体或排尿过程。",
+      "endState": "泡沫自然缓慢变化，不能用消失/增加作为诊断。",
+      "scale": "水面细节",
+      "camera": "便器上方斜俯、不拍人物排尿；85；固定或极轻自然呼吸，未指定不加运镜；home保持窗在右；clinic女主左/医生右；outside左至右",
+      "dialogue": [],
+      "subtitles": [],
+      "dependencies": [
+        "S05"
+      ],
+      "route": "seedance",
+      "prompt": "原生9:16竖屏，写实真人健康科普故事，home_flashback。只表现这个瞬间：水面可见细密成簇泡沫，画面不做肾病结论。\n\n站位与构图：单一细节占中间约55%画幅，周边留足上下文；不拼图，不以大标题遮挡病灶、关节或动作接触点。 起始状态：闪回某次如厕后的观察，不显示裸体或排尿过程。 结束状态：泡沫自然缓慢变化，不能用消失/增加作为诊断。\n\n机位：便器上方斜俯、不拍人物排尿；85毫米全画幅等效镜头，水面细节。焦点在本镜主动作及其接触点；医生/患者说话镜头嘴部全程可见，不用极浅景深掩盖嘴唇。\n\n光线、色彩与材质：右侧真实窗光作大面积柔光，米白与浅木为中性底，浅蓝只来自丝带/衣物；正常肤色、保留纹理，亮而不过曝。 布料、纸、皮肤和物件重力自然。清晰干净的数字摄影质感，不添加风格化炫光或重颗粒。\n\n情绪与限制：克制、生活化，她有疑问，因此选择让医生判断。 不生成中文字、品牌、医院标识、无关人物、诊断结论水印或字幕；不改变身份，不夸张症状，不以口外摸脸代替口腔内病灶。",
+      "mustShow": [
+        "水面可见细密成簇泡沫，画面不做肾病结论。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "S07",
+      "title": "先照顾自己",
+      "startFrame": 350,
+      "endFrame": 425,
+      "entityIds": [
+        "E-A-CHAR-P01",
+        "E-A-SET-HOME",
+        "E-A-PROP-GIFT",
+        "E-A-PROP-NOTE",
+        "E-A-PROP-WRAPPED-BOOK",
+        "E-A-PROP-BLUE-RIBBON",
+        "E-A-PROP-GIFT-CARD",
+        "E-C-NONDIAGNOSTIC",
+        "E-ACTION-S07"
+      ],
+      "requiredAssetIds": [
+        "A-CHAR-P01",
+        "A-SET-HOME",
+        "A-PROP-GIFT",
+        "A-PROP-NOTE",
+        "A-PROP-WRAPPED-BOOK",
+        "A-PROP-BLUE-RIBBON",
+        "A-PROP-GIFT-CARD"
+      ],
+      "evidenceIds": [
+        "EV-NIAMS-DIAGNOSIS"
+      ],
+      "action": "回到桌前，她把未系完的礼物放入抽屉，拿起症状记录，决定就医。",
+      "startState": "回到现在；蓝色丝带未系完，仍与S02一致。",
+      "endState": "礼物收好但未放弃；女主手持记录向门口看。",
+      "scale": "中近景",
+      "camera": "沿S01同轴线、眼平固定；50；固定或极轻自然呼吸，未指定不加运镜；home保持窗在右；clinic女主左/医生右；outside左至右",
+      "dialogue": [
+        {
+          "id": "P-L02",
+          "speakerId": "E-A-CHAR-P01",
+          "text": "我去医院看看。",
+          "startFrame": 356,
+          "endFrame": 419
+        }
+      ],
+      "subtitles": [
+        {
+          "id": "CAP-P-L02",
+          "text": "我去医院看看。",
+          "startFrame": 356,
+          "endFrame": 419
+        }
+      ],
+      "dependencies": [
+        "S06"
+      ],
+      "route": "seedance",
+      "prompt": "原生9:16竖屏，写实真人健康科普故事，home。只表现这个瞬间：回到桌前，她把未系完的礼物放入抽屉，拿起症状记录，决定就医。\n\n站位与构图：前景手或桌缘引导至中景人物，背景只保留空间出处；主动作在画幅横向0.45、纵向0.52附近，嘴和双手离边缘至少8%。 起始状态：回到现在；蓝色丝带未系完，仍与S02一致。 结束状态：礼物收好但未放弃；女主手持记录向门口看。\n\n机位：沿S01同轴线、眼平固定；50毫米全画幅等效镜头，中近景。焦点在本镜主动作及其接触点；医生/患者说话镜头嘴部全程可见，不用极浅景深掩盖嘴唇。\n\n光线、色彩与材质：右侧真实窗光作大面积柔光，米白与浅木为中性底，浅蓝只来自丝带/衣物；正常肤色、保留纹理，亮而不过曝。 布料、纸、皮肤和物件重力自然。清晰干净的数字摄影质感，不添加风格化炫光或重颗粒。\n\n情绪与限制：克制、生活化，一次明确主动行动：暂停送礼，带记录去就诊。 不生成中文字、品牌、医院标识、无关人物、诊断结论水印或字幕；不改变身份，不夸张症状，不以口外摸脸代替口腔内病灶。",
+      "mustShow": [
+        "回到桌前，她把未系完的礼物放入抽屉，拿起症状记录，决定就医。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "S08",
+      "title": "把一周讲给医生听",
+      "startFrame": 425,
+      "endFrame": 500,
+      "entityIds": [
+        "E-A-CHAR-P01",
+        "E-A-CHAR-D00",
+        "E-A-SET-CLINIC",
+        "E-A-PROP-NOTE",
+        "E-C-EVALUATION",
+        "E-ACTION-S08"
+      ],
+      "requiredAssetIds": [
+        "A-CHAR-P01",
+        "A-CHAR-D00",
+        "A-SET-CLINIC",
+        "A-PROP-NOTE"
+      ],
+      "evidenceIds": [
+        "EV-NIAMS-DIAGNOSIS"
+      ],
+      "action": "女主把记录推到桌子中间，向指定医生说出持续时间。",
+      "startState": "初诊；女主画左、医生画右，桌面只有记录与病历。",
+      "endState": "记录停在两人中间，医生接下话题。",
+      "scale": "患者肩上中近景",
+      "camera": "医生肩后，女主脸清楚朝画右；65；固定或极轻自然呼吸，未指定不加运镜；home保持窗在右；clinic女主左/医生右；outside左至右",
+      "dialogue": [
+        {
+          "id": "P-L03",
+          "speakerId": "E-A-CHAR-P01",
+          "text": "医生，已经一周了。",
+          "startFrame": 431,
+          "endFrame": 494
+        }
+      ],
+      "subtitles": [
+        {
+          "id": "CAP-P-L03",
+          "text": "医生，已经一周了。",
+          "startFrame": 431,
+          "endFrame": 494
+        }
+      ],
+      "dependencies": [
+        "S07"
+      ],
+      "route": "seedance",
+      "prompt": "原生9:16竖屏，写实真人健康科普故事，clinic_first。只表现这个瞬间：女主把记录推到桌子中间，向指定医生说出持续时间。\n\n站位与构图：前景手或桌缘引导至中景人物，背景只保留空间出处；主动作在画幅横向0.45、纵向0.52附近，嘴和双手离边缘至少8%。 起始状态：初诊；女主画左、医生画右，桌面只有记录与病历。 结束状态：记录停在两人中间，医生接下话题。\n\n机位：医生肩后，女主脸清楚朝画右；65毫米全画幅等效镜头，患者肩上中近景。焦点在本镜主动作及其接触点；医生/患者说话镜头嘴部全程可见，不用极浅景深掩盖嘴唇。\n\n光线、色彩与材质：诊室/检验区的柔和窗光与中性顶灯，白袍不过曝，浅蓝和米白背景，肤色自然，口腔边缘与嘴唇动作清晰。 布料、纸、皮肤和物件重力自然。清晰干净的数字摄影质感，不添加风格化炫光或重颗粒。\n\n情绪与限制：克制、生活化，同一女主求助同一医生，不突然换成公共口播演员。 不生成中文字、品牌、医院标识、无关人物、诊断结论水印或字幕；不改变身份，不夸张症状，不以口外摸脸代替口腔内病灶。",
+      "mustShow": [
+        "女主把记录推到桌子中间，向指定医生说出持续时间。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "S09",
+      "title": "医生先评估",
+      "startFrame": 500,
+      "endFrame": 625,
+      "entityIds": [
+        "E-A-CHAR-D00",
+        "E-A-SET-CLINIC",
+        "E-A-PROP-NOTE",
+        "E-C-EVALUATION",
+        "E-ACTION-S09"
+      ],
+      "requiredAssetIds": [
+        "A-CHAR-D00",
+        "A-SET-CLINIC",
+        "A-PROP-NOTE"
+      ],
+      "evidenceIds": [
+        "EV-NIAMS-DIAGNOSIS"
+      ],
+      "action": "医生先看记录，再看向女主，用一整句解释需要检查。",
+      "startState": "病历在医生左前方，双手静置桌面。",
+      "endState": "整句说完才轻点病历；闭口留至少0.24秒。",
+      "scale": "医生胸上近景",
+      "camera": "患者肩后，医生三分之二正面，嘴部无遮挡；65；固定或极轻自然呼吸，未指定不加运镜；home保持窗在右；clinic女主左/医生右；outside左至右",
+      "dialogue": [
+        {
+          "id": "D-L01",
+          "speakerId": "E-A-CHAR-D00",
+          "text": "先查血、查尿，不能只看脸。",
+          "startFrame": 506,
+          "endFrame": 619
+        }
+      ],
+      "subtitles": [
+        {
+          "id": "CAP-D-L01",
+          "text": "先查血、查尿，不能只看脸。",
+          "startFrame": 506,
+          "endFrame": 619
+        }
+      ],
+      "dependencies": [
+        "S08"
+      ],
+      "route": "doctor",
+      "prompt": "原生9:16竖屏，写实真人健康科普故事，clinic_first。只表现这个瞬间：医生先看记录，再看向女主，用一整句解释需要检查。\n\n站位与构图：前景手或桌缘引导至中景人物，背景只保留空间出处；主动作在画幅横向0.45、纵向0.52附近，嘴和双手离边缘至少8%。 起始状态：病历在医生左前方，双手静置桌面。 结束状态：整句说完才轻点病历；闭口留至少0.24秒。\n\n机位：患者肩后，医生三分之二正面，嘴部无遮挡；65毫米全画幅等效镜头，医生胸上近景。焦点在本镜主动作及其接触点；医生/患者说话镜头嘴部全程可见，不用极浅景深掩盖嘴唇。\n\n光线、色彩与材质：诊室/检验区的柔和窗光与中性顶灯，白袍不过曝，浅蓝和米白背景，肤色自然，口腔边缘与嘴唇动作清晰。 布料、纸、皮肤和物件重力自然。清晰干净的数字摄影质感，不添加风格化炫光或重颗粒。\n\n情绪与限制：克制、生活化，医生第一句必须看见真实同步发音，不能铺旧旁白。 不生成中文字、品牌、医院标识、无关人物、诊断结论水印或字幕；不改变身份，不夸张症状，不以口外摸脸代替口腔内病灶。",
+      "mustShow": [
+        "医生先看记录，再看向女主，用一整句解释需要检查。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ],
+      "firstAnchorId": "ANC-A-CHAR-D00"
+    },
+    {
+      "id": "S10",
+      "title": "检查不是看脸下结论",
+      "startFrame": 625,
+      "endFrame": 700,
+      "entityIds": [
+        "E-A-SET-CLINIC",
+        "E-A-TEST-BLOOD-URINE",
+        "E-A-CHAR-LAB-HANDS",
+        "E-A-PROP-BLOOD-TUBE",
+        "E-A-PROP-URINE-CUP",
+        "E-A-PROP-LAB-TRAY",
+        "E-C-EVALUATION",
+        "E-ACTION-S10"
+      ],
+      "requiredAssetIds": [
+        "A-SET-CLINIC",
+        "A-TEST-BLOOD-URINE",
+        "A-CHAR-LAB-HANDS",
+        "A-PROP-BLOOD-TUBE",
+        "A-PROP-URINE-CUP",
+        "A-PROP-LAB-TRAY"
+      ],
+      "evidenceIds": [
+        "EV-NIAMS-DIAGNOSIS"
+      ],
+      "action": "工作人员把分隔摆放的血样管与尿样杯放入对应检验托盘。",
+      "startState": "时间压缩：按医嘱检查，两个密封容器已有对应隔位。",
+      "endState": "容器放稳；不显示阳性数值，不生成报告结论。",
+      "scale": "检验台插入镜头",
+      "camera": "工作人员肩后斜俯，密封容器清楚；75；固定或极轻自然呼吸，未指定不加运镜；home保持窗在右；clinic女主左/医生右；outside左至右",
+      "dialogue": [],
+      "subtitles": [],
+      "dependencies": [
+        "S09"
+      ],
+      "route": "seedance",
+      "prompt": "原生9:16竖屏，写实真人健康科普故事，laboratory。只表现这个瞬间：工作人员把分隔摆放的血样管与尿样杯放入对应检验托盘。\n\n站位与构图：前景手或桌缘引导至中景人物，背景只保留空间出处；主动作在画幅横向0.45、纵向0.52附近，嘴和双手离边缘至少8%。 起始状态：时间压缩：按医嘱检查，两个密封容器已有对应隔位。 结束状态：容器放稳；不显示阳性数值，不生成报告结论。\n\n机位：工作人员肩后斜俯，密封容器清楚；75毫米全画幅等效镜头，检验台插入镜头。焦点在本镜主动作及其接触点；医生/患者说话镜头嘴部全程可见，不用极浅景深掩盖嘴唇。\n\n光线、色彩与材质：诊室/检验区的柔和窗光与中性顶灯，白袍不过曝，浅蓝和米白背景，肤色自然，口腔边缘与嘴唇动作清晰。 布料、纸、皮肤和物件重力自然。清晰干净的数字摄影质感，不添加风格化炫光或重颗粒。\n\n情绪与限制：克制、生活化，为下一场医生综合评估提供过程，不暗示一眼确诊。 不生成中文字、品牌、医院标识、无关人物、诊断结论水印或字幕；不改变身份，不夸张症状，不以口外摸脸代替口腔内病灶。",
+      "mustShow": [
+        "工作人员把分隔摆放的血样管与尿样杯放入对应检验托盘。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "S11",
+      "title": "隔了一段时间，医生解释",
+      "startFrame": 700,
+      "endFrame": 850,
+      "entityIds": [
+        "E-A-CHAR-D00",
+        "E-A-SET-CLINIC",
+        "E-A-PROP-NOTE",
+        "E-C-FICTIONAL-DIAGNOSIS",
+        "E-ACTION-S11"
+      ],
+      "requiredAssetIds": [
+        "A-CHAR-D00",
+        "A-SET-CLINIC",
+        "A-PROP-NOTE"
+      ],
+      "evidenceIds": [
+        "EV-NIAMS-DIAGNOSIS"
+      ],
+      "action": "经过检查与随访后，医生合上已有记录，向女主解释综合判断。",
+      "startState": "明确时间跳跃；非上午初诊后立即确诊。",
+      "endState": "完整病名说完，视线仍向女主，不切走遮口型。",
+      "scale": "医生三分之二正面近景",
+      "camera": "同初诊轴线，稍靠前20厘米固定；65；固定或极轻自然呼吸，未指定不加运镜；home保持窗在右；clinic女主左/医生右；outside左至右",
+      "dialogue": [
+        {
+          "id": "D-L02",
+          "speakerId": "E-A-CHAR-D00",
+          "text": "综合评估后，是系统性红斑狼疮。",
+          "startFrame": 706,
+          "endFrame": 844
+        }
+      ],
+      "subtitles": [
+        {
+          "id": "CAP-D-L02",
+          "text": "综合评估后，是系统性红斑狼疮。",
+          "startFrame": 706,
+          "endFrame": 844
+        }
+      ],
+      "dependencies": [
+        "S10"
+      ],
+      "route": "doctor",
+      "prompt": "原生9:16竖屏，写实真人健康科普故事，clinic_followup。只表现这个瞬间：经过检查与随访后，医生合上已有记录，向女主解释综合判断。\n\n站位与构图：前景手或桌缘引导至中景人物，背景只保留空间出处；主动作在画幅横向0.45、纵向0.52附近，嘴和双手离边缘至少8%。 起始状态：明确时间跳跃；非上午初诊后立即确诊。 结束状态：完整病名说完，视线仍向女主，不切走遮口型。\n\n机位：同初诊轴线，稍靠前20厘米固定；65毫米全画幅等效镜头，医生三分之二正面近景。焦点在本镜主动作及其接触点；医生/患者说话镜头嘴部全程可见，不用极浅景深掩盖嘴唇。\n\n光线、色彩与材质：诊室/检验区的柔和窗光与中性顶灯，白袍不过曝，浅蓝和米白背景，肤色自然，口腔边缘与嘴唇动作清晰。 布料、纸、皮肤和物件重力自然。清晰干净的数字摄影质感，不添加风格化炫光或重颗粒。\n\n情绪与限制：克制、生活化，在虚构故事里完成专业判断，同时保留多源综合评估语境。 不生成中文字、品牌、医院标识、无关人物、诊断结论水印或字幕；不改变身份，不夸张症状，不以口外摸脸代替口腔内病灶。",
+      "mustShow": [
+        "经过检查与随访后，医生合上已有记录，向女主解释综合判断。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ],
+      "firstAnchorId": "ANC-A-CHAR-D00"
+    },
+    {
+      "id": "S12",
+      "title": "不是一句病名结束",
+      "startFrame": 850,
+      "endFrame": 975,
+      "entityIds": [
+        "E-A-CHAR-D00",
+        "E-A-SET-CLINIC",
+        "E-A-MED-AUTOIMMUNE",
+        "E-C-AUTOIMMUNE",
+        "E-C-MANAGEMENT",
+        "E-ACTION-S12"
+      ],
+      "requiredAssetIds": [
+        "A-CHAR-D00",
+        "A-SET-CLINIC",
+        "A-MED-AUTOIMMUNE"
+      ],
+      "evidenceIds": [
+        "EV-NIAMS-OVERVIEW",
+        "EV-NIAMS-DIAGNOSIS"
+      ],
+      "action": "医生继续解释疾病性质及规范治疗，旁边出现不遮嘴的简化免疫图。",
+      "startState": "延续S11医生姿态、病历位置与灯光。",
+      "endState": "医生句尾闭口；图示保持简洁，不演成全身器官被破坏。",
+      "scale": "医生胸上近景",
+      "camera": "同轴线、轻微角度差小于15度；65；固定或极轻自然呼吸，未指定不加运镜；home保持窗在右；clinic女主左/医生右；outside左至右",
+      "dialogue": [
+        {
+          "id": "D-L03",
+          "speakerId": "E-A-CHAR-D00",
+          "text": "这是自身免疫病，需要规范治疗。",
+          "startFrame": 856,
+          "endFrame": 969
+        }
+      ],
+      "subtitles": [
+        {
+          "id": "CAP-D-L03",
+          "text": "这是自身免疫病，需要规范治疗。",
+          "startFrame": 856,
+          "endFrame": 969
+        }
+      ],
+      "dependencies": [
+        "S11"
+      ],
+      "route": "doctor",
+      "prompt": "原生9:16竖屏，写实真人健康科普故事，clinic_followup。只表现这个瞬间：医生继续解释疾病性质及规范治疗，旁边出现不遮嘴的简化免疫图。\n\n站位与构图：前景手或桌缘引导至中景人物，背景只保留空间出处；主动作在画幅横向0.45、纵向0.52附近，嘴和双手离边缘至少8%。 起始状态：延续S11医生姿态、病历位置与灯光。 结束状态：医生句尾闭口；图示保持简洁，不演成全身器官被破坏。\n\n机位：同轴线、轻微角度差小于15度；65毫米全画幅等效镜头，医生胸上近景。焦点在本镜主动作及其接触点；医生/患者说话镜头嘴部全程可见，不用极浅景深掩盖嘴唇。\n\n光线、色彩与材质：诊室/检验区的柔和窗光与中性顶灯，白袍不过曝，浅蓝和米白背景，肤色自然，口腔边缘与嘴唇动作清晰。 布料、纸、皮肤和物件重力自然。清晰干净的数字摄影质感，不添加风格化炫光或重颗粒。\n\n情绪与限制：克制、生活化，把病名转成可理解的下一步，而非制造恐惧。 不生成中文字、品牌、医院标识、无关人物、诊断结论水印或字幕；不改变身份，不夸张症状，不以口外摸脸代替口腔内病灶。",
+      "mustShow": [
+        "医生继续解释疾病性质及规范治疗，旁边出现不遮嘴的简化免疫图。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ],
+      "firstAnchorId": "ANC-A-CHAR-D00"
+    },
+    {
+      "id": "S13",
+      "title": "她把计划记下来",
+      "startFrame": 975,
+      "endFrame": 1025,
+      "entityIds": [
+        "E-A-CHAR-P01",
+        "E-A-SET-CLINIC",
+        "E-A-CARE-PLAN",
+        "E-A-PROP-PEN",
+        "E-A-PROP-FOLLOWUP-BOOK",
+        "E-C-MANAGEMENT",
+        "E-ACTION-S13"
+      ],
+      "requiredAssetIds": [
+        "A-CHAR-P01",
+        "A-SET-CLINIC",
+        "A-CARE-PLAN",
+        "A-PROP-PEN",
+        "A-PROP-FOLLOWUP-BOOK"
+      ],
+      "evidenceIds": [
+        "EV-NIAMS-DIAGNOSIS"
+      ],
+      "action": "女主认真点头，在自己的计划簿上记下需要做的事情。",
+      "startState": "计划簿摊开，表情认真而非突然大笑。",
+      "endState": "笔停下，她抬头继续听，纸面不生成药名剂量。",
+      "scale": "患者反应与手部中近景",
+      "camera": "医生肩后，女主脸与纸在同一可读层；65；固定或极轻自然呼吸，未指定不加运镜；home保持窗在右；clinic女主左/医生右；outside左至右",
+      "dialogue": [],
+      "subtitles": [],
+      "dependencies": [
+        "S12"
+      ],
+      "route": "seedance",
+      "prompt": "原生9:16竖屏，写实真人健康科普故事，clinic_followup。只表现这个瞬间：女主认真点头，在自己的计划簿上记下需要做的事情。\n\n站位与构图：前景手或桌缘引导至中景人物，背景只保留空间出处；主动作在画幅横向0.45、纵向0.52附近，嘴和双手离边缘至少8%。 起始状态：计划簿摊开，表情认真而非突然大笑。 结束状态：笔停下，她抬头继续听，纸面不生成药名剂量。\n\n机位：医生肩后，女主脸与纸在同一可读层；65毫米全画幅等效镜头，患者反应与手部中近景。焦点在本镜主动作及其接触点；医生/患者说话镜头嘴部全程可见，不用极浅景深掩盖嘴唇。\n\n光线、色彩与材质：诊室/检验区的柔和窗光与中性顶灯，白袍不过曝，浅蓝和米白背景，肤色自然，口腔边缘与嘴唇动作清晰。 布料、纸、皮肤和物件重力自然。清晰干净的数字摄影质感，不添加风格化炫光或重颗粒。\n\n情绪与限制：克制、生活化，承接医生解释，用倾听和记录表现理解。 不生成中文字、品牌、医院标识、无关人物、诊断结论水印或字幕；不改变身份，不夸张症状，不以口外摸脸代替口腔内病灶。",
+      "mustShow": [
+        "女主认真点头，在自己的计划簿上记下需要做的事情。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "S14",
+      "title": "三件具体的事",
+      "startFrame": 1025,
+      "endFrame": 1170,
+      "entityIds": [
+        "E-A-CHAR-D00",
+        "E-A-SET-CLINIC",
+        "E-A-CARE-PLAN",
+        "E-A-CARE-SUN",
+        "E-A-PROP-FOLLOWUP-BOOK",
+        "E-C-MANAGEMENT",
+        "E-ACTION-S14"
+      ],
+      "requiredAssetIds": [
+        "A-CHAR-D00",
+        "A-SET-CLINIC",
+        "A-CARE-PLAN",
+        "A-CARE-SUN",
+        "A-PROP-FOLLOWUP-BOOK"
+      ],
+      "evidenceIds": [
+        "EV-NIAMS-DIAGNOSIS"
+      ],
+      "action": "医生看向女主，平稳说完防晒、复查和不自行停药。",
+      "startState": "同一诊室同一医生，桌面计划簿位置不变。",
+      "endState": "句子完整闭合、嘴自然停下，不留半句待剪。",
+      "scale": "医生正面中近景",
+      "camera": "患者视角、眼平、嘴部完整清楚；65；固定或极轻自然呼吸，未指定不加运镜；home保持窗在右；clinic女主左/医生右；outside左至右",
+      "dialogue": [
+        {
+          "id": "D-L04",
+          "speakerId": "E-A-CHAR-D00",
+          "text": "做好防晒，按时复查，别自行停药。",
+          "startFrame": 1031,
+          "endFrame": 1164
+        }
+      ],
+      "subtitles": [
+        {
+          "id": "CAP-D-L04",
+          "text": "做好防晒，按时复查，别自行停药。",
+          "startFrame": 1031,
+          "endFrame": 1164
+        }
+      ],
+      "dependencies": [
+        "S13"
+      ],
+      "route": "doctor",
+      "prompt": "原生9:16竖屏，写实真人健康科普故事，clinic_followup。只表现这个瞬间：医生看向女主，平稳说完防晒、复查和不自行停药。\n\n站位与构图：前景手或桌缘引导至中景人物，背景只保留空间出处；主动作在画幅横向0.45、纵向0.52附近，嘴和双手离边缘至少8%。 起始状态：同一诊室同一医生，桌面计划簿位置不变。 结束状态：句子完整闭合、嘴自然停下，不留半句待剪。\n\n机位：患者视角、眼平、嘴部完整清楚；65毫米全画幅等效镜头，医生正面中近景。焦点在本镜主动作及其接触点；医生/患者说话镜头嘴部全程可见，不用极浅景深掩盖嘴唇。\n\n光线、色彩与材质：诊室/检验区的柔和窗光与中性顶灯，白袍不过曝，浅蓝和米白背景，肤色自然，口腔边缘与嘴唇动作清晰。 布料、纸、皮肤和物件重力自然。清晰干净的数字摄影质感，不添加风格化炫光或重颗粒。\n\n情绪与限制：克制、生活化，第四句直接对白，每个提醒随后有对应生活动作。 不生成中文字、品牌、医院标识、无关人物、诊断结论水印或字幕；不改变身份，不夸张症状，不以口外摸脸代替口腔内病灶。",
+      "mustShow": [
+        "医生看向女主，平稳说完防晒、复查和不自行停药。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ],
+      "firstAnchorId": "ANC-A-CHAR-D00"
+    },
+    {
+      "id": "S15",
+      "title": "把医嘱放进日常",
+      "startFrame": 1170,
+      "endFrame": 1230,
+      "entityIds": [
+        "E-A-CHAR-P01",
+        "E-A-SET-HOME",
+        "E-A-CARE-PLAN",
+        "E-A-PROP-FOLLOWUP-BOOK",
+        "E-A-PROP-REMINDER-CARD",
+        "E-A-PROP-PILLBOX",
+        "E-C-MANAGEMENT",
+        "E-ACTION-S15"
+      ],
+      "requiredAssetIds": [
+        "A-CHAR-P01",
+        "A-SET-HOME",
+        "A-CARE-PLAN",
+        "A-PROP-FOLLOWUP-BOOK",
+        "A-PROP-REMINDER-CARD",
+        "A-PROP-PILLBOX"
+      ],
+      "evidenceIds": [
+        "EV-NIAMS-DIAGNOSIS"
+      ],
+      "action": "随访期间，她确认个人复查记录，把处方提醒卡放在关闭的无品牌药盒旁。",
+      "startState": "明确又一时间省略，遵医嘱管理期间，不给一周治愈时间。",
+      "endState": "复查记录与关闭药盒均保留；不表演自行增减药。",
+      "scale": "桌面手部细节",
+      "camera": "桌面斜俯固定；75；固定或极轻自然呼吸，未指定不加运镜；home保持窗在右；clinic女主左/医生右；outside左至右",
+      "dialogue": [],
+      "subtitles": [],
+      "dependencies": [
+        "S14"
+      ],
+      "route": "seedance",
+      "prompt": "原生9:16竖屏，写实真人健康科普故事，home_later。只表现这个瞬间：随访期间，她确认个人复查记录，把处方提醒卡放在关闭的无品牌药盒旁。\n\n站位与构图：单一细节占中间约55%画幅，周边留足上下文；不拼图，不以大标题遮挡病灶、关节或动作接触点。 起始状态：明确又一时间省略，遵医嘱管理期间，不给一周治愈时间。 结束状态：复查记录与关闭药盒均保留；不表演自行增减药。\n\n机位：桌面斜俯固定；75毫米全画幅等效镜头，桌面手部细节。焦点在本镜主动作及其接触点；医生/患者说话镜头嘴部全程可见，不用极浅景深掩盖嘴唇。\n\n光线、色彩与材质：右侧真实窗光作大面积柔光，米白与浅木为中性底，浅蓝只来自丝带/衣物；正常肤色、保留纹理，亮而不过曝。 布料、纸、皮肤和物件重力自然。清晰干净的数字摄影质感，不添加风格化炫光或重颗粒。\n\n情绪与限制：克制、生活化，复查与用药有实物依据，不是三个空口号。 不生成中文字、品牌、医院标识、无关人物、诊断结论水印或字幕；不改变身份，不夸张症状，不以口外摸脸代替口腔内病灶。",
+      "mustShow": [
+        "随访期间，她确认个人复查记录，把处方提醒卡放在关闭的无品牌药盒旁。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "S16",
+      "title": "出门前的保护",
+      "startFrame": 1230,
+      "endFrame": 1290,
+      "entityIds": [
+        "E-A-CHAR-P01",
+        "E-A-SET-HOME",
+        "E-A-CARE-SUN",
+        "E-A-PROP-SUNSCREEN",
+        "E-A-WARDROBE-OUTER",
+        "E-C-SUN",
+        "E-ACTION-S16"
+      ],
+      "requiredAssetIds": [
+        "A-CHAR-P01",
+        "A-SET-HOME",
+        "A-CARE-SUN",
+        "A-PROP-SUNSCREEN",
+        "A-WARDROBE-OUTER"
+      ],
+      "evidenceIds": [
+        "EV-NIAMS-DIAGNOSIS"
+      ],
+      "action": "她用右手把防晒乳轻抹在左前臂，浅色长袖外套放在一旁。",
+      "startState": "无品牌瓶打开，前臂少量乳液已点上。",
+      "endState": "乳液抹匀，瓶盖放回原处，下一镜不重复同动作。",
+      "scale": "前臂和手的特写",
+      "camera": "窗边斜俯固定；85；固定或极轻自然呼吸，未指定不加运镜；home保持窗在右；clinic女主左/医生右；outside左至右",
+      "dialogue": [],
+      "subtitles": [],
+      "dependencies": [
+        "S15"
+      ],
+      "route": "seedance",
+      "prompt": "原生9:16竖屏，写实真人健康科普故事，home_later。只表现这个瞬间：她用右手把防晒乳轻抹在左前臂，浅色长袖外套放在一旁。\n\n站位与构图：单一细节占中间约55%画幅，周边留足上下文；不拼图，不以大标题遮挡病灶、关节或动作接触点。 起始状态：无品牌瓶打开，前臂少量乳液已点上。 结束状态：乳液抹匀，瓶盖放回原处，下一镜不重复同动作。\n\n机位：窗边斜俯固定；85毫米全画幅等效镜头，前臂和手的特写。焦点在本镜主动作及其接触点；医生/患者说话镜头嘴部全程可见，不用极浅景深掩盖嘴唇。\n\n光线、色彩与材质：右侧真实窗光作大面积柔光，米白与浅木为中性底，浅蓝只来自丝带/衣物；正常肤色、保留纹理，亮而不过曝。 布料、纸、皮肤和物件重力自然。清晰干净的数字摄影质感，不添加风格化炫光或重颗粒。\n\n情绪与限制：克制、生活化，看到实际涂抹，不用瓶子特写代替防晒动作。 不生成中文字、品牌、医院标识、无关人物、诊断结论水印或字幕；不改变身份，不夸张症状，不以口外摸脸代替口腔内病灶。",
+      "mustShow": [
+        "她用右手把防晒乳轻抹在左前臂，浅色长袖外套放在一旁。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "S17",
+      "title": "把未完成的结系好",
+      "startFrame": 1290,
+      "endFrame": 1340,
+      "entityIds": [
+        "E-A-CHAR-P01",
+        "E-A-SET-HOME",
+        "E-A-PROP-GIFT",
+        "E-A-PROP-WRAPPED-BOOK",
+        "E-A-PROP-BLUE-RIBBON",
+        "E-A-PROP-GIFT-CARD",
+        "E-C-LIFE",
+        "E-ACTION-S17"
+      ],
+      "requiredAssetIds": [
+        "A-CHAR-P01",
+        "A-SET-HOME",
+        "A-PROP-GIFT",
+        "A-PROP-WRAPPED-BOOK",
+        "A-PROP-BLUE-RIBBON",
+        "A-PROP-GIFT-CARD"
+      ],
+      "evidenceIds": [
+        "EV-NIAMS-DIAGNOSIS"
+      ],
+      "action": "她轻轻拉紧已绕好的蓝丝带最后一圈，完成开头没系好的结。",
+      "startState": "同一礼物、包装折痕与丝带；当前结已绕好，只差最后轻拉。",
+      "endState": "蝴蝶结成形但不夸张紧勒；双手自然，没有治愈式特效。",
+      "scale": "双手与礼物特写",
+      "camera": "与S02相同轴线、俯20度；85；固定或极轻自然呼吸，未指定不加运镜；home保持窗在右；clinic女主左/医生右；outside左至右",
+      "dialogue": [],
+      "subtitles": [],
+      "dependencies": [
+        "S16"
+      ],
+      "route": "seedance",
+      "prompt": "原生9:16竖屏，写实真人健康科普故事，home_later。只表现这个瞬间：她轻轻拉紧已绕好的蓝丝带最后一圈，完成开头没系好的结。\n\n站位与构图：单一细节占中间约55%画幅，周边留足上下文；不拼图，不以大标题遮挡病灶、关节或动作接触点。 起始状态：同一礼物、包装折痕与丝带；当前结已绕好，只差最后轻拉。 结束状态：蝴蝶结成形但不夸张紧勒；双手自然，没有治愈式特效。\n\n机位：与S02相同轴线、俯20度；85毫米全画幅等效镜头，双手与礼物特写。焦点在本镜主动作及其接触点；医生/患者说话镜头嘴部全程可见，不用极浅景深掩盖嘴唇。\n\n光线、色彩与材质：右侧真实窗光作大面积柔光，米白与浅木为中性底，浅蓝只来自丝带/衣物；正常肤色、保留纹理，亮而不过曝。 布料、纸、皮肤和物件重力自然。清晰干净的数字摄影质感，不添加风格化炫光或重颗粒。\n\n情绪与限制：克制、生活化，用同一物件回扣开头；不声明关节已经永久恢复。 不生成中文字、品牌、医院标识、无关人物、诊断结论水印或字幕；不改变身份，不夸张症状，不以口外摸脸代替口腔内病灶。",
+      "mustShow": [
+        "她轻轻拉紧已绕好的蓝丝带最后一圈，完成开头没系好的结。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "S18",
+      "title": "换一种方式出发",
+      "startFrame": 1340,
+      "endFrame": 1375,
+      "entityIds": [
+        "E-A-CHAR-P01",
+        "E-A-SET-OUTSIDE",
+        "E-A-PROP-GIFT",
+        "E-A-CARE-SUN",
+        "E-A-WARDROBE-OUTER",
+        "E-A-PROP-UMBRELLA",
+        "E-A-PROP-SHOULDER-BAG",
+        "E-A-PROP-WRAPPED-BOOK",
+        "E-A-PROP-BLUE-RIBBON",
+        "E-A-PROP-GIFT-CARD",
+        "E-C-SUN",
+        "E-C-LIFE",
+        "E-ACTION-S18"
+      ],
+      "requiredAssetIds": [
+        "A-CHAR-P01",
+        "A-SET-OUTSIDE",
+        "A-PROP-GIFT",
+        "A-CARE-SUN",
+        "A-WARDROBE-OUTER",
+        "A-PROP-UMBRELLA",
+        "A-PROP-SHOULDER-BAG",
+        "A-PROP-WRAPPED-BOOK",
+        "A-PROP-BLUE-RIBBON",
+        "A-PROP-GIFT-CARD"
+      ],
+      "evidenceIds": [
+        "EV-NIAMS-DIAGNOSIS"
+      ],
+      "action": "她穿好长袖，在已打开的浅色伞下出门，礼物在肩包里可辨。",
+      "startState": "伞在室外已经打开，不在室内重复开伞。",
+      "endState": "向画右走入树荫；遮阳伞覆盖头肩。",
+      "scale": "半身中景",
+      "camera": "家门侧方眼平，向画面右运动；50；固定或极轻自然呼吸，未指定不加运镜；home保持窗在右；clinic女主左/医生右；outside左至右",
+      "dialogue": [],
+      "subtitles": [],
+      "dependencies": [
+        "S17"
+      ],
+      "route": "seedance",
+      "prompt": "原生9:16竖屏，写实真人健康科普故事，outside。只表现这个瞬间：她穿好长袖，在已打开的浅色伞下出门，礼物在肩包里可辨。\n\n站位与构图：前景手或桌缘引导至中景人物，背景只保留空间出处；主动作在画幅横向0.45、纵向0.52附近，嘴和双手离边缘至少8%。 起始状态：伞在室外已经打开，不在室内重复开伞。 结束状态：向画右走入树荫；遮阳伞覆盖头肩。\n\n机位：家门侧方眼平，向画面右运动；50毫米全画幅等效镜头，半身中景。焦点在本镜主动作及其接触点；医生/患者说话镜头嘴部全程可见，不用极浅景深掩盖嘴唇。\n\n光线、色彩与材质：右侧真实窗光作大面积柔光，米白与浅木为中性底，浅蓝只来自丝带/衣物；正常肤色、保留纹理，亮而不过曝。 布料、纸、皮肤和物件重力自然。清晰干净的数字摄影质感，不添加风格化炫光或重颗粒。\n\n情绪与限制：克制、生活化，身体需要被照顾，但生活的约定仍可继续。 不生成中文字、品牌、医院标识、无关人物、诊断结论水印或字幕；不改变身份，不夸张症状，不以口外摸脸代替口腔内病灶。",
+      "mustShow": [
+        "她穿好长袖，在已打开的浅色伞下出门，礼物在肩包里可辨。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "S19",
+      "title": "把心意递出去",
+      "startFrame": 1375,
+      "endFrame": 1450,
+      "entityIds": [
+        "E-A-CHAR-P01",
+        "E-A-CHAR-F01",
+        "E-A-SET-OUTSIDE",
+        "E-A-PROP-GIFT",
+        "E-A-CARE-SUN",
+        "E-A-WARDROBE-OUTER",
+        "E-A-PROP-UMBRELLA",
+        "E-A-PROP-SHOULDER-BAG",
+        "E-A-PROP-WRAPPED-BOOK",
+        "E-A-PROP-BLUE-RIBBON",
+        "E-A-PROP-GIFT-CARD",
+        "E-C-LIFE",
+        "E-ACTION-S19"
+      ],
+      "requiredAssetIds": [
+        "A-CHAR-P01",
+        "A-CHAR-F01",
+        "A-SET-OUTSIDE",
+        "A-PROP-GIFT",
+        "A-CARE-SUN",
+        "A-WARDROBE-OUTER",
+        "A-PROP-UMBRELLA",
+        "A-PROP-SHOULDER-BAG",
+        "A-PROP-WRAPPED-BOOK",
+        "A-PROP-BLUE-RIBBON",
+        "A-PROP-GIFT-CARD"
+      ],
+      "evidenceIds": [
+        "EV-NIAMS-DIAGNOSIS"
+      ],
+      "action": "女主看着朋友，在说话的同时缓慢把已举起的礼物向前送；朋友从下方托住，句尾双方已经共同持礼物。",
+      "startState": "到达屋檐下，伞已收起靠在左侧；女主已把礼物举到胸前，两手托住，朋友的手在下方准备接；长袖和肩包不变。",
+      "endState": "句尾朋友已稳定托住礼物底部，女主手只轻触侧边，尚未松手；交接的最后释放留给S20。",
+      "scale": "女主正面中近景",
+      "camera": "朋友肩侧，女主朝右侧近镜外说话；65；固定或极轻自然呼吸，未指定不加运镜；home保持窗在右；clinic女主左/医生右；outside左至右",
+      "dialogue": [
+        {
+          "id": "P-L04",
+          "speakerId": "E-A-CHAR-P01",
+          "text": "终于，亲手交给你。",
+          "startFrame": 1381,
+          "endFrame": 1444
+        }
+      ],
+      "subtitles": [
+        {
+          "id": "CAP-P-L04",
+          "text": "终于，亲手交给你。",
+          "startFrame": 1381,
+          "endFrame": 1444
+        }
+      ],
+      "dependencies": [
+        "S18"
+      ],
+      "route": "seedance",
+      "prompt": "原生9:16竖屏，写实真人健康科普故事，outside。有遮挡的会面处，女主看着朋友，边说本镜台词边缓慢递出胸前礼物，朋友从下方托住；嘴部清楚，句尾双方已经共同持礼物。\n\n站位与构图：女主在画面左中部、朋友只露右侧手与衣袖，礼物位于两人之间。开镜礼物已经举到女主胸前；伞收在屋檐左侧。说话过程中开始交接，句尾朋友稳定托住底部，女主仍轻触侧边；此镜不松手，不另做重复递礼。\n\n机位：朋友肩侧，女主朝右侧近镜外说话；65毫米全画幅等效镜头，女主正面中近景。焦点在本镜主动作及其接触点；医生/患者说话镜头嘴部全程可见，不用极浅景深掩盖嘴唇。\n\n光线、色彩与材质：右侧真实窗光作大面积柔光，米白与浅木为中性底，浅蓝只来自丝带/衣物；正常肤色、保留纹理，亮而不过曝。 布料、纸、皮肤和物件重力自然。清晰干净的数字摄影质感，不添加风格化炫光或重颗粒。\n\n情绪与限制：克制、生活化，结尾兑现开头的承诺，女主台词独立且口型同步。 不生成中文字、品牌、医院标识、无关人物、诊断结论水印或字幕；不改变身份，不夸张症状，不以口外摸脸代替口腔内病灶。",
+      "mustShow": [
+        "有遮挡的会面处，女主看向朋友，说完把礼物递过去，朋友的手接住。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    },
+    {
+      "id": "S20",
+      "title": "生活继续，管理也继续",
+      "startFrame": 1450,
+      "endFrame": 1500,
+      "entityIds": [
+        "E-A-CHAR-P01",
+        "E-A-CHAR-F01",
+        "E-A-SET-OUTSIDE",
+        "E-A-PROP-GIFT",
+        "E-A-PROP-WRAPPED-BOOK",
+        "E-A-PROP-BLUE-RIBBON",
+        "E-A-PROP-GIFT-CARD",
+        "E-C-LIFE",
+        "E-ACTION-S20"
+      ],
+      "requiredAssetIds": [
+        "A-CHAR-P01",
+        "A-CHAR-F01",
+        "A-SET-OUTSIDE",
+        "A-PROP-GIFT",
+        "A-PROP-WRAPPED-BOOK",
+        "A-PROP-BLUE-RIBBON",
+        "A-PROP-GIFT-CARD"
+      ],
+      "evidenceIds": [
+        "EV-NIAMS-DIAGNOSIS"
+      ],
+      "action": "朋友已经托稳，女主用整段自然动作从礼物侧面缓慢松手；礼物保持在朋友手中，蓝色结在画面中央，不重新递出。",
+      "startState": "接S19句尾：朋友已稳定托住礼物底部，女主只轻触侧边；礼物位置、蓝丝带结、两只手与伞/衣袖状态不变。",
+      "endState": "朋友独立持礼物，女主手自然退出；包装和结保持原状，无重复交接或治愈式特效。",
+      "scale": "礼物交接特写",
+      "camera": "沿S19同轴线，手部轻俯固定；85；固定或极轻自然呼吸，未指定不加运镜；home保持窗在右；clinic女主左/医生右；outside左至右",
+      "dialogue": [],
+      "subtitles": [],
+      "dependencies": [
+        "S19"
+      ],
+      "route": "seedance",
+      "prompt": "原生9:16竖屏，写实真人健康科普故事，outside。朋友已经从下方托稳礼物，女主只将轻触侧边的手缓慢松开，完成上镜尚未结束的一次交接。\n\n站位与构图：礼物和双方手部位于画面中部，蓝色丝带结清楚；沿S19同轴线，朋友的承托手开镜已经接触礼物底部。女主手从侧面释放，朋友独立持物为落幅；不得重新伸礼或重复接取。\n\n机位：沿S19同轴线，手部轻俯固定；85毫米全画幅等效镜头，礼物交接特写。焦点在本镜主动作及其接触点；医生/患者说话镜头嘴部全程可见，不用极浅景深掩盖嘴唇。\n\n光线、色彩与材质：右侧真实窗光作大面积柔光，米白与浅木为中性底，浅蓝只来自丝带/衣物；正常肤色、保留纹理，亮而不过曝。 布料、纸、皮肤和物件重力自然。清晰干净的数字摄影质感，不添加风格化炫光或重颗粒。\n\n情绪与限制：克制、生活化，交付的只是礼物，不是治愈承诺。 不生成中文字、品牌、医院标识、无关人物、诊断结论水印或字幕；不改变身份，不夸张症状，不以口外摸脸代替口腔内病灶。",
+      "mustShow": [
+        "女主从已被朋友托住的礼物侧面松手，蓝色蝴蝶结居中，画面停在真实自然动作。",
+        "按本镜身份、物件及入出状态制作，禁止从v5不匹配素材中找替代"
+      ],
+      "rejectIf": [
+        "用无关旧镜头贴上新字幕",
+        "静态图推拉冒充已要求的真人动作"
+      ]
+    }
+  ],
+  "postProgram": {
+    "version": 1,
+    "elements": [
+      {
+        "type": "text",
+        "text": "手指关节不适",
+        "x": 64,
+        "y": 110,
+        "color": "#FFFFFF",
+        "size": 40,
+        "startFrame": 75,
+        "endFrame": 125,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "情景/教学示意，不能用于自我诊断",
+        "x": 64,
+        "y": 1780,
+        "color": "#FFFFFF",
+        "size": 28,
+        "startFrame": 75,
+        "endFrame": 125,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "这一周",
+        "x": 64,
+        "y": 110,
+        "color": "#FFFFFF",
+        "size": 40,
+        "startFrame": 125,
+        "endFrame": 200,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "蝶形分布红斑 · 情景示意",
+        "x": 64,
+        "y": 200,
+        "color": "#FFFFFF",
+        "size": 40,
+        "startFrame": 125,
+        "endFrame": 200,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "情景/教学示意，不能用于自我诊断",
+        "x": 64,
+        "y": 1780,
+        "color": "#FFFFFF",
+        "size": 28,
+        "startFrame": 125,
+        "endFrame": 200,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "掉发增多？记录变化",
+        "x": 64,
+        "y": 110,
+        "color": "#FFFFFF",
+        "size": 40,
+        "startFrame": 200,
+        "endFrame": 250,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "情景/教学示意，不能用于自我诊断",
+        "x": 64,
+        "y": 1780,
+        "color": "#FFFFFF",
+        "size": 28,
+        "startFrame": 200,
+        "endFrame": 250,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "口腔溃疡 · 教学示意",
+        "x": 64,
+        "y": 110,
+        "color": "#FFFFFF",
+        "size": 40,
+        "startFrame": 250,
+        "endFrame": 300,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "情景/教学示意，不能用于自我诊断",
+        "x": 64,
+        "y": 1780,
+        "color": "#FFFFFF",
+        "size": 28,
+        "startFrame": 250,
+        "endFrame": 300,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "泡沫尿不等于肾损伤",
+        "x": 64,
+        "y": 110,
+        "color": "#FFFFFF",
+        "size": 40,
+        "startFrame": 300,
+        "endFrame": 350,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "情景/教学示意，不能用于自我诊断",
+        "x": 64,
+        "y": 1780,
+        "color": "#FFFFFF",
+        "size": 28,
+        "startFrame": 300,
+        "endFrame": 350,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "反复变化，主动就医",
+        "x": 64,
+        "y": 110,
+        "color": "#FFFFFF",
+        "size": 40,
+        "startFrame": 350,
+        "endFrame": 425,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "情景/教学示意，不能用于自我诊断",
+        "x": 64,
+        "y": 1780,
+        "color": "#FFFFFF",
+        "size": 28,
+        "startFrame": 350,
+        "endFrame": 425,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "AI演绎 · 非本人录制或医学审稿",
+        "x": 64,
+        "y": 1780,
+        "color": "#FFFFFF",
+        "size": 28,
+        "startFrame": 425,
+        "endFrame": 500,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "AI演绎 · 非本人录制或医学审稿",
+        "x": 64,
+        "y": 1780,
+        "color": "#FFFFFF",
+        "size": 28,
+        "startFrame": 500,
+        "endFrame": 625,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "血液检查",
+        "x": 64,
+        "y": 110,
+        "color": "#FFFFFF",
+        "size": 40,
+        "startFrame": 625,
+        "endFrame": 700,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "尿液检查",
+        "x": 64,
+        "y": 200,
+        "color": "#FFFFFF",
+        "size": 40,
+        "startFrame": 625,
+        "endFrame": 700,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "具体检查由医生决定",
+        "x": 64,
+        "y": 290,
+        "color": "#FFFFFF",
+        "size": 40,
+        "startFrame": 625,
+        "endFrame": 700,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "检查与随访后",
+        "x": 64,
+        "y": 110,
+        "color": "#FFFFFF",
+        "size": 40,
+        "startFrame": 700,
+        "endFrame": 850,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "系统性红斑狼疮",
+        "x": 64,
+        "y": 200,
+        "color": "#FFFFFF",
+        "size": 40,
+        "startFrame": 700,
+        "endFrame": 850,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "AI演绎 · 非本人录制或医学审稿",
+        "x": 64,
+        "y": 1780,
+        "color": "#FFFFFF",
+        "size": 28,
+        "startFrame": 700,
+        "endFrame": 850,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "自身免疫病",
+        "x": 64,
+        "y": 110,
+        "color": "#FFFFFF",
+        "size": 40,
+        "startFrame": 850,
+        "endFrame": 975,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "机制简化示意",
+        "x": 64,
+        "y": 200,
+        "color": "#FFFFFF",
+        "size": 40,
+        "startFrame": 850,
+        "endFrame": 975,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "AI演绎 · 非本人录制或医学审稿",
+        "x": 64,
+        "y": 1780,
+        "color": "#FFFFFF",
+        "size": 28,
+        "startFrame": 850,
+        "endFrame": 975,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "AI演绎 · 非本人录制或医学审稿",
+        "x": 64,
+        "y": 1780,
+        "color": "#FFFFFF",
+        "size": 28,
+        "startFrame": 1025,
+        "endFrame": 1170,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "随访期间",
+        "x": 64,
+        "y": 110,
+        "color": "#FFFFFF",
+        "size": 40,
+        "startFrame": 1170,
+        "endFrame": 1230,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "按医嘱复查与用药",
+        "x": 64,
+        "y": 200,
+        "color": "#FFFFFF",
+        "size": 40,
+        "startFrame": 1170,
+        "endFrame": 1230,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "做好防晒",
+        "x": 64,
+        "y": 110,
+        "color": "#FFFFFF",
+        "size": 40,
+        "startFrame": 1230,
+        "endFrame": 1290,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "把日子慢慢接回来",
+        "x": 64,
+        "y": 110,
+        "color": "#FFFFFF",
+        "size": 40,
+        "startFrame": 1290,
+        "endFrame": 1340,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "本视频仅供健康科普，不能替代医生诊疗。",
+        "x": 64,
+        "y": 1780,
+        "color": "#FFFFFF",
+        "size": 28,
+        "startFrame": 1375,
+        "endFrame": 1450,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "生活继续，管理也继续",
+        "x": 64,
+        "y": 110,
+        "color": "#FFFFFF",
+        "size": 40,
+        "startFrame": 1450,
+        "endFrame": 1500,
+        "fadeFrames": 0
+      },
+      {
+        "type": "text",
+        "text": "本视频仅供健康科普，不能替代医生诊疗。",
+        "x": 64,
+        "y": 1780,
+        "color": "#FFFFFF",
+        "size": 28,
+        "startFrame": 1450,
+        "endFrame": 1500,
+        "fadeFrames": 0
+      }
+    ]
+  }
+}

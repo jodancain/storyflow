@@ -1,0 +1,64 @@
+name: StoryFlow checks
+on: [push, pull_request]
+permissions:
+  contents: read
+concurrency:
+  group: storyflow-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      STORYFLOW_DATA_DIR: /tmp/storyflow-ci-data
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg fonts-noto-cjk python3-venv
+      - run: python3 -m venv /tmp/storyflow-python && /tmp/storyflow-python/bin/pip install pypdf==6.1.1
+      - run: echo 'PYTHON=/tmp/storyflow-python/bin/python' >> "$GITHUB_ENV"
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run doctor -- --json
+      - run: npm run check
+      - run: npm run test:ui
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: ui-failure-report
+          path: playwright-report/
+          if-no-files-found: ignore
+  container:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t storyflow:ci .
+      - name: Container health, media dependencies, dedicated volume persistence
+        run: |
+          docker volume create storyflow-ci-data
+          docker run -d --name storyflow-ci -p 127.0.0.1:18296:18296 -v storyflow-ci-data:/data/storyflow storyflow:ci
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:18296/healthz; then break; fi
+            sleep 2
+          done
+          curl --fail http://127.0.0.1:18296/healthz
+          docker exec storyflow-ci npm run doctor -- --json
+          docker exec storyflow-ci node -e "const fs=require('fs'); if(process.getuid()===0)throw Error('root');fs.writeFileSync('/data/storyflow/persistence-check','retained')"
+          docker rm -f storyflow-ci
+          docker run -d --name storyflow-ci -p 127.0.0.1:18296:18296 -v storyflow-ci-data:/data/storyflow storyflow:ci
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:18296/healthz; then break; fi
+            sleep 2
+          done
+          curl --fail http://127.0.0.1:18296/healthz
+          docker exec storyflow-ci node -e "if(require('fs').readFileSync('/data/storyflow/persistence-check','utf8')!=='retained')process.exit(1)"
+      - name: Container logs
+        if: failure()
+        run: docker logs storyflow-ci
+      - name: Cleanup
+        if: always()
+        run: docker rm -f storyflow-ci; docker volume rm storyflow-ci-data
