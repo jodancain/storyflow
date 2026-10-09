@@ -15,8 +15,10 @@
 | 停机备份恢复 | `tests/maintenance.test.ts` | 独占锁、进程强退释放、备份/还原、篡改拒绝、会话清除通过 |
 | 真实媒体执行 | `tests/media.test.ts` | FFmpeg实际编码解码；24fps/1440帧及25fps/1500帧60秒、音轨、字幕/图示、缺料拒绝通过 |
 | 浏览器 | `npm run test:ui` | 四阶段、真实隔离API/SQLite闭环、320/390/1440宽度、dirty编辑保护、旧任务不冒充当前修订通过 |
-| Docker | GitHub Actions `container` | 以本次提交对应的 Actions 结果为准；未安装本机 Docker |
+| Docker | GitHub Actions `container` | [首轮实际构建/容器重建通过](https://github.com/jodancain/storyflow/actions/runs/37977592720)；最终提交结果见交付校验清单，未安装本机 Docker |
 | 全新源码解包 | 交付时重新解压、`npm ci`、检查和浏览器流程 | 见交付包旁的校验清单 |
+
+首次全新解包验证：62/62核心测试、10/10浏览器测试通过；新增资料提取测试后的最终计数见交付校验清单。
 
 媒体测试使用合成画面和测试音，不代表已制作通过审核的医学实片。低分辨率fixture用于高效验证严格时序；竖屏1080P专项测试独立列在媒体测试内。UI模拟任务仅存在于测试文件，运行产品不会注入模拟成功状态。
 

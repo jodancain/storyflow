@@ -13,7 +13,7 @@
 
 ## Mac 原生运行
 
-安装 Node 22、FFmpeg、Python 3、Chrome 后，在仓库根目录执行：
+安装 Node 22、FFmpeg、Python 3、Chromium（或 Chrome）后，在仓库根目录执行：
 
 ```sh
 npm ci
@@ -33,7 +33,7 @@ npm start
 
 浏览器访问 `http://127.0.0.1:18296`。开发热更新另开终端执行 `npm run dev:ui`；API 仍通过 `npm run dev` 启动。生产模式也运行同一 Node API，仅使用 `dist/` 静态页面。
 
-`FFMPEG_PATH` / `FFPROBE_PATH` 与旧命名 `FFMPEG` / `FFPROBE` 均支持，前者优先。Mac 未设置 `CHROMIUM_PATH` 时使用已安装的 Chrome；Linux 未设置时使用 Playwright Chromium，可用 `npx playwright install chromium` 安装。`doctor` 只检查配置是否存在，不发送模型请求；它检查真实 Chromium PNG 渲染、SQLite WAL 读写和媒体工具。
+`FFMPEG_PATH` / `FFPROBE_PATH` 与旧命名 `FFMPEG` / `FFPROBE` 均支持，前者优先。未设置 `CHROMIUM_PATH` 时优先使用 Playwright 安装版 Chromium（`npx playwright install chromium`）；Mac 没有安装版时回退到已安装的 Chrome，也可显式设置 `STORYFLOW_BROWSER_CHANNEL=chrome`。`doctor` 只检查配置是否存在，不发送模型请求；它检查真实 Chromium PNG 渲染、SQLite WAL 读写和媒体工具。
 
 ## 本机 Docker
 
@@ -117,7 +117,7 @@ docker compose up -d
 
 真正配置 HTTPS 时须把 `PUBLIC_BASE_URL` 改成外部 HTTPS origin，重启应用并重新登录。会话 cookie 的 `Secure` 由此配置决定，同时始终使用 `HttpOnly`、`SameSite=Strict`、`Path=/`；域名使用 host-only cookie，不共享原项目登录。不能只在代理终止 TLS 而继续把应用的公开地址留为 HTTP。
 
-当前 Nginx 文件是仅监听回环地址的 HTTP 模板，未提供证书或公网监听。未来应在受控 TLS 入口代理到回环 API，并保留 Host / X-Forwarded-Proto；应用只信任回环代理。若将代理改为独立容器，不能直接把 `trust proxy` 放宽为信任任何客户端，应按实际网络边界单独配置。不要把本地开发入口或首次管理员设置接口直接开放公网。
+`deploy/nginx/storyflow.conf` 是回环 HTTP 模板；`deploy/nginx/storyflow.https.conf.template` 是未来域名的完整 80→443 重定向与 TLS 反代模板，证书路径须由部署者准备，两者均未安装或启用。未来应在受控 TLS 入口代理到回环 API，并保留 Host / X-Forwarded-Proto；应用只信任回环代理。若将代理改为独立容器，不能直接把 `trust proxy` 放宽为信任任何客户端，应按实际网络边界单独配置。不要把本地开发入口或首次管理员设置接口直接开放公网。
 
 ## Docker 静态复核
 
@@ -131,7 +131,7 @@ docker compose up -d
 
 GitHub Actions 定义了两条检查：
 
-1. Node 类型检查、单元/真实低分辨率媒体测试、前端构建及 Playwright 交互测试。
+1. Node 类型检查、单元/真实媒体测试（含完整1080P竖屏）、前端构建及 Playwright 交互测试。
 2. 构建独立 Docker 镜像，确认非 root、媒体依赖、健康接口，并通过删除/重建容器验证专属卷持久化及锁恢复。
 
 CI 不使用提供商密钥，不执行付费模型生成，不推送镜像，也不部署生产。工作流文件存在不等于 CI 已通过；真实 Docker 构建、容器验收、真实模型成片及内容验收分别记录。
@@ -140,12 +140,12 @@ CI 不使用提供商密钥，不执行付费模型生成，不推送镜像，�
 
 | 检查 | 结果与范围 |
 | --- | --- |
-| `npm run doctor -- --json` | 通过；Node 22.23.1、FFmpeg/FFprobe 8.1.2、Python 3.9.6 + 本机 pypdf 6.14.2、SQLite WAL 读写、非同步数据目录、Chrome 154 的 PNG 渲染。镜像固定的 pypdf 6.1.1 尚待 CI 容器验证。 |
+| `npm run doctor -- --json` | 通过；Node 22.23.1、FFmpeg/FFprobe 8.1.2、Python 3.9.6 + 本机 pypdf 6.14.2、SQLite WAL 读写、非同步数据目录、Chrome 154 的 PNG 渲染。镜像固定的 pypdf 6.1.1 已在首轮 CI 容器 doctor 通过。 |
 | `tests/maintenance.test.ts` | 5/5 通过：互斥、SIGKILL 释放、运行中拒绝/停机恢复/会话清除、篡改拒绝、路径穿越与符号链接拒绝。 |
 | 实际 npm 维护命令 | 临时独立目录完成 backup → 空目录 restore → `--replace` restore，业务值保持；只用本地 fixture。 |
 | 完整竖屏媒体合成 | 新增实际 1080×1920、25fps、60 秒测试通过：1500 帧、AAC 时长 60 秒、音画起点偏差 0、完整解码通过；中文字幕及图示通过输出像素检查。固定图层只渲染 1 张 PNG，其余帧硬链接复用。 |
 | 完整媒体测试耗时 | 本机底片准备 1.26 秒、合成 16.11 秒、全部校验合计 18.89 秒；临时目录在测试后删除。此值不是 CI/生产性能承诺，未涉及模型生成。测试超时 10 分钟，CI test job 上限 45 分钟包含依赖安装与其他测试。 |
 | HTTPS cookie 配置 | 临时 API 以 HTTPS canonical URL 启动，核验登录响应包含 Secure / HttpOnly / SameSite=Strict / Path=/；不连接公网。 |
 | 配置静态检查 | Compose / CI YAML 解析通过；named volume 和回环监听断言通过；Python 脚本编译及维护模块严格 TypeScript 检查通过。 |
-| Docker / GitHub CI | 当前检查机器无 Docker 命令，未安装、未构建镜像、未运行容器；CI 需推送后查看真实结果。未进行生产操作。 |
+| Docker / GitHub CI | 本机未安装 Docker；[首轮 GitHub CI](https://github.com/jodancain/storyflow/actions/runs/37977592720) 的 test/container 均成功，包含实际Docker构建、非root doctor及容器重建持久卷。当前提交新增工程/素材重建检查，以对应Actions结果为准。未进行生产操作。 |
 | 模型接口 | Doctor 仅查看是否配置；本轮维护验证没有实际模型提交或付费调用。 |

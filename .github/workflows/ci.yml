@@ -36,6 +36,9 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - run: docker build -t storyflow:ci .
       - name: Container health, media dependencies, dedicated volume persistence
         run: |
@@ -48,6 +51,23 @@ jobs:
           curl --fail http://127.0.0.1:18296/healthz
           docker exec storyflow-ci npm run doctor -- --json
           docker exec storyflow-ci node -e "const fs=require('fs'); if(process.getuid()===0)throw Error('root');fs.writeFileSync('/data/storyflow/persistence-check','retained')"
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import {writeFileSync} from 'node:fs';
+          const base='http://127.0.0.1:18296';
+          const setup=await fetch(`${base}/api/auth/setup`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({password:'ci-storyflow-fixture-password'})});
+          assert.equal(setup.status,200);
+          const cookie=setup.headers.get('set-cookie')?.split(';')[0];
+          assert.ok(cookie);
+          const created=await fetch(`${base}/api/projects`,{method:'POST',headers:{'content-type':'application/json',cookie},body:JSON.stringify({name:'CI volume recovery fixture',template:'lupus-v6'})});
+          assert.equal(created.status,201);
+          const project=await created.json();
+          assert.equal(project.ontology.shots.length,20);
+          assert.equal(project.files.length,12);
+          const file=project.files[0];
+          writeFileSync('/tmp/storyflow-ci-project.json',JSON.stringify({cookie,id:project.id,revision:project.revision,file:{id:file.id,sha256:file.sha256,bytes:file.bytes}}),{mode:0o600});
+          console.log('Created real template project: 20 shots, 12 assets.');
+          JS
           docker rm -f storyflow-ci
           docker run -d --name storyflow-ci -p 127.0.0.1:18296:18296 -v storyflow-ci-data:/data/storyflow storyflow:ci
           for attempt in $(seq 1 30); do
@@ -56,9 +76,35 @@ jobs:
           done
           curl --fail http://127.0.0.1:18296/healthz
           docker exec storyflow-ci node -e "if(require('fs').readFileSync('/data/storyflow/persistence-check','utf8')!=='retained')process.exit(1)"
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import {readFileSync,unlinkSync} from 'node:fs';
+          import {createHash} from 'node:crypto';
+          const state=JSON.parse(readFileSync('/tmp/storyflow-ci-project.json','utf8'));
+          const base='http://127.0.0.1:18296',headers={cookie:state.cookie};
+          const response=await fetch(`${base}/api/projects/${state.id}`,{headers});
+          assert.equal(response.status,200,'The same persisted session must work after container replacement');
+          const project=await response.json();
+          assert.equal(project.id,state.id);
+          assert.equal(project.revision,state.revision);
+          assert.equal(project.ontology.shots.length,20);
+          assert.equal(project.files.length,12);
+          const file=project.files.find(f=>f.id===state.file.id);
+          assert.equal(file?.sha256,state.file.sha256);
+          const download=await fetch(`${base}/api/files/${state.file.id}?download=1`,{headers});
+          assert.equal(download.status,200);
+          const bytes=Buffer.from(await download.arrayBuffer());
+          assert.equal(bytes.length,state.file.bytes);
+          assert.equal(createHash('sha256').update(bytes).digest('hex'),state.file.sha256);
+          unlinkSync('/tmp/storyflow-ci-project.json');
+          console.log('Recovered actual project and session; downloaded asset SHA-256 verified.');
+          JS
       - name: Container logs
         if: failure()
         run: docker logs storyflow-ci
       - name: Cleanup
         if: always()
-        run: docker rm -f storyflow-ci; docker volume rm storyflow-ci-data
+        run: |
+          rm -f /tmp/storyflow-ci-project.json
+          docker rm -f storyflow-ci
+          docker volume rm storyflow-ci-data
