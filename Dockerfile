@@ -21,7 +21,7 @@ ENV NODE_ENV=production \
     CHROMIUM_PATH=/usr/bin/chromium \
     FFMPEG=/usr/bin/ffmpeg \
     FFPROBE=/usr/bin/ffprobe
-COPY package.json package-lock.json ./
+COPY package.json package-lock.json tsconfig.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/dist-review ./dist-review

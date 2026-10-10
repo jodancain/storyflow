@@ -74,7 +74,8 @@ jobs:
           console.log(`Created real template project: 20 shots, ${expectedFiles} files, ${candidateCount} pending image candidates.`);
           JS
           docker rm -f storyflow-ci
-          docker run -d --name storyflow-ci -p 127.0.0.1:18296:18296 -v storyflow-ci-data:/data/storyflow storyflow:ci
+          review_project_id="$(node -p "JSON.parse(require('fs').readFileSync('/tmp/storyflow-ci-project.json','utf8')).id")"
+          docker run -d --name storyflow-ci -p 127.0.0.1:18296:18296 -v storyflow-ci-data:/data/storyflow -e STORYFLOW_PUBLIC_REVIEW_PROJECTS="$review_project_id" storyflow:ci
           for attempt in $(seq 1 30); do
             if curl --fail --silent http://127.0.0.1:18296/healthz; then break; fi
             sleep 2
@@ -103,8 +104,35 @@ jobs:
           const bytes=Buffer.from(await download.arrayBuffer());
           assert.equal(bytes.length,state.file.bytes);
           assert.equal(createHash('sha256').update(bytes).digest('hex'),state.file.sha256);
+          // The runtime executes TSX for SSR. Health checks and built client JS
+          // cannot detect a missing runtime tsconfig / automatic JSX transform.
+          const review=await fetch(`${base}/review/${state.id}`);
+          assert.equal(review.status,200,'Published review HTML must render in the replacement runtime container');
+          assert.match(review.headers.get('content-type') || '',/text\/html/);
+          assert.match(review.headers.get('content-security-policy') || '',/connect-src 'self'/);
+          const html=await review.text();
+          assert.match(html,/id="storyflow-snapshot"/);
+          assert.match(html,/id="shots"/);
+          assert.match(html,/id="production"/);
+          const snapshotResponse=await fetch(`${base}/api/public-review/${state.id}`);
+          assert.equal(snapshotResponse.status,200);
+          const snapshot=await snapshotResponse.json();
+          assert.equal(snapshot.projectId,state.id);
+          assert.equal(snapshot.revision,state.revision);
+          assert.deepEqual(snapshot.onlineReview,{apiBase:'/api',projectId:state.id});
+          assert.equal(snapshot.items.filter(item=>item.type==='shot').length,20);
+          assert.equal(snapshot.items.reduce((count,item)=>count+item.candidates.length,0),state.candidateCount);
+          assert.equal(snapshot.imageJobs.length,0);
+          const publishedImage=snapshot.items.find(item=>item.image)?.image;
+          assert.ok(publishedImage,'The real template must publish an actual candidate');
+          assert.ok(publishedImage.url.startsWith(`/api/public-review/${state.id}/files/`));
+          const publicImage=await fetch(`${base}${publishedImage.url}`);
+          assert.equal(publicImage.status,200);
+          const publicBytes=Buffer.from(await publicImage.arrayBuffer());
+          assert.equal(createHash('sha256').update(publicBytes).digest('hex'),publishedImage.sha256);
+          assert.equal((await fetch(`${base}/api/public-review/00000000-0000-4000-8000-000000000000`)).status,404);
           unlinkSync('/tmp/storyflow-ci-project.json');
-          console.log('Recovered actual project and session; downloaded asset SHA-256 verified.');
+          console.log('Recovered project/session; runtime SSR, allowlisted public snapshot and image SHA-256 verified. No provider calls.');
           JS
       - name: Container logs
         if: failure()

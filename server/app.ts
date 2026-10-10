@@ -100,7 +100,7 @@ export function createApp(
   });
   app.use(express.json({ limit: "5mb" }));
   app.get("/healthz", (_req, res) =>
-    res.json({ ok: true, service: "storyflow", version: "0.3.0" }),
+    res.json({ ok: true, service: "storyflow", version: "0.3.1" }),
   );
   app.use("/api", (req, _res, next) => {
     if (!["GET", "HEAD", "OPTIONS"].includes(req.method)) {
@@ -176,7 +176,7 @@ export function createApp(
   app.get("/api/config", (_req, res) => {
     const c = jobs.providers.capabilities();
     res.json({
-      version: "0.3.0",
+      version: "0.3.1",
       publicBaseUrl: canonical.href,
       capabilities: {
         image: {
