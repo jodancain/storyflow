@@ -57,11 +57,13 @@ test("a bound private original is excluded from the public page; only explicitly
     p.files = t.store.files(p.id);
     p.ontology.assets.push({id:"private-photo",label:"原始照片",kind:"image",purpose:"production",fileId:privatePhoto.id,sha256:privatePhoto.sha256,gap:false});
     p.ontology.assets.push({id:"public-ref",label:"授权参考",kind:"image",purpose:"reference",fileId:reference.id,sha256:reference.sha256,gap:false});
-    p.ontology.shots[0].requiredAssetIds.push("public-ref");
+    p.ontology.relations.push({id:"asset-depiction",type:"depicts",from:"face",to:"hero"},{id:"reference-depiction",type:"depicts",from:"public-ref",to:"hero"});
     const resolved:string[]=[];
     const view=publicSnapshot(p,id=>{resolved.push(id);return `assets/${id}`});
     assert.equal(view.items.find(i=>i.id==="private-photo")?.image,undefined);
     assert.ok(!resolved.includes(privatePhoto.id));
     assert.ok(resolved.includes(reference.id));
+    assert.equal(view.items.find(i=>i.id==="face")?.references[0]?.id,"public-ref");
+    assert.equal(view.items.find(i=>i.id==="s1")?.references[0]?.id,"public-ref");
   } finally { t.close(); }
 });

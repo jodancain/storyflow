@@ -56,13 +56,16 @@ export function projectSnapshot(project: Project, fileUrl: (id: string) => strin
   };
   const currentPass = (id: string) => project.reviews.some(r => r.targetId === id && r.targetHash === project.compiled.targetHashes[id] && r.status === "pass");
   const refs = project.ontology.assets.filter(a => a.purpose === "reference");
-  const reference = (ids: string[]) => refs.filter(a => ids.includes(a.id)).map(a => ({ id: a.id, title: a.label, url: a.source?.url, imageUrl: a.fileId && file(a.fileId)?.mime.startsWith("image/") ? fileUrl(a.fileId) : undefined, note: a.source?.use || a.source?.license }));
+  const reference = (ids: string[]) => {
+    const depicted = new Set(project.ontology.relations.filter(r => r.type === "depicts" && ids.includes(r.from)).map(r => r.to));
+    return refs.filter(a => ids.includes(a.id) || project.ontology.relations.some(r => r.type === "depicts" && r.from === a.id && depicted.has(r.to))).map(a => ({ id: a.id, title: a.label, url: a.source?.url, imageUrl: a.fileId && file(a.fileId)?.mime.startsWith("image/") ? fileUrl(a.fileId) : undefined, note: a.source?.use || a.source?.license }));
+  };
   const items: ReviewItem[] = project.ontology.assets.filter(a => a.purpose === "production" && ["image", "graphic"].includes(a.kind)).map(asset => {
     const a = asset as typeof asset & { previewImage?: Binding };
     const candidates = images.filter(i => (i as Artifact & { assetId?: string }).assetId === a.id).map(image);
     const selected = resolve(a.previewImage, a.fileId, currentPass(a.id)) || candidates[0];
     const related = project.ontology.shots.filter(s => s.requiredAssetIds.includes(a.id) || project.ontology.anchors.some(n => n.assetId === a.id && [s.firstAnchorId, s.endAnchorId].includes(n.id)));
-    return { id: a.id, imageAttempt:a.imageAttempt, type: "asset", title: a.label, description: a.mustShow?.join("；") || "核对专属资产的身份、状态与用途。", image: selected, candidates: candidates.length ? candidates : selected ? [selected] : [], relatedIds: related.map(s => s.id), mustShow: a.mustShow || [], rejectIf: a.rejectIf || [], dependencies: selected?.parentIds || [], approvedFileId: a.fileId, source: a.source, targetHash: project.compiled.targetHashes[a.id], references: reference(related.flatMap(s => s.requiredAssetIds)) };
+    return { id: a.id, imageAttempt:a.imageAttempt, type: "asset", title: a.label, description: a.mustShow?.join("；") || "核对专属资产的身份、状态与用途。", image: selected, candidates: candidates.length ? candidates : selected ? [selected] : [], relatedIds: related.map(s => s.id), mustShow: a.mustShow || [], rejectIf: a.rejectIf || [], dependencies: selected?.parentIds || [], approvedFileId: a.fileId, source: a.source, targetHash: project.compiled.targetHashes[a.id], references: reference([a.id]) };
   });
   for (const shot of project.ontology.shots) {
     const s = shot as typeof shot & { reviewImage?: Binding; firstFrameImage?: Binding };
