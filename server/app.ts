@@ -100,7 +100,7 @@ export function createApp(
   });
   app.use(express.json({ limit: "5mb" }));
   app.get("/healthz", (_req, res) =>
-    res.json({ ok: true, service: "storyflow", version: "0.3.1" }),
+    res.json({ ok: true, service: "storyflow", version: "0.3.2" }),
   );
   app.use("/api", (req, _res, next) => {
     if (!["GET", "HEAD", "OPTIONS"].includes(req.method)) {
@@ -278,6 +278,9 @@ export function createApp(
         boundedText(req.body.fileId, 128),
       ),
     ),
+  );
+  app.post("/api/projects/:id/production-images/adopt", (req, res) =>
+    res.json(store.adoptProductionImages(String(req.params.id), revision(req.body.baseRevision), key(req.body.idempotencyKey), req.body.items)),
   );
   app.put("/api/projects/:id/reviews", (req, res) => {
     const id = String(req.params.id),

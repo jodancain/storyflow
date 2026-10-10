@@ -1,4 +1,12 @@
-# v0.3 当前开发入口
+# v0.3.2 当前开发入口
+
+- 批量采用：`POST /api/projects/:id/production-images/adopt`，body 为 `{baseRevision,idempotencyKey,items:[{artifactId,sha256}]}`。只接受当前展示、当前有效且已批准的图片，核对真实字节；绑定写入一次修订，审核新制作快照后再调用既有 `/runs`。
+- `metadata.productionAdoption` 记录绑定修订及采用条件，原 `sourceHash` 和生成回执保持不变。有效采用必须匹配同工程持久 action；工程 ZIP 中的记录仅作历史，不继承授权，完整私有备份恢复则保留该 action。真实父图、脚本或身份变化仍使候选过期；不以重写来源绕过审核。
+- 公开制作视图：`GET /api/public-review/:id/production`；已登录管理员经 `POST /api/public-review/:id/artifacts/:artifactId/review` 提交 `{accepted,sourceHash,fileSha256,note}`。只处理该公开工程、当前产物的审核，不创建额外付费任务。
+- 候选视频/声音使用原 `files/:fileId` 白名单下载，支持 Range；页面 CSP 限制 `media-src 'self'`。反向代理还需允许上述两个路径，不能开放整个项目 API。
+- 真实视频执行依赖供应商配置、素材批准和前镜产物审核。没有凭据、缺图、受理不明、待听审都不是“生成成功”。浏览器草稿与服务器正式审核分别保留。
+
+# v0.3 历史开发入口
 
 新增能力和操作语义以 [REVIEW-WORKFLOW-v0.3.md](REVIEW-WORKFLOW-v0.3.md) 为准：图片内联审核、意见事务、返修任务、统一身份门禁和可配置在线审稿。下文 v0.2 的本地导出意见说明为历史实现，不再是主操作路径。
 

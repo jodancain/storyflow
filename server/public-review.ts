@@ -5,6 +5,7 @@ import { resolve } from "node:path";
 import { createHash } from "node:crypto";
 import JSZip from "jszip";
 import type { Project } from "../shared/types.ts";
+import type { PublicProduction } from "../shared/review-production.ts";
 import { inspectImageConsistency } from "../shared/image-consistency.ts";
 import { projectSnapshot, type ReviewSnapshot } from "../src/review/projectSnapshot.ts";
 import { PublicReview } from "../src/review/PublicReview.tsx";
@@ -12,6 +13,23 @@ import { Store } from "./store.ts";
 import { ensure, escapeHtml, sha } from "./util.ts";
 
 const json = (value: unknown) => JSON.stringify(value).replace(/</g, "\\u003c").replace(/>/g, "\\u003e").replace(/&/g, "\\u0026");
+const mediaKinds = new Set(["video", "voice", "lipsync", "graphic", "compose"]);
+const publicStages = new Set(["queued", "preparing", "submitting", "polling", "downloading", "rendering", "complete", "cancelled", "acceptance_unknown", "provider_failed", "dependency_blocked", "review_dependency"]);
+/** Only completed, owned task outputs are published. Uploaded/reference files are never inferred public. */
+export function publicProduction(project: Project, fileUrl: (id: string) => string): PublicProduction {
+  const jobs = project.jobs.filter(j => mediaKinds.has(j.kind));
+  const candidates: PublicProduction["candidates"] = [];
+  for (const artifact of project.artifacts) {
+    if (!["video", "voice", "lipsync", "graphic", "final"].includes(artifact.kind)) continue;
+    const job = jobs.find(j => j.id === artifact.jobId && j.projectId === project.id && j.state === "complete" && j.result?.artifactId === artifact.id && j.shotId === artifact.shotId && (j.kind === artifact.kind || (j.kind === "compose" && artifact.kind === "final")));
+    const file = project.files.find(f => f.id === artifact.fileId && f.projectId === project.id);
+    if (!job || !file || artifact.projectId !== project.id) continue;
+    const allowedMime = artifact.kind === "voice" ? ["audio/wav", "audio/x-wav", "audio/mpeg", "audio/mp4", "audio/ogg"] : ["video/mp4", "video/webm"];
+    if (!allowedMime.includes(file.mime)) continue;
+    candidates.push({ id:artifact.id, shotId:artifact.shotId, kind:artifact.kind as PublicProduction["candidates"][number]["kind"], fileId:file.id, url:fileUrl(file.id), mime:file.mime, sha256:file.sha256, sourceHash:artifact.sourceHash, current:artifact.shotId ? artifact.sourceHash === project.compiled.shotHashes[artifact.shotId] : job.input?.postHash === project.compiled.postHash, accepted:artifact.accepted, reviewed:typeof artifact.metadata.reviewedAt === "string", createdAt:artifact.createdAt });
+  }
+  return { projectId:project.id, revision:project.revision, candidates, jobs:jobs.map(job => ({ id:job.id, shotId:job.shotId, kind:job.kind, state:job.state, stage:publicStages.has(job.stage) ? job.stage : "preparing", current:job.shotId ? job.input?.generationHash === project.compiled.shotHashes[job.shotId] : job.input?.postHash === project.compiled.postHash, updatedAt:job.updatedAt, dependsOn:job.dependsOn.filter(id=>jobs.some(j=>j.id===id)), reason:job.state === "uncertain" ? "供应商是否受理尚未确认，后台不会自动重复提交。" : job.state === "blocked" ? "制作条件尚未齐备，请管理员检查素材或模型配置。" : job.state === "failed" ? "此任务未完成，管理员需检查后处理；不会自动追加生成。" : job.stage === "dependency_blocked" ? "前置任务尚未完成，等待处理。" : job.stage === "review_dependency" ? "等待前置声音或镜头人工通过，审核后继续已排队任务。" : undefined })) };
+}
 function safeLink(value?: string) {
   if (!value) return undefined;
   try { const url = new URL(value); if (!["https:", "http:"].includes(url.protocol) || url.username || url.password) return undefined; url.search = ""; url.hash = ""; return url.toString(); } catch { return undefined; }
@@ -59,7 +77,7 @@ export function publicReviewCsp(online = false): string {
   const path = resolve("dist-review/review.js");
   const script = existsSync(path) ? readFileSync(path, "utf8").replace(/<\/script/gi, "<\\/script") : "";
   const digest = createHash("sha256").update(script).digest("base64");
-  return `default-src 'none'; script-src 'sha256-${digest}'; style-src 'unsafe-inline'; img-src 'self' data:; connect-src ${online ? "'self'" : "'none'"}; frame-ancestors 'none'; base-uri 'none'; form-action 'none'`;
+  return `default-src 'none'; script-src 'sha256-${digest}'; style-src 'unsafe-inline'; img-src 'self' data:; media-src 'self'; connect-src ${online ? "'self'" : "'none'"}; frame-ancestors 'none'; base-uri 'none'; form-action 'none'`;
 }
 export function renderPublicReviewHtml(project: Project, fileUrl: (id: string) => string, requireInteractive = false, onlineReview?: { apiBase: string; projectId: string }): string {
   const snapshot = publicSnapshot(project, fileUrl);

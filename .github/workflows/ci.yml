@@ -123,6 +123,11 @@ jobs:
           assert.equal(snapshot.items.filter(item=>item.type==='shot').length,20);
           assert.equal(snapshot.items.reduce((count,item)=>count+item.candidates.length,0),state.candidateCount);
           assert.equal(snapshot.imageJobs.length,0);
+          const productionResponse=await fetch(`${base}/api/public-review/${state.id}/production`);
+          assert.equal(productionResponse.status,200);
+          const production=await productionResponse.json();
+          assert.equal(production.jobs.length,0,'A fresh template must not invent production tasks');
+          assert.equal(production.candidates.length,0,'Image candidates are not video output');
           const publishedImage=snapshot.items.find(item=>item.image)?.image;
           assert.ok(publishedImage,'The real template must publish an actual candidate');
           assert.ok(publishedImage.url.startsWith(`/api/public-review/${state.id}/files/`));
