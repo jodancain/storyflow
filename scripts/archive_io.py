@@ -6,17 +6,19 @@ import tarfile
 from pathlib import Path
 
 MAX_BYTES = 256 * 1024**3
-MAX_FILES = 100_002
+MAX_FILES = 200_002
 
 def allowed(name):
-    return name in ('manifest.json', 'storyflow.sqlite') or re.fullmatch(r'files/[a-f0-9]{64}', name)
+    return name in ('manifest.json', 'storyflow.sqlite') or re.fullmatch(r'files/[a-f0-9]{64}', name) or re.fullmatch(r'work/[a-f0-9-]{36}/image-receipt\.json', name)
 
 def main():
     mode, archive, directory = sys.argv[1:]
     root = Path(directory).resolve()
     if mode == 'pack':
         with tarfile.open(archive, 'x') as out:
-            for file in [root / 'manifest.json', root / 'storyflow.sqlite', *sorted((root / 'files').iterdir())]:
+            receipts = sorted((root / 'work').glob('*/image-receipt.json')) if (root / 'work').exists() else []
+            assets = sorted((root / 'files').iterdir()) if (root / 'files').exists() else []
+            for file in [root / 'manifest.json', root / 'storyflow.sqlite', *assets, *receipts]:
                 name = file.relative_to(root).as_posix()
                 if not allowed(name) or file.is_symlink() or not file.is_file():
                     raise ValueError('Unsupported backup entry')
@@ -38,7 +40,7 @@ def main():
                 seen.add(name)
                 if len(seen) > MAX_FILES or total > MAX_BYTES or member.size > 8 * 1024**3:
                     raise ValueError('Archive exceeds maintenance limits')
-                if name == 'manifest.json' and member.size > 64 * 1024**2:
+                if (name == 'manifest.json' or name.endswith('/image-receipt.json')) and member.size > 64 * 1024**2:
                     raise ValueError('Manifest exceeds limit')
                 path = root / name
                 path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)

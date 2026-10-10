@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { resolveImageConsistency, validateImageConsistency } from "./image-consistency.js";
 import type {
   Anchor,
   Asset,
@@ -624,6 +625,7 @@ export function validateOntology(value: unknown): Issue[] {
       });
     }
   }
+  issues.push(...validateImageConsistency(value));
   return issues;
 }
 
@@ -717,6 +719,7 @@ export function compileOntology(ontology: Ontology): Compiled {
     const assetIds = new Set([
       ...list<string>(s.requiredAssetIds),
       ...shotAnchors.map((a) => a.assetId),
+      ...resolveImageConsistency(ontology, s.id).requiredIdentityAssetIds,
     ]);
     const selectedEntities = ordered(
       [...entityIds]
@@ -759,6 +762,7 @@ export function compileOntology(ontology: Ontology): Compiled {
     ]);
     prompts[s.id] = [
       s.prompt || "",
+      resolveImageConsistency(ontology, s.id).promptGuard,
       `画幅 ${spec.width}×${spec.height}，目标镜头 ${s.endFrame - s.startFrame} 帧 / ${spec.fps}fps。`,
       `景别：${s.scale || ""}；机位：${s.camera || ""}。`,
       `开始：${s.startState || ""}\n动作：${s.action || ""}\n结束：${s.endState || ""}`,
@@ -889,7 +893,8 @@ export function compileOntology(ontology: Ontology): Compiled {
         ),
       });
   for (const a of assets)
-    if (typeof a.id === "string") targetHashes[a.id] = hash({ ...a, imageAttempt:undefined, previewImage: a.previewImage ? {sha256:a.previewImage.sha256} : undefined });
+    if (typeof a.id === "string") targetHashes[a.id] = hash({ ...a, imageAttempt:undefined, previewImage: a.previewImage ? {sha256:a.previewImage.sha256} : undefined,
+      ...(ontology.imageConsistency ? {identity:resolveImageConsistency(ontology,a.id).desiredReferences} : {}) });
   for (const s of shots)
     if (typeof s.id === "string")
       targetHashes[s.id] = hash({
@@ -1106,7 +1111,8 @@ export function imageTargetHashes(ontology: Ontology): Record<string, string> {
   const compiled=compileOntology(copy), values:Record<string,string>={};
   for(const asset of ontology.assets) {
     const {fileId,sha256,gap,previewImage,imageAttempt,...brief}=asset;
-    values[asset.id]=hash({schema:"storyflow-image-brief-v1",spec:{width:ontology.spec.width,height:ontology.spec.height},asset:brief});
+    values[asset.id]=hash({schema:"storyflow-image-brief-v1",spec:{width:ontology.spec.width,height:ontology.spec.height},asset:brief,
+      ...(ontology.imageConsistency ? {identity:resolveImageConsistency(ontology,asset.id).desiredReferences} : {})});
   }
   for(const shot of ontology.shots)
     values[shot.id]=hash({schema:"storyflow-image-brief-v1",shotHash:compiled.shotHashes[shot.id]});

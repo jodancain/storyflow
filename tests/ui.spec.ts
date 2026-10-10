@@ -1,4 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
+import { readFileSync } from "node:fs";
+import { projectSnapshot } from "../src/review/projectSnapshot.ts";
 import { compileOntology } from "../shared/ontology.ts";
 import type { Project, Requirements, Ontology } from "../shared/types.ts";
 
@@ -130,6 +132,7 @@ async function mockApi(page: Page, setup = false, imageConfigured = false) {
     authenticated = !setup,
     created = false;
   const requests: { path: string; method: string; body: any }[] = [];
+  const submissions: any[] = [];
   await page.route("**/api/**", async (route) => {
     const request = route.request(),
       url = new URL(request.url()),
@@ -158,7 +161,25 @@ async function mockApi(page: Page, setup = false, imageConfigured = false) {
       }
       return ok(project);
     }
+    if (path.endsWith("/review-submissions") && method === "POST") {
+      if (body.baseRevision !== project.revision) return ok({ error: "工程版本已变化，请重新核对当前图片。" }, 409);
+      const items = body.items.map((item: any) => {
+        const artifact = project.artifacts.find(a => a.id === item.imageId)!;
+        artifact.accepted = item.status === "pass";
+        artifact.metadata = { ...artifact.metadata, reviewNote: item.note, reviewStatus: item.status };
+        return { ...item, outcome: item.status === "pass" ? "approved" : imageConfigured ? "queued" : "blocked", ...(item.status === "change" && !imageConfigured ? { blocked: { code: "image_unconfigured", reason: "图片服务尚未配置，意见已保存。" } } : {}) };
+      });
+      const submission = { id: `review-submission-fixture-${submissions.length}`, projectId: project.id, baseRevision: project.revision, createdAt: project.createdAt, items };
+      submissions.unshift(submission);
+      return ok({ submission, project, jobs: [] });
+    }
+    if (path.endsWith("/review-submissions") && method === "GET") return authenticated ? ok({ submissions }) : ok({ error: "请先登录审核" }, 401);
     if (path.endsWith("/image-generations")) return ok({runId:"fixture-run",jobs:[]});
+    if (path === "/api/public-review/test-project") {
+      const snapshot = projectSnapshot(project, id => `/api/files/${id}`);
+      for (const item of snapshot.items) { if (item.image) delete item.image.note; for (const candidate of item.candidates) delete candidate.note; }
+      return ok({ ...snapshot, onlineReview: { apiBase: "/api", projectId: project.id } });
+    }
     if (path === "/api/auth")
       return ok({ setupRequired: setup && !authenticated, authenticated });
     if (path === "/api/auth/setup" || path === "/api/auth/login") {
@@ -384,6 +405,7 @@ test("真实服务：创建、编辑、持久审核、工程迁移与缺凭据�
       STORYFLOW_DATA_DIR: join(temp, "data"),
       STORYFLOW_ADMIN_PASSWORD: "",
       OPUS_API_KEY: "",
+      IMAGE_API_KEY: "",
       SEEDANCE_API_KEY: "",
       FAL_KEY: "",
     },
@@ -413,7 +435,16 @@ test("真实服务：创建、编辑、持久审核、工程迁移与缺凭据�
     await page.getByRole("button", { name: "＋ 新建项目" }).click();
     await page.getByRole("button", { name: /狼疮科普模板/ }).click();
     await page.getByLabel("项目名称", { exact: true }).fill("真实服务验收工程");
+    // The real template copies and hashes its media before creation completes.
+    // Wait for that bounded API operation, then keep the normal UI render deadline.
+    const createdResponse = page.waitForResponse(response => response.url() === `${base}/api/projects` && response.request().method() === "POST", { timeout: 60000 });
     await page.getByRole("button", { name: "创建项目 →" }).click();
+    const created = await createdResponse;
+    expect(created.status()).toBe(201);
+    const createdProject = await created.json();
+    expect(createdProject.name).toBe("真实服务验收工程");
+    expect(createdProject.ontology.shots).toHaveLength(20);
+    expect(createdProject.files.length).toBeGreaterThan(0);
     await expect(
       page.getByRole("heading", { name: "真实服务验收工程", exact: true }),
     ).toBeVisible();
@@ -464,7 +495,13 @@ test("真实服务：创建、编辑、持久审核、工程迁移与缺凭据�
     const zip = join(temp, "project.zip");
     await download.saveAs(zip);
     await page.getByRole("button", { name: "返回项目列表" }).click();
+    const importedResponse = page.waitForResponse(response => response.url() === `${base}/api/import` && response.request().method() === "POST", { timeout: 60000 });
     await page.locator(".library-heading input[type=file]").setInputFiles(zip);
+    const imported = await importedResponse;
+    expect(imported.status()).toBe(201);
+    const importedProject = await imported.json();
+    expect(importedProject.id).not.toBe(id);
+    expect(importedProject.ontology.shots).toHaveLength(20);
     await expect(page.getByRole("status")).toContainText("工程已导入");
     await expect
       .poll(() => new URL(page.url()).searchParams.get("project"))
@@ -645,8 +682,9 @@ test("真实资产候选可比较、明确批准与采用，返回保留筛选",
   await dialog.getByLabel("并排比较").selectOption("candidate-second");
   await expect(dialog.getByAltText("指定医生参考照对比候选")).toBeVisible();
   await page.screenshot({path:testInfo.outputPath("candidate-review.png"),animations:"disabled"});
-  await dialog.getByLabel("当前候选审图意见").fill("核对指定医生身份，批准当前候选。");
-  await dialog.getByRole("button",{name:"确认此图通过",exact:true}).click();
+  await dialog.getByLabel("portrait图片修改意见").fill("核对指定医生身份，批准当前候选。");
+  await dialog.getByRole("button",{name:"通过",exact:true}).click();
+  await dialog.getByRole("button",{name:"提交审核意见",exact:true}).click();
   await expect(dialog.getByRole("button",{name:"采用为制作资产",exact:true})).toBeEnabled();
   await dialog.getByRole("button",{name:"作为审稿展示图",exact:true}).click();
   expect(mock.requests.filter(r=>r.path.endsWith("/select")).at(-1)?.body.usage).toBe("preview");
@@ -710,4 +748,163 @@ test("实际参考图可取消与明确发送，卡片缩略图与技术返修�
   expect(mock.requests.filter(r=>r.path.endsWith("/image-generations"))).toHaveLength(0);
   await page.getByRole("button",{name:"提交生成一个候选",exact:true}).click();
   const request=mock.requests.filter(r=>r.path.endsWith("/image-generations"));expect(request).toHaveLength(1);expect(request[0].body.targets[0].referenceAssetIds).toEqual(["portrait"]);expect(request[0].body.targets[0].shotId).toBe("S02");expect(request[0].body.targets[0].prompt).toContain("医生口型");expect(request[0].body.targets[0].prompt).toContain("更明亮的人物面部");
+});
+
+function addInlineImage(p: Project) {
+  p.files = [{ id: "file-first", projectId: p.id, name: "fixture.svg", mime: "image/svg+xml", sha256: "1".repeat(64), bytes: 300, relativePath: "fixture", createdAt: p.createdAt }];
+  p.artifacts = [{ id: "candidate-first", projectId: p.id, jobId: "image-first", kind: "image", assetId: "portrait", fileId: "file-first", sourceHash: "image-hash", accepted: false, metadata: { origin: "ai-generated", modelRequested: "fixture-image", reviewStatus: "pending" }, createdAt: p.createdAt }];
+  p.ontology.assets[0].previewImage = { artifactId: "candidate-first", fileId: "file-first", sha256: "1".repeat(64) };
+  p.imageTargetHashes = { portrait: "image-hash" };
+}
+async function openImageReview(page: Page) {
+  await openProject(page);
+  await page.getByRole("button", { name: /^03 审核/ }).first().click();
+  await page.getByRole("button", { name: "资产图与首帧", exact: true }).click();
+}
+
+test("卡片内审核一次提交通过和返修，评论缺失不生成", async ({ page }, testInfo) => {
+  const mock = await mockApi(page, false, true), p = mock.getProject(); addInlineImage(p);
+  await openImageReview(page);
+  const card = page.locator("#item-portrait");
+  await card.getByRole("button", { name: "不通过", exact: false }).click();
+  await expect(page.getByRole("button", { name: "提交意见并生成返修图", exact: true })).toBeDisabled();
+  await card.getByLabel("portrait图片修改意见").fill("保持角色基准的同一张脸，齐肩短发。");
+  expect(mock.requests.filter(r => r.path.endsWith("/review-submissions"))).toHaveLength(0);
+  await page.screenshot({path: testInfo.outputPath("inline-review-desktop.png"), animations:"disabled"});
+  await page.getByRole("button", { name: "提交意见并生成返修图", exact: true }).click();
+  await expect(page.getByText(/意见已保存：0 项通过，1 项返修已排队/)).toBeVisible();
+  const sent = mock.requests.filter(r => r.path.endsWith("/review-submissions"));
+  expect(sent).toHaveLength(1);
+  expect(sent[0].body.items).toEqual([{ targetId: "portrait", targetHash: p.compiled.targetHashes.portrait, imageId: "candidate-first", imageSha256: "1".repeat(64), status: "change", note: "保持角色基准的同一张脸，齐肩短发。" }]);
+  expect(sent[0].body.idempotencyKey).toBeTruthy();
+  expect(mock.requests.filter(r => r.path.endsWith("/image-generations"))).toHaveLength(0);
+  await card.getByRole("button", { name: "通过", exact: true }).click();
+  await page.getByRole("button", { name: "提交审核意见", exact: true }).click();
+  await expect(page.getByText(/意见已保存：1 项通过，0 项返修已排队/)).toBeVisible();
+  expect(p.artifacts[0].accepted).toBe(true);
+});
+
+test("意见提交网络不明保留草稿和幂等键，缺配置真实显示等待", async ({ page }) => {
+  const mock = await mockApi(page), p = mock.getProject(); addInlineImage(p);
+  const submissionKeys: string[] = [];
+  await page.route("**/review-submissions", async route => {
+    submissionKeys.push(route.request().postDataJSON().idempotencyKey);
+    if (submissionKeys.length === 1) return route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ error: "网络暂不可用，相同意见重试不会重复生成。" }) });
+    return route.fallback();
+  });
+  await openImageReview(page);
+  const card = page.locator("#item-portrait");
+  await card.getByRole("button", { name: "不通过", exact: false }).click();
+  await card.getByLabel("portrait图片修改意见").fill("脸型与基准不一致，请修正。");
+  const submit = page.getByRole("button", { name: "提交意见并生成返修图", exact: true });
+  await submit.click();
+  await expect(card.getByLabel("portrait图片修改意见")).toHaveValue("脸型与基准不一致，请修正。");
+  await expect(page.getByText("网络暂不可用，相同意见重试不会重复生成。", { exact: true })).toBeVisible();
+  await submit.click();
+  expect(submissionKeys).toHaveLength(2); expect(submissionKeys[0]).toBe(submissionKeys[1]);
+  await expect(page.getByText(/1 项等待条件。portrait：图片服务尚未配置/)).toBeVisible();
+});
+
+test("历史候选可提交返修但不能通过；图片审核手机单列", async ({ page }) => {
+  const mock = await mockApi(page), p = mock.getProject(); addInlineImage(p); p.imageCandidateCurrent = { "candidate-first": false };
+  await page.setViewportSize({ width: 390, height: 850 }); await openImageReview(page);
+  const card = page.locator("#item-portrait");
+  await expect(card.getByRole("button", { name: "通过", exact: true })).toBeDisabled();
+  await expect(card.getByRole("button", { name: "不通过", exact: false })).toBeEnabled();
+  await card.getByRole("button", { name: "不通过", exact: false }).click();
+  await card.getByLabel("portrait图片修改意见").fill("按新的身份基准返修。");
+  await expect(page.getByRole("button", { name: "提交意见并生成返修图", exact: true })).toBeEnabled();
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+});
+
+async function serveReviewFixture(page: Page, p: Project, online: boolean) {
+  const snapshot = { ...projectSnapshot(p, id => `/api/files/${id}`), ...(online ? { onlineReview: { apiBase: "/api", projectId: p.id } } : {}) };
+  const script = readFileSync("dist-review/review.js", "utf8"), styles = readFileSync("dist-review/review.css", "utf8");
+  await page.route("**/review-fixture", route => route.fulfill({ status: 200, contentType: "text/html", body: `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${styles}</style><body><div id="root"></div><script id="storyflow-snapshot" type="application/json">${JSON.stringify(snapshot).replace(/</g, "\\u003c")}</script><script>${script}</script></body></html>` }));
+  await page.goto("/review-fixture");
+}
+
+test("公网审图在线登录后直接提交，匿名无生成权限且不再导出意见", async ({ page }) => {
+  const mock = await mockApi(page, true), p = mock.getProject(); addInlineImage(p);
+  await serveReviewFixture(page, p, true);
+  await expect(page.getByText("已连接审稿后台 · 图片与制作状态实时更新")).toBeVisible();
+  const card = page.locator("#item-portrait");
+  await card.getByRole("button", { name: "不通过", exact: false }).click();
+  await card.getByLabel("portrait图片修改意见").fill("请固定角色脸型和齐肩发型。");
+  await expect(page.getByRole("button", { name: "提交意见并生成返修图", exact: true }).first()).toBeDisabled();
+  await expect(page.getByRole("button", { name: /下载.*意见/ })).toHaveCount(0);
+  expect(mock.requests.filter(r => r.path.endsWith("/review-submissions"))).toHaveLength(0);
+  await page.getByRole("button", { name: "登录审核", exact: true }).click();
+  await page.getByLabel("审核密码").fill("fixture-admin-password");
+  await page.getByRole("button", { name: "登录并继续审图", exact: true }).click();
+  await expect(page.getByText("已登录审核", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "提交意见并生成返修图", exact: true }).first().click();
+  await expect(page.getByText("最近提交已保存", { exact: true })).toBeVisible();
+  await expect(page.getByText(/意见已保存，等待条件：图片服务尚未配置/)).toBeVisible();
+  expect(mock.requests.filter(r => r.path.endsWith("/review-submissions") && r.method === "POST")).toHaveLength(1);
+  expect(mock.requests.filter(r => r.path.endsWith("/image-generations"))).toHaveLength(0);
+});
+
+test("静态页明确未连接；刷新不丢失未提交意见", async ({ page }, testInfo) => {
+  const mock = await mockApi(page), p = mock.getProject(); addInlineImage(p);
+  await page.setViewportSize({ width: 390, height: 850 }); await serveReviewFixture(page, p, false);
+  await expect(page.getByText("本页尚未连接审稿后台，意见暂存本机；部署后台后才能提交并生成。", { exact: true })).toBeVisible();
+  const card = page.locator("#item-portrait");
+  await card.getByRole("button", { name: "不通过", exact: false }).click();
+  await card.getByLabel("portrait图片修改意见").fill("发型不能变化。");
+  await page.reload();
+  await expect(card.getByLabel("portrait图片修改意见")).toHaveValue("发型不能变化。");
+  await expect(page.getByRole("button", { name: "提交意见并生成返修图", exact: true }).first()).toBeDisabled();
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+  await card.scrollIntoViewIfNeeded();
+  await page.screenshot({path:testInfo.outputPath("inline-review-mobile.png"),animations:"disabled"});
+  expect(mock.requests.filter(r => r.path.endsWith("/review-submissions"))).toHaveLength(0);
+});
+
+test("返修回执丢失后刷新保持同一提交标识", async ({ page }) => {
+  const mock = await mockApi(page, false, true), p = mock.getProject(); addInlineImage(p);
+  const keys: string[] = [];
+  await page.route("**/review-submissions", async route => {
+    keys.push(route.request().postDataJSON().idempotencyKey);
+    if (keys.length === 1) return route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ error: "回执暂不可用，请保留当前意见。" }) });
+    return route.fallback();
+  });
+  await openImageReview(page);
+  await page.locator("#item-portrait").getByRole("button", { name: "不通过", exact: false }).click();
+  await page.getByLabel("portrait图片修改意见").fill("同一角色同一面部特征。");
+  await page.getByRole("button", { name: "提交意见并生成返修图", exact: true }).click();
+  await expect(page.getByText("回执暂不可用，请保留当前意见。", { exact: true })).toBeVisible();
+  await page.reload(); await page.getByRole("button", { name: /^03 审核/ }).first().click(); await page.getByRole("button", { name: "资产图与首帧", exact: true }).click();
+  await expect(page.getByLabel("portrait图片修改意见")).toHaveValue("同一角色同一面部特征。");
+  await page.getByRole("button", { name: "提交意见并生成返修图", exact: true }).click();
+  expect(keys).toHaveLength(2); expect(keys[0]).toBe(keys[1]);
+});
+
+test("公网刷新只在登录后读回持久意见，不重复创建返修", async ({ page }) => {
+  const mock = await mockApi(page, true), p = mock.getProject(); addInlineImage(p);
+  await serveReviewFixture(page, p, true);
+  await expect(page.getByText("已连接审稿后台 · 图片与制作状态实时更新")).toBeVisible();
+  expect(mock.requests.filter(r => r.path.endsWith("/review-submissions"))).toHaveLength(0);
+  await page.getByRole("button", { name: "登录审核", exact: true }).click();
+  await page.getByLabel("审核密码").fill("fixture-admin-password");
+  await page.getByRole("button", { name: "登录并继续审图", exact: true }).click();
+  const card = page.locator("#item-portrait");
+  await card.getByRole("button", { name: "不通过", exact: false }).click();
+  await card.getByLabel("portrait图片修改意见").fill("仅审核者查看：保持同一角色的手部和衣袖。");
+  await page.getByRole("button", { name: "提交意见并生成返修图", exact: true }).first().click();
+  await expect(page.locator(".public-submission")).toContainText("仅审核者查看：保持同一角色的手部和衣袖。");
+  const before = mock.requests.filter(r => r.path.endsWith("/review-submissions") && r.method === "GET").length;
+  await page.reload();
+  await expect(page.locator(".public-submission")).toContainText("仅审核者查看：保持同一角色的手部和衣袖。");
+  await expect(page.locator(".public-submission")).toContainText("意见已保存，等待条件");
+  expect(mock.requests.filter(r => r.path.endsWith("/review-submissions") && r.method === "GET").length).toBeGreaterThan(before);
+  expect(mock.requests.filter(r => r.path.endsWith("/review-submissions") && r.method === "POST")).toHaveLength(1);
+  expect(mock.requests.filter(r => r.path.endsWith("/image-generations"))).toHaveLength(0);
+  await page.route("**/api/auth", route => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ authenticated: false }) }));
+  const privateReads = mock.requests.filter(r => r.path.endsWith("/review-submissions") && r.method === "GET").length;
+  await page.reload();
+  await expect(page.getByRole("button", { name: "登录审核", exact: true })).toBeVisible();
+  await expect(page.locator(".public-submission")).toHaveCount(0);
+  await expect(page.getByText(/仅审核者查看：保持同一角色的手部和衣袖/)).toHaveCount(0);
+  expect(mock.requests.filter(r => r.path.endsWith("/review-submissions") && r.method === "GET")).toHaveLength(privateReads);
 });

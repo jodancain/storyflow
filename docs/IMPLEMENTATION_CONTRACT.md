@@ -55,3 +55,14 @@ UI polls project only when jobs active, preserves dirty editors on refresh. Four
 Public draft JSON has `{schema:'storyflow-review-draft',projectId,revision,scriptSha256,items:[{targetId,targetHash,status,note,imageId?,imageSha256?}],overall}`. Opinions stay local until the reviewer downloads them. POST `/api/projects/:id/reviews/import` preserves provenance in `Review.imported`, including original status and `match:'current'|'image-only'|'historical'`. It never automatically approves the current server content; cross-Mac IDs may differ while image hashes still match. The administrator explicitly adopts text as pending review, then performs current approval.
 
 Static local draft “pass” does not mutate the frozen snapshot's official approved count. Preview and production selection remain separate in both UI and API. No public page controls call provider services.
+
+
+## v0.3 inline review contract (supersedes static-only interaction above)
+
+- `POST /api/projects/:id/review-submissions` authenticated, `{baseRevision,idempotencyKey,items:[{targetId,targetHash,imageId,imageSha256,status:'pass'|'change',note}]}`. Validates every submitted snapshot before writes. Saves opinions and generation intents atomically. A pass does not create an image job; rejection needs a nonempty note. Returns `{submission,project,jobs}`; each submission item is `approved`, `queued` or `blocked` with an explicit reason.
+- `GET /api/projects/:id/review-submissions` preserves administrator audit history. Client retries reuse an idempotency key; unknown provider acceptance is never automatically resubmitted.
+- `STORYFLOW_PUBLIC_REVIEW_PROJECTS` explicitly allowlists published project IDs. Default is empty. `GET /api/public-review/:id`, image-only `/files/:fileId` and `/review/:id` expose the safe presentation only. Unlisted projects, original photos, API receipts, configuration and all writes remain authenticated.
+- `STORYFLOW_PUBLIC_REVIEW_API_BASE` supports same-origin path proxies (default `/api`). Online HTML permits same-origin fetch in CSP; offline exports keep `connect-src 'none'` and never claim submission succeeded.
+- `imageConsistency` and each target's `imageComposition` are typed ontology fields. Required approved identity images are placed first in the actual request and cannot be removed by the optional reference picker. Runtime gate and task submission snapshot are the source of truth, not a prompt promise.
+- Source examples have `consistencyContract:'legacy-unverified'`: existing model outputs are retained without claiming generation under the new contract. A newly returned revision appears for review; production bindings remain explicit.
+- SQLite migration002 stores review submissions. Project archives preserve sanitized submission history as non-executable evidence; full backups retain active jobs. Import never replays approvals, tasks or sessions.

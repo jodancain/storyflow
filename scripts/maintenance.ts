@@ -18,6 +18,7 @@ export type Manifest = {
   createdAt: string;
   database: Entry;
   assets: Entry[];
+  receipts?: Entry[];
   excluded: string[];
 };
 export function inside(root: string, path: string) {
@@ -48,7 +49,7 @@ export function databaseAssets(path: string): Entry[] {
       "ok"
     )
       throw new Error("SQLite integrity check failed");
-    if ((db.prepare("PRAGMA user_version").get() as any)?.user_version !== 1)
+    if (![1, 2].includes((db.prepare("PRAGMA user_version").get() as any)?.user_version))
       throw new Error("Unsupported database schema");
     const assets = new Map<string, Entry>();
     for (const row of db.prepare("SELECT json FROM files").all() as any[]) {
@@ -73,6 +74,18 @@ export function databaseAssets(path: string): Entry[] {
   } finally {
     db.close();
   }
+}
+/** These response receipts are durable task evidence, not disposable rendering cache. */
+export function databaseImageReceipts(path: string): {path:string;required:boolean}[] {
+  const db=new DatabaseSync(path,{readOnly:true});
+  try {
+    return (db.prepare("SELECT json FROM jobs").all() as any[]).flatMap(row=>{
+      const job=JSON.parse(row.json);
+      if(job.kind !== "image") return [];
+      if(!/^[a-f0-9-]{36}$/.test(job.id)) throw new Error("Invalid image job identity");
+      return [{path:`work/${job.id}/image-receipt.json`,required:job.result?.imageReceiptStored === true && !["complete","cancelled"].includes(job.state)}];
+    });
+  } finally { db.close(); }
 }
 export async function verifyEntry(root: string, item: Entry) {
   if (
@@ -112,6 +125,22 @@ export async function verifyArchive(root: string): Promise<Manifest> {
       throw new Error("Database and backup asset mismatch");
     await verifyEntry(root, item);
   }
+  const receipts=m.receipts || [];
+  if(!Array.isArray(receipts) || receipts.length>100000) throw new Error("Invalid receipt inventory");
+  const expectedReceipts=databaseImageReceipts(join(root,"storyflow.sqlite"));
+  const receiptNames=new Set<string>();
+  for(const item of receipts) {
+    if(!/^work\/[a-f0-9-]{36}\/image-receipt\.json$/.test(item.path) || item.bytes>64*1024*1024 || receiptNames.has(item.path) || !expectedReceipts.some(r=>r.path===item.path)) throw new Error("Invalid image receipt path or owner");
+    receiptNames.add(item.path); await verifyEntry(root,item);
+  }
+  if(expectedReceipts.some(r=>r.required && !receiptNames.has(r.path))) throw new Error("Backup is missing an accepted image response receipt; refusing a restore that cannot resume safely");
+  try {
+    for(const directory of readdirSync(join(root,"work"))) {
+      const folder=join(root,"work",directory);
+      if(!lstatSync(folder).isDirectory() || lstatSync(folder).isSymbolicLink()) throw new Error("Invalid receipt directory");
+      for(const name of readdirSync(folder)) if(!receiptNames.has(`work/${directory}/${name}`)) throw new Error("Archive contains unreferenced work files");
+    }
+  } catch(error) { if((error as NodeJS.ErrnoException).code !== "ENOENT") throw error; }
   let entries: string[] = [];
   try {
     entries = readdirSync(join(root, "files"));

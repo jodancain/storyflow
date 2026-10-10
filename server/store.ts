@@ -25,6 +25,7 @@ import type {
 } from "../shared/types.ts";
 import { compileOntology, hash, imageTargetHash, imageTargetHashes } from "../shared/ontology.ts";
 import { ensure, iso, sha } from "./util.ts";
+import { resolveImageReference } from "../shared/image-consistency.ts";
 const parse = (value: any) => JSON.parse(value);
 export class Store {
   db: DatabaseSync;
@@ -39,7 +40,7 @@ export class Store {
 `);
     const version = (this.db.prepare("PRAGMA user_version").get() as any)
       .user_version;
-    ensure(version <= 1, "数据库版本高于本程序，请使用兼容版本", 500);
+    ensure(version <= 2, "数据库版本高于本程序，请使用兼容版本", 500);
     if (version === 0) {
       this.db.exec("BEGIN IMMEDIATE");
       try {
@@ -54,6 +55,9 @@ export class Store {
         this.db.exec("ROLLBACK");
         throw e;
       }
+    }
+    if (version < 2) {
+      this.transaction(() => this.db.exec(readFileSync(new URL("./migrations/002-review-submissions.sql", import.meta.url), "utf8")));
     }
   }
   close() {
@@ -178,11 +182,20 @@ export class Store {
       const matches=a.sourceHash===targetHashes[a.assetId || a.shotId || ""] &&
         ((a.metadata.parentAssets || []) as any[]).every(parent=>{
           const asset=p.ontology.assets.find((x:any)=>x.id===parent.assetId);
+          const identity=Array.isArray(a.metadata.identityReferences) && a.metadata.identityReferences.find((r:any)=>r.assetId===parent.assetId);
+          if(identity && identity.artifactId) {
+            const canonical=artifacts.filter(candidate=>candidate.kind === "image" && candidate.assetId===parent.assetId && candidate.accepted && candidate.sourceHash===targetHashes[parent.assetId]);
+            return canonical.length === 1 && canonical[0].id===identity.artifactId && canonical[0].fileId===parent.fileId && this.file(parent.fileId).sha256===parent.sha256 && imageCurrent(canonical[0]);
+          }
+          if(identity) {
+            const approved=this.reviews(id).some(review=>review.targetId===parent.assetId && review.targetHash===compiled.targetHashes[parent.assetId] && review.status === "pass");
+            return approved && asset?.fileId===parent.fileId && asset?.sha256===parent.sha256;
+          }
           const selected=parent.assetId === a.assetId && parent.fileId
             ? this.files(id).find(f=>f.id===parent.fileId)
-            : [asset?.previewImage,asset].find(candidate=>candidate?.fileId && candidate.sha256===parent.sha256);
-          if(selected?.sha256 !== parent.sha256) return false;
-          const upstream=artifacts.find(x=>x.kind === "image" && x.id!==a.id && x.fileId===(selected.fileId || selected.id));
+            : resolveImageReference({id,ontology:p.ontology,files:this.files(id),artifacts,reviews:this.reviews(id),compiled,imageTargetHashes:targetHashes,imageCandidateCurrent:current},parent.assetId,candidate=>imageCurrent(candidate),parent.sha256);
+          if(!selected || selected.sha256 !== parent.sha256) return false;
+          const upstream=artifacts.find(x=>x.kind === "image" && x.id!==a.id && x.fileId===(("fileId" in selected && selected.fileId) || ("id" in selected && selected.id)));
           return !upstream || imageCurrent(upstream);
         }) && ((a.metadata.parentShots || []) as any[]).every(parent=>{
           const shot=p.ontology.shots.find((s:any)=>s.id===parent.shotId);
@@ -302,6 +315,18 @@ export class Store {
       .prepare("INSERT OR REPLACE INTO reviews VALUES(?,?,?,?)")
       .run(id, targetId, review.targetHash, JSON.stringify(review));
     return this.project(id);
+  }
+  reviewSubmissions(projectId: string): import("./review-submissions.ts").ReviewSubmission[] {
+    this.raw(projectId);
+    return this.db.prepare("SELECT json FROM review_submissions WHERE project_id=? ORDER BY rowid DESC").all(projectId).map((row: any) => parse(row.json));
+  }
+  reviewSubmission(projectId: string, id: string): import("./review-submissions.ts").ReviewSubmission {
+    const row = this.db.prepare("SELECT json FROM review_submissions WHERE project_id=? AND id=?").get(projectId, id) as any;
+    ensure(row, "意见提交记录不存在", 404);
+    return parse(row.json);
+  }
+  recordReviewSubmission(submission: import("./review-submissions.ts").ReviewSubmission) {
+    this.db.prepare("INSERT INTO review_submissions VALUES(?,?,?)").run(submission.id, submission.projectId, JSON.stringify(submission));
   }
   importOpinion(projectId:string,targetId:string,note:string,imported:ImportedOpinion) {
     this.raw(projectId);
@@ -580,12 +605,33 @@ export class Store {
         }
       });
     }
+    const writeReview=() => {
+    if(a.kind === "image" && accepted && a.assetId && this.raw(a.projectId).ontology.imageConsistency?.characters?.some((profile:any)=>profile.identityAssetId===a.assetId)) {
+      for(const other of this.artifacts(a.projectId)) if(other.id!==a.id && other.kind === "image" && other.assetId===a.assetId && other.accepted) {
+        other.accepted=false;
+        other.metadata={...other.metadata,reviewStatus:"historical",invalidationReason:"identity_replaced",replacedBy:a.id};
+        this.db.prepare("UPDATE artifacts SET json=? WHERE id=?").run(JSON.stringify(other),other.id);
+      }
+    }
     a.accepted = accepted;
     a.metadata = { ...a.metadata, reviewNote: note, reviewedAt: iso(), ...(a.kind === "image" ? {reviewStatus:accepted ? "pass" : "change"} : {}) };
     this.db
       .prepare("UPDATE artifacts SET json=? WHERE id=?")
       .run(JSON.stringify(a), id);
     return a;
+    };
+    if(a.kind !== "image") return writeReview();
+    // SAVEPOINT is atomic both for the legacy single-artifact API and inside a batch submission.
+    this.db.exec("SAVEPOINT image_artifact_review");
+    try {
+      const result=writeReview();
+      this.db.exec("RELEASE SAVEPOINT image_artifact_review");
+      return result;
+    } catch(error) {
+      this.db.exec("ROLLBACK TO SAVEPOINT image_artifact_review");
+      this.db.exec("RELEASE SAVEPOINT image_artifact_review");
+      throw error;
+    }
   }
   select(id: string, sourceInSeconds = 0) {
     const a = this.artifact(id),

@@ -10,8 +10,12 @@ const release = acquireDataLock(config.dataDir, "runtime");
 const store = new Store(config.dataDir);
 if (config.adminPassword && !store.hasPassword())
   store.setPassword(config.adminPassword);
+if (config.publicReviewProjectIds.length && !store.hasPassword()) {
+  store.close(); release();
+  throw new Error("Publishing review projects requires an existing administrator password or STORYFLOW_ADMIN_PASSWORD.");
+}
 const jobs = new Jobs(store, new Providers(config.providers));
-const app = createApp(store, jobs, { publicBaseUrl: config.publicBaseUrl });
+const app = createApp(store, jobs, { publicBaseUrl: config.publicBaseUrl, publicReviewProjectIds: config.publicReviewProjectIds, publicReviewApiBase: config.publicReviewApiBase });
 const server = app.listen(config.port, config.host, () => {
   jobs.start();
   console.log(`StoryFlow ready: http://${config.host}:${config.port}`);

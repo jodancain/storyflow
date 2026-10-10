@@ -12,6 +12,8 @@ import {
   hash,
 } from "../shared/ontology.ts";
 import { Store } from "./store.ts";
+import { submitReviews } from "./review-submissions.ts";
+import { mountPublicReviewRoutes } from "./public-review-router.ts";
 import { validateDraft } from "./validation.ts";
 import { Jobs } from "./jobs.ts";
 import { ingest } from "./ingest.ts";
@@ -79,6 +81,8 @@ export function createApp(
   jobs: Jobs,
   options: {
     publicBaseUrl?: string;
+    publicReviewProjectIds?: string[];
+    publicReviewApiBase?: string;
     dist?: string;
     search?: typeof searchReferences;
   } = {},
@@ -96,7 +100,7 @@ export function createApp(
   });
   app.use(express.json({ limit: "5mb" }));
   app.get("/healthz", (_req, res) =>
-    res.json({ ok: true, service: "storyflow", version: "0.2.0" }),
+    res.json({ ok: true, service: "storyflow", version: "0.3.0" }),
   );
   app.use("/api", (req, _res, next) => {
     if (!["GET", "HEAD", "OPTIONS"].includes(req.method)) {
@@ -163,6 +167,7 @@ export function createApp(
     setCookie(res, store.session());
     res.json({ authenticated: true, setupRequired: false });
   });
+  mountPublicReviewRoutes(app, store, { projectIds: options.publicReviewProjectIds, apiBase: options.publicReviewApiBase });
   app.use("/api", (req, _res, next) => {
     if (!store.authenticated(token(req)))
       return next(new AppError("请先登录管理员", 401, "login_required"));
@@ -171,7 +176,7 @@ export function createApp(
   app.get("/api/config", (_req, res) => {
     const c = jobs.providers.capabilities();
     res.json({
-      version: "0.2.0",
+      version: "0.3.0",
       publicBaseUrl: canonical.href,
       capabilities: {
         image: {
@@ -298,6 +303,11 @@ export function createApp(
       store.review(id, target, status, boundedText(req.body.note || "", 10000)),
     );
   });
+  app.post("/api/projects/:id/review-submissions", (req, res) => {
+    const result = submitReviews(store, jobs, String(req.params.id), revision(req.body.baseRevision), key(req.body.idempotencyKey), req.body.items);
+    res.status(result.jobs.length ? 202 : 200).json(result);
+  });
+  app.get("/api/projects/:id/review-submissions", (req, res) => res.json({ submissions: store.reviewSubmissions(String(req.params.id)) }));
   app.post("/api/projects/:id/reviews/import", (req, res) => {
     const id = String(req.params.id),
       p = store.project(id),

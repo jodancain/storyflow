@@ -1901,7 +1901,7 @@ function ReviewPanel(props: PanelProps & { config: Config | null; imageReview?: 
         </select>
         </>}
       </div>
-      {view === "images" && <ImageWorkspace {...props} configured={!!props.config?.capabilities.image?.configured} reason={props.config?.capabilities.image?.reason} model={props.config?.capabilities.image?.model} />}
+      {view === "images" && <ImageWorkspace key={props.project.id} {...props} configured={!!props.config?.capabilities.image?.configured} reason={props.config?.capabilities.image?.reason} model={props.config?.capabilities.image?.model} />}
       <div className={view === "assets" ? "asset-grid" : "review-list"}>
         {targets
           .filter(

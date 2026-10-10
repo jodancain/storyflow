@@ -42,6 +42,18 @@ test("template parents match content SHA across original binding and pending pre
   assert.equal((candidate.metadata.parentAssets as any[])[0].fileId,parentCandidate.fileId);assert.notEqual((candidate.metadata.parentAssets as any[])[0].fileId,p.ontology.assets[0].fileId);
   assert.equal(t.store.imageCurrent(candidate),true);assert.equal(t.store.file(candidate.metadata.thumbnailFileId as string).sha256,thumb.sha256);
   assert.equal(p.files.length,4);assert.equal(p.jobs.length,0);assert.equal(candidate.accepted,false);
+  const original=p.ontology.assets[0];
+  const oldDescendant=t.store.addArtifact({projectId:p.id,jobId:"old-lineage",assetId:"child",kind:"image",fileId:candidate.fileId,sourceHash:imageTargetHash(p.ontology,{assetId:"child"}),metadata:{parentAssets:[{assetId:"parent",fileId:original.fileId,sha256:original.sha256}]}});
+  assert.equal(t.store.imageCurrent(oldDescendant),true,"original and pending preview lineages coexist before approval");
+  const pendingFile=t.store.addFile(p.id,"another-preview.png","image/png",Buffer.concat([png,Buffer.from("another preview")]));
+  const pending=t.store.addArtifact({projectId:p.id,jobId:"pending-preview",assetId:"parent",kind:"image",fileId:pendingFile.id,sourceHash:imageTargetHash(p.ontology,{assetId:"parent"}),metadata:{}});
+  p=t.store.selectImage(pending.id,p.revision,"preview");
+  assert.equal(t.store.imageCurrent(oldDescendant),true,"an unapproved preview never invalidates retained original lineage");
+  assert.equal(t.store.imageCurrent(candidate),false,"the superseded pending preview is no longer an active binding");
+  t.store.reviewArtifact(parentCandidate.id,true,"select this approved scene");
+  assert.equal(t.store.imageCurrent(candidate),true,"approval selects the actual parent independently of another pending preview");
+  assert.equal(t.store.imageCurrent(oldDescendant),false,"the newly approved reference supersedes the older original for image generation");
+  assert.equal(t.store.project(p.id).ontology.assets[0].fileId,original.fileId,"video input binding is unchanged");
  }finally{t.close();}
 });
 

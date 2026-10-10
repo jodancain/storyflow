@@ -29,7 +29,7 @@ export function loadExampleAssets(store:Store,p:Project,ontology:Ontology, optio
       fileId:f.id,sourceHash:imageTargetHash(ontology,target),metadata:{...item.metadata,
         ...(item.original ? {originalFileId:load(item.original).id,originalSha256:item.original.sha256}:{}),
         ...(item.thumbnail ? {thumbnailFileId:load(item.thumbnail).id,thumbnailSha256:item.thumbnail.sha256}:{}),
-        origin:item.metadata?.origin || "ai-generated",reviewStatus:"pending",generationSnapshotHash:item.sourceHash || item.metadata?.generationSnapshotHash}});
+        origin:item.metadata?.origin || "ai-generated",consistencyContract:"legacy-unverified",reviewStatus:"pending",generationSnapshotHash:item.sourceHash || item.metadata?.generationSnapshotHash}});
     const binding={artifactId:a.id,fileId:f.id,sha256:f.sha256};
     if(target.assetId) {
       const asset=ontology.assets.find(x=>x.id===target.assetId); ensure(asset,"模板素材槽不存在",500); asset.previewImage=binding;

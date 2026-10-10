@@ -12,7 +12,7 @@ function make() {
   o.shots[0].requiredAssetIds = ["face"];
   let p = t.store.create("资产审稿", requirements, o);
   const f = t.store.addFile(p.id, "generated.png", "image/png", png);
-  const a = t.store.addArtifact({ projectId: p.id, jobId: "external-batch", assetId: "face", kind: "image", fileId: f.id, sourceHash: imageTargetHash(o, { assetId: "face" }), metadata: { origin: "ai-generated", modelRequested: "test-model", modelActual: null, reviewStatus: "pending", apiKey: "private-key-fixture", localPath: "/Users/private/doctor.png" } });
+  const a = t.store.addArtifact({ projectId: p.id, jobId: "external-batch", assetId: "face", kind: "image", fileId: f.id, sourceHash: imageTargetHash(o, { assetId: "face" }), metadata: { origin: "ai-generated", modelRequested: "test-model", modelActual: null, reviewStatus: "pending", reviewNote: "PRIVATE HUMAN COMMENT", technicalReview: {notes:["PUBLIC TECHNICAL CHECK"]}, apiKey: "private-key-fixture", localPath: "/Users/private/doctor.png" } });
   p = t.store.selectImage(a.id, p.revision, "preview");
   t.store.addFile(p.id, "private-original.txt", "text/plain", Buffer.from("PRIVATE ORIGINAL DO NOT PUBLISH"));
   return { ...t, p, a, f };
@@ -23,7 +23,8 @@ test("public snapshot uses real pending candidate, excludes private files/receip
     assert.equal(view.items.find(i => i.id === "face")?.image?.status, "pending");
     assert.equal(view.items.find(i => i.id === "s1")?.image, undefined);
     assert.equal(view.items.find(i => i.id === "face")?.image?.modelActual, null);
-    assert.doesNotMatch(JSON.stringify(view), /private-key-fixture|\/Users\/private|PRIVATE ORIGINAL/);
+    assert.doesNotMatch(JSON.stringify(view), /private-key-fixture|\/Users\/private|PRIVATE ORIGINAL|PRIVATE HUMAN COMMENT/);
+    assert.equal(view.items.find(i=>i.id === "face")?.image?.note,"PUBLIC TECHNICAL CHECK");
     const zip = await JSZip.loadAsync(await exportReviewSnapshot(t.store, t.p.id));
     const manifest = JSON.parse(await zip.file("public-manifest.json")!.async("string"));
     assert.equal(manifest.images.length, 1); assert.equal(manifest.images[0].sha256, t.f.sha256);
@@ -66,4 +67,20 @@ test("a bound private original is excluded from the public page; only explicitly
     assert.equal(view.items.find(i=>i.id==="face")?.references[0]?.id,"public-ref");
     assert.equal(view.items.find(i=>i.id==="s1")?.references[0]?.id,"public-ref");
   } finally { t.close(); }
+});
+
+test("an identity source photo is never public even if generic file sharing metadata was set", () => {
+  const t=make(); try {
+    const p=t.store.project(t.p.id);
+    const original=t.store.addFile(p.id,"identity-original.png","image/png",Buffer.concat([png,Buffer.from("original-private")] ),{metadata:{publicShareApproved:true}});
+    p.files=t.store.files(p.id);
+    p.ontology.assets.push({id:"identity-source",label:"原照",kind:"image",purpose:"reference",fileId:original.id,sha256:original.sha256,gap:false});
+    p.ontology.imageConsistency={version:1,enforceApprovedIdentity:true,characters:[{characterId:"hero",identityAssetId:"face",referenceSourceAssetId:"identity-source",visibility:"person",appearance:"同一人",wardrobes:[{id:"base",description:"同一衣服"}]}]};
+    p.ontology.assets[0].imageComposition={visibleCharacters:[{characterId:"hero",wardrobeId:"base",visibility:"face"}]};
+    p.ontology.shots[0].imageComposition={visibleCharacters:[{characterId:"hero",wardrobeId:"base",visibility:"face"}]};
+    const resolved:string[]=[];
+    const snapshot=publicSnapshot(p,id=>{resolved.push(id);return `assets/${id}`});
+    assert.ok(!resolved.includes(original.id));
+    assert.ok(!JSON.stringify(snapshot).includes(original.sha256));
+  } finally {t.close();}
 });

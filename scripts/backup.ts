@@ -16,6 +16,7 @@ import {
   archive,
   cliArgs,
   databaseAssets,
+  databaseImageReceipts,
   entry,
   inside,
   isMain,
@@ -58,15 +59,29 @@ export async function backup(dataDir: string, output: string) {
       copyFileSync(join(dataDir, asset.path), join(stage, asset.path));
       chmodSync(join(stage, asset.path), 0o600);
     }
+    const receipts=[];
+    for(const candidate of databaseImageReceipts(join(stage,"storyflow.sqlite"))) {
+      const source=join(dataDir,candidate.path);
+      if(!existsSync(source)) {
+        if(candidate.required) throw new Error("Accepted image response receipt is missing; cannot create a resumable backup");
+        continue;
+      }
+      const saved=await entry(dataDir,candidate.path);
+      if(saved.bytes>64*1024*1024) throw new Error("Image receipt exceeds backup limit");
+      mkdirSync(dirname(join(stage,candidate.path)),{recursive:true,mode:0o700});
+      copyFileSync(source,join(stage,candidate.path)); chmodSync(join(stage,candidate.path),0o600);
+      receipts.push(saved);
+    }
     const manifest: Manifest = {
       format: "storyflow-private-backup",
       version: 1,
       createdAt: new Date().toISOString(),
       database: await entry(stage, "storyflow.sqlite"),
       assets,
+      receipts,
       excluded: [
         "environment and provider credentials",
-        "work render cache",
+        "work render cache (image response receipts retained)",
         "process mutex",
         "prior restore rollback directories",
       ],
@@ -84,7 +99,8 @@ export async function backup(dataDir: string, output: string) {
     return {
       output,
       assets: assets.length,
-      bytes: manifest.database.bytes + assets.reduce((n, a) => n + a.bytes, 0),
+      receipts: receipts.length,
+      bytes: manifest.database.bytes + [...assets,...receipts].reduce((n, a) => n + a.bytes, 0),
       databaseHash: manifest.database.sha256,
     };
   } finally {

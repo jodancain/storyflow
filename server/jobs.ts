@@ -11,6 +11,7 @@ import type {
   ImageInput,
 } from "../shared/types.ts";
 import { compileOntology, hash, imageTargetHash } from "../shared/ontology.ts";
+import { inspectImageConsistency, resolveImageReference } from "../shared/image-consistency.ts";
 import { Store } from "./store.ts";
 import { validateDraft } from "./validation.ts";
 import { ensure, cleanError } from "./util.ts";
@@ -91,16 +92,13 @@ export class Jobs {
     void this.tick();
     return job;
   }
-  enqueueImages(projectId: string, baseRevision: number, key: string, targets: ImageTarget[]) {
+  prepareImageInputs(projectId: string, baseRevision: number, targets: ImageTarget[]) {
     ensure(Array.isArray(targets) && targets.length > 0 && targets.length <= 52,"每批须为1–52个图片目标");
-    const ih=hash({kind:"images",baseRevision,targets});
-    const prior=this.store.action(projectId,key,ih);
-    if(prior) return {runId:prior.runId,jobs:prior.ids.map((id:string)=>this.store.job(id))};
     const p=this.store.project(projectId);
     ensure(p.revision === baseRevision,"工程版本已经变化",409);
     ensure(!p.compiled.issues.some(i=>i.severity === "error"),"本体存在错误，请先修正",422,"ontology_invalid");
     const seen=new Set<string>();
-    const inputs=targets.map(target=>{
+    return targets.map(target=>{
       ensure(target && typeof target === "object" && Boolean(target.assetId) !== Boolean(target.shotId),"每个图片目标必须且只能指定assetId或shotId");
       ensure(Object.keys(target).every(k=>["assetId","shotId","prompt","referenceAssetIds"].includes(k)),"图片目标包含未知字段");
       const id=target.assetId || target.shotId!;
@@ -108,19 +106,32 @@ export class Jobs {
       const asset=p.ontology.assets.find(a=>a.id === target.assetId), shot=p.ontology.shots.find(s=>s.id === target.shotId);
       ensure(asset || shot,"图片目标不存在",404);
       if(asset) ensure(["image","graphic"].includes(asset.kind),"只能为图片或图示素材槽生成图片");
-      const prompt=target.prompt ?? (asset ? `${asset.label}。必须可见：${(asset.mustShow || []).join("；")}。拒收：${(asset.rejectIf || []).join("；")}。制作独立图片资产，不添加水印。` : `${p.compiled.prompts[id]}\n仅绘制本镜头开始时刻的单张首帧。不要画分镜拼图或添加字幕。`);
+      let prompt=target.prompt ?? (asset ? `${asset.label}。必须可见：${(asset.mustShow || []).join("；")}。拒收：${(asset.rejectIf || []).join("；")}。制作独立图片资产，不添加水印。` : `${p.compiled.prompts[id]}\n仅绘制本镜头开始时刻的单张首帧。不要画分镜拼图或添加字幕。`);
       ensure(typeof prompt === "string" && prompt.length > 0 && prompt.length <= 40000,"图片提示词须为1–40000字符");
-      const refs=target.referenceAssetIds || [];
-      ensure(Array.isArray(refs) && refs.length <= 16 && new Set(refs).size === refs.length,"参考图须为不重复的素材ID，最多16项");
-      const parentAssets=refs.map(assetId=>{
-        const a=p.ontology.assets.find(x=>x.id === assetId), selected=a?.fileId ? a : a?.previewImage;
+      const requestedRefs=target.referenceAssetIds || [];
+      ensure(Array.isArray(requestedRefs) && requestedRefs.length <= 16 && new Set(requestedRefs).size === requestedRefs.length,"参考图须为不重复的素材ID，最多16项");
+      const consistency=inspectImageConsistency(p,id,requestedRefs);
+      const issue=consistency.issues.find(i=>i.severity === "error");
+      ensure(!issue,issue?.message || "人物一致性条件未就绪",409,issue?.code || "identity_not_ready");
+      if(consistency.enabled) prompt=`${prompt}\n\n${consistency.promptGuard}`;
+      ensure(prompt.length <= 40000,"包含一致性合同后的提示词过长，请缩短补充意见");
+      const parentAssets=consistency.referenceAssetIds.map(assetId=>{
+        const identity=consistency.identityReferences.find(r=>r.assetId===assetId);
+        const a=p.ontology.assets.find(x=>x.id === assetId), selected=identity || resolveImageReference(p,assetId);
         ensure(a && selected?.fileId,"参考素材尚无实际图片",409,"asset_gap");
         const f=this.store.file(selected.fileId);
         ensure(f.projectId === projectId && f.sha256 === selected.sha256 && ["image/png","image/jpeg","image/webp"].includes(f.mime),"参考素材类型、归属或哈希错误");
-        return {assetId,fileId:f.id,sha256:f.sha256,mime:f.mime,approval:this.store.approved(p,assetId)?"approved":"pending"};
+        return {assetId,fileId:f.id,sha256:f.sha256,mime:f.mime,approval:identity ? "approved" : selected.approval};
       });
-      return {baseRevision,target:{assetId:target.assetId,shotId:target.shotId},targetHash:imageTargetHash(p.ontology,target),prompt,parentAssets,width:p.ontology.spec.width,height:p.ontology.spec.height};
+      return {baseRevision,target:{assetId:target.assetId,shotId:target.shotId},targetHash:imageTargetHash(p.ontology,target),prompt,parentAssets,width:p.ontology.spec.width,height:p.ontology.spec.height,...(consistency.enabled ? {identityReferences:consistency.identityReferences,desiredReferences:consistency.desiredReferences,consistencyContract:"approved-identity-v1"} : {})};
     });
+  }
+  enqueueImages(projectId: string, baseRevision: number, key: string, targets: ImageTarget[]) {
+    ensure(Array.isArray(targets) && targets.length > 0 && targets.length <= 52,"每批须为1–52个图片目标");
+    const ih=hash({kind:"images",baseRevision,targets});
+    const prior=this.store.action(projectId,key,ih);
+    if(prior) return {runId:prior.runId,jobs:prior.ids.map((id:string)=>this.store.job(id))};
+    const inputs=this.prepareImageInputs(projectId,baseRevision,targets);
     const runId=randomUUID();
     const jobs=this.store.transaction(()=>{
       const added=inputs.map(input=>this.store.addJob({projectId,runId,kind:"image",shotId:input.target.shotId,dependsOn:[],inputHash:hash(input),input}));
@@ -549,8 +560,13 @@ export class Jobs {
           ensure(job.attempts === 0,"图片提交受理状态不明，禁止自动重投",409,"image_already_submitted");
           const current=s.project(job.projectId);
           ensure(imageTargetHash(current.ontology,job.input.target) === job.input.targetHash,"图片制作条件已变化，请按当前修订创建新任务",409,"stale_snapshot");
+          const consistency=inspectImageConsistency(current,job.input.target.assetId || job.input.target.shotId,job.input.parentAssets.map((r:any)=>r.assetId));
+          const issue=consistency.issues.find(i=>i.severity === "error");
+          ensure(!issue,issue?.message || "人物一致性条件未就绪",409,issue?.code || "identity_not_ready");
+          if(consistency.enabled) ensure(job.input.consistencyContract === "approved-identity-v1" && hash(consistency.identityReferences) === hash(job.input.identityReferences),"批准的角色基准已变化，此任务未发送，请按当前审核重新提交",409,"stale_identity");
           for(const parent of job.input.parentAssets) {
-            const a=current.ontology.assets.find(a=>a.id===parent.assetId), selected=a?.fileId?a:a?.previewImage;
+            const identity=consistency.identityReferences.find(r=>r.assetId===parent.assetId);
+            const selected=identity || resolveImageReference(current,parent.assetId);
             ensure(selected?.sha256===parent.sha256,"图片参考已变化，请按当前修订创建新任务",409,"stale_snapshot");
           }
           const input:ImageInput={prompt:job.input.prompt,width:job.input.width,height:job.input.height,
@@ -582,7 +598,8 @@ export class Jobs {
         const a=s.addArtifact({projectId:job.projectId,jobId:job.id,assetId:job.input.target.assetId,shotId:job.shotId,
           kind:"image",fileId:file.id,sourceHash:job.input.targetHash,
           metadata:{...request,...receipt.metadata,targetHash:job.input.targetHash,prompt:job.input.prompt,parentAssets:job.input.parentAssets,
-            origin:"ai-generated",reviewStatus:"pending",originalFileId:original.id,originalSha256:original.sha256,crop,baseRevision:job.input.baseRevision,
+            ...(job.input.consistencyContract ? {consistencyContract:job.input.consistencyContract,identityReferences:job.input.identityReferences,desiredReferences:job.input.desiredReferences} : {}),
+            origin:"ai-generated",reviewStatus:"pending",reviewSubmissionId:job.input.reviewSubmissionId,revisionOf:job.input.revisionOf,reviewNote:job.input.reviewNote,originalFileId:original.id,originalSha256:original.sha256,crop,baseRevision:job.input.baseRevision,
             requestedCanvas:{width:job.input.width,height:job.input.height}}});
         s.updateJob(job.id,{state:"complete",stage:"complete",progress:1,result:{...s.job(job.id).result,artifactId:a.id}});
         return;
@@ -747,7 +764,7 @@ export class Jobs {
       );
     } catch (error: any) {
       if (s.job(job.id).state === "cancelled") return;
-      const uncertain = error?.uncertain === true || (job.kind === "image" && s.job(job.id).attempts > 0 && s.job(job.id).stage === "submitting" && !existsSync(join(s.workDir(job.id), "image-receipt.json")));
+      const uncertain = error?.uncertain === true || (error?.uncertain !== false && job.kind === "image" && s.job(job.id).attempts > 0 && s.job(job.id).stage === "submitting" && !existsSync(join(s.workDir(job.id), "image-receipt.json")));
       const message = cleanError(error);
       const blocked = /not configured|未配置|missing.*key|credential/i.test(
         message,
@@ -755,6 +772,7 @@ export class Jobs {
       s.updateJob(job.id, {
         state: uncertain ? "uncertain" : blocked ? "blocked" : "failed",
         error: message,
+        result: { ...s.job(job.id).result, errorCode: typeof error?.code === "string" ? error.code : "execution_failed" },
         stage: uncertain
           ? "acceptance_unknown"
           : error?.code === "provider_failed"

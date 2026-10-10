@@ -191,3 +191,40 @@ with tarfile.open(sys.argv[1],'w') as t:
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test("schema 2 backup preserves review submissions and accepted image receipts so restore downloads without a second POST",async()=>{
+ const {Jobs}=await import("../server/jobs.ts"),{Providers}=await import("../server/providers.ts");
+ const {fixture:ontologyFixture,requirements,mockMedia}=await import("./helpers.ts");
+ const root=mkdtempSync(join(tmpdir(),"storyflow-receipt-backup-")),data=join(root,"data");
+ let store=new Store(data);let posts=0,gets=0,offline=true;
+ const png=Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jFeYAAAAASUVORK5CYII=","base64");
+ const providers=new Providers({imageBase:"http://fixture.invalid/v1",imageKey:"test-only",seedanceBase:"",seedanceKey:"",seedanceModel:"",falKey:"",falBase:"",opusBase:"",opusKey:"",opusModel:"",allowPrivate:true},{fetchImpl:(async(_url:any,options:any)=>{
+  if(options.method==="POST"){posts++;return new Response(JSON.stringify({data:[{url:"http://fixture.invalid/image.png"}]}));}
+  gets++;if(offline)throw new Error("offline");return new Response(png);
+ }) as any});
+ try {
+  const o=ontologyFixture();o.assets.push({id:"ref",label:"测试人物",kind:"image",purpose:"production",gap:true});
+  const project=store.create("backup",requirements,o),jobs=new Jobs(store,providers,mockMedia());jobs.stopped=true;
+  const job=jobs.enqueueImages(project.id,1,"backup-image",[{assetId:"ref"}]).jobs[0];
+  jobs.stopped=false;await jobs.tick();jobs.stopped=true;
+  assert.equal(store.job(job.id).state,"failed");assert.equal(posts,1);assert.equal(gets,1);
+  store.recordReviewSubmission({id:"history-1",projectId:project.id,baseRevision:1,createdAt:new Date().toISOString(),items:[]});
+  writeFileSync(join(store.workDir(job.id),"unneeded-render-cache.png"),"cache");
+  store.close();
+  const tar=join(root,"backup.tar"),copied=await backup(data,tar);assert.equal(copied.receipts,1);
+  const destination=join(root,"restored"),restored=await restore(destination,tar);assert.equal(restored.receipts,1);
+  assert.equal(existsSync(join(destination,"work",job.id,"unneeded-render-cache.png")),false);
+  store=new Store(destination);assert.equal(store.reviewSubmissions(project.id)[0].id,"history-1");
+  const runner=new Jobs(store,providers,mockMedia());runner.stopped=true;offline=false;
+  runner.retry(job.id,"download-after-restore");runner.stopped=false;await runner.tick();runner.stopped=true;
+  assert.equal(store.job(job.id).state,"complete");assert.equal(posts,1);assert.equal(gets,2);
+  store.close();
+  const unpacked=join(root,"unpacked");mkdirSync(unpacked);await archive("unpack",tar,unpacked);
+  writeFileSync(join(unpacked,"work",job.id,"image-receipt.json"),"tampered");
+  const bad=join(root,"tampered.tar");await archive("pack",bad,unpacked);
+  await assert.rejects(restore(destination,bad,true),/mismatch/);
+  // A missing durable receipt must fail before either losing task evidence or replacing destination data.
+  rmSync(join(data,"work",job.id,"image-receipt.json"));
+  await assert.rejects(backup(data,join(root,"incomplete.tar")),/receipt is missing/);
+ }finally{try{store.close();}catch{}rmSync(root,{recursive:true,force:true});}
+});

@@ -20,6 +20,8 @@ export function configFromEnv() {
     ),
     publicBaseUrl: e.PUBLIC_BASE_URL || `http://127.0.0.1:${e.PORT || 18296}`,
     adminPassword: e.STORYFLOW_ADMIN_PASSWORD || "",
+    publicReviewProjectIds: (e.STORYFLOW_PUBLIC_REVIEW_PROJECTS || "").split(",").map(id => id.trim()).filter(Boolean),
+    publicReviewApiBase: e.STORYFLOW_PUBLIC_REVIEW_API_BASE || "/api",
     providers: {
       imageBase: e.IMAGE_BASE_URL || "",
       imageKey: e.IMAGE_API_KEY || "",

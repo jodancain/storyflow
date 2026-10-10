@@ -1,12 +1,14 @@
+import { inspectImageConsistency } from "../../shared/image-consistency";
 import type { Project, Artifact, ImageAttemptHistory } from "../../shared/types";
 
 export type ImageStatus = "pending" | "approved" | "change" | "historical";
 export interface ReviewImage {
   id: string; url: string; thumbnailUrl?: string; sha256: string; status: ImageStatus;
   fileId: string; modelRequested?: string; modelActual?: string | null;
-  parentIds: string[]; note?: string; needsRevision?: boolean; origin: "generated" | "imported"; stale?: boolean;
+  parentIds: string[]; consistencyEvidence?: "legacy-unverified" | "strict-references"; note?: string; needsRevision?: boolean; origin: "generated" | "imported"; stale?: boolean;
 }
 export interface ReviewItem {
+  consistency?: { isIdentityMaster: boolean; ready: boolean; requiredAssetIds: string[]; issues: string[] };
   imageAttempt?: ImageAttemptHistory;
   id: string; type: "asset" | "shot"; title: string; description: string;
   image?: ReviewImage; candidates: ReviewImage[]; relatedIds: string[];
@@ -22,6 +24,8 @@ export interface ReviewFlow {
   outputId?: string; dependsOn: string[]; reason?: string;
 }
 export interface ReviewSnapshot {
+  onlineReview?: { apiBase: string; projectId: string };
+  imageJobs?: { id: string; targetId: string; state: string; updatedAt?: string; reason?: string }[];
   schemaVersion: 1; projectId: string; title: string; revision: number;
   contentHash: string; fps: number; totalFrames: number; items: ReviewItem[];
   flow: ReviewFlow[]; evidence: { id: string; title: string; excerpt: string; url?: string }[];
@@ -42,6 +46,7 @@ export function projectSnapshot(project: Project, fileUrl: (id: string) => strin
     parentIds: [...(Array.isArray(a.metadata?.parentAssets) ? a.metadata.parentAssets.flatMap((p: any) => typeof p?.assetId === "string" ? [p.assetId] : []) : []), ...(Array.isArray(a.metadata?.parentShots) ? a.metadata.parentShots.flatMap((p: any) => typeof p?.shotId === "string" ? [p.shotId] : []) : [])],
     note: typeof a.metadata?.reviewNote === "string" ? a.metadata.reviewNote : undefined,
     needsRevision: !!a.metadata?.technicalReview && typeof a.metadata.technicalReview === "object" && (a.metadata.technicalReview as {contentReview?:string}).contentReview === "needs_revision",
+    consistencyEvidence: a.metadata.consistencyContract === "legacy-unverified" ? "legacy-unverified" : a.metadata.identityReferences ? "strict-references" : undefined,
     origin: a.metadata.origin === "ai-generated" ? "generated" : "imported",
   });
   const imported = (fileId?: string, approved = false): ReviewImage | undefined => {
@@ -54,6 +59,17 @@ export function projectSnapshot(project: Project, fileUrl: (id: string) => strin
     const a = images.find(a => a.id === binding.artifactId);
     return a ? image(a) : imported(binding.fileId);
   };
+  // A returned repair becomes the review focus only when it revises the displayed candidate.
+  // This never changes the selected production image or overwrites concurrent ontology edits.
+  const latestRevision = (selected: ReviewImage | undefined, candidates: ReviewImage[]) => {
+    let result = selected; const seen = new Set<string>();
+    while (result && !seen.has(result.id)) {
+      seen.add(result.id);
+      const child = candidates.find(candidate => !candidate.stale && images.find(a => a.id === candidate.id)?.metadata.revisionOf === result!.id);
+      if (!child) break; result = child;
+    }
+    return result;
+  };
   const currentPass = (id: string) => project.reviews.some(r => r.targetId === id && r.targetHash === project.compiled.targetHashes[id] && r.status === "pass");
   const refs = project.ontology.assets.filter(a => a.purpose === "reference");
   const reference = (ids: string[]) => {
@@ -63,7 +79,7 @@ export function projectSnapshot(project: Project, fileUrl: (id: string) => strin
   const items: ReviewItem[] = project.ontology.assets.filter(a => a.purpose === "production" && ["image", "graphic"].includes(a.kind)).map(asset => {
     const a = asset as typeof asset & { previewImage?: Binding };
     const candidates = images.filter(i => (i as Artifact & { assetId?: string }).assetId === a.id).map(image);
-    const selected = resolve(a.previewImage, a.fileId, currentPass(a.id)) || candidates[0];
+    const selected = latestRevision(resolve(a.previewImage, a.fileId, currentPass(a.id)) || candidates[0], candidates);
     const related = project.ontology.shots.filter(s => s.requiredAssetIds.includes(a.id) || project.ontology.anchors.some(n => n.assetId === a.id && [s.firstAnchorId, s.endAnchorId].includes(n.id)));
     return { id: a.id, imageAttempt:a.imageAttempt, type: "asset", title: a.label, description: a.mustShow?.join("；") || "核对专属资产的身份、状态与用途。", image: selected, candidates: candidates.length ? candidates : selected ? [selected] : [], relatedIds: related.map(s => s.id), mustShow: a.mustShow || [], rejectIf: a.rejectIf || [], dependencies: selected?.parentIds || [], approvedFileId: a.fileId, source: a.source, targetHash: project.compiled.targetHashes[a.id], references: reference([a.id]) };
   });
@@ -71,7 +87,7 @@ export function projectSnapshot(project: Project, fileUrl: (id: string) => strin
     const s = shot as typeof shot & { reviewImage?: Binding; firstFrameImage?: Binding };
     const candidates = images.filter(a => a.shotId === s.id).map(image);
     const firstAsset = project.ontology.assets.find(a => a.id === project.ontology.anchors.find(n => n.id === s.firstAnchorId)?.assetId);
-    const selected = resolve(s.reviewImage) || candidates[0];
+    const selected = latestRevision(resolve(s.reviewImage) || candidates[0], candidates);
     items.push({ id: s.id, imageAttempt:s.imageAttempt, type: "shot", title: s.title, description: s.action, image: selected, candidates, relatedIds: s.requiredAssetIds.filter(id => items.some(i => i.id === id)), mustShow: s.mustShow, rejectIf: s.rejectIf, startFrame: s.startFrame, endFrame: s.endFrame, scale: s.scale, camera: s.camera, dialogue: s.dialogue.map(d => `${project.ontology.entities.find(e => e.id === d.speakerId)?.label || d.speakerId}：${d.text}`), subtitles: s.subtitles.map(c => c.text), startState: s.startState, endState: s.endState, dependencies: s.dependencies, firstFrameId: s.firstFrameImage?.fileId || firstAsset?.fileId, targetHash: project.compiled.targetHashes[s.id], references: reference(s.requiredAssetIds) });
   }
   const flow: ReviewFlow[] = project.compiled.tasks.map(t => {
@@ -80,5 +96,10 @@ export function projectSnapshot(project: Project, fileUrl: (id: string) => strin
     const job = [...jobs].sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
     return { id: t.id, title: shot ? `${shot.id} · ${shot.title}` : "完整影片合成", kind: t.kind, state: job?.state || "draft", inputIds: shot?.requiredAssetIds.filter(id => items.some(i => i.id === id)) || [], outputId: shot?.id, dependsOn: t.dependsOn, reason: job?.error };
   });
-  return { schemaVersion: 1, projectId: project.id, title: project.ontology.title || project.name, revision: project.revision, contentHash: project.compiled.hash, fps: project.ontology.spec.fps, totalFrames: project.ontology.spec.totalFrames, items, flow, evidence: project.ontology.evidence };
+  for (const item of items) {
+    const consistency = inspectImageConsistency(project, item.id);
+    if (consistency.enabled) item.consistency = { isIdentityMaster: consistency.isIdentityMaster, ready: consistency.ready, requiredAssetIds: [...consistency.requiredSourceAssetIds, ...consistency.requiredIdentityAssetIds], issues: consistency.issues.map(issue => issue.message) };
+  }
+  const imageJobs = project.jobs.filter(j => j.kind === "image").map(j => ({ id:j.id, targetId:String(j.input?.target?.assetId || j.input?.target?.shotId || j.shotId || ""), state:j.state, updatedAt:j.updatedAt, reason:j.error ? "任务需要处理，请登录查看详情。" : undefined }));
+  return { schemaVersion: 1, imageJobs, projectId: project.id, title: project.ontology.title || project.name, revision: project.revision, contentHash: project.compiled.hash, fps: project.ontology.spec.fps, totalFrames: project.ontology.spec.totalFrames, items, flow, evidence: project.ontology.evidence };
 }

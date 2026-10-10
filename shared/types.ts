@@ -42,7 +42,31 @@ export interface ImageTarget {
   prompt?: string;
   referenceAssetIds?: string[];
 }
+export type CharacterVisibility = "face" | "body" | "hands" | "shoulder";
+export interface CharacterIdentity {
+  characterId: string;
+  identityAssetId: string;
+  /** Original human-authorized photo required only when creating this identity master. */
+  referenceSourceAssetId?: string;
+  visibility: "person" | "hands-only";
+  appearance: string;
+  wardrobes: { id: string; description: string }[];
+}
+export interface ImageComposition {
+  /** This is an allowlist; an empty array means no identifiable person in frame. */
+  visibleCharacters: {
+    characterId: string;
+    wardrobeId: string;
+    visibility: CharacterVisibility;
+  }[];
+}
+export interface ImageConsistency {
+  version: 1;
+  enforceApprovedIdentity: true;
+  characters: CharacterIdentity[];
+}
 export interface Asset {
+  imageComposition?: ImageComposition;
   imageAttempt?: ImageAttemptHistory;
   previewImage?: ImageBinding;
   id: string;
@@ -90,6 +114,7 @@ export interface Caption {
   text: string;
 }
 export interface Shot {
+  imageComposition?: ImageComposition;
   imageAttempt?: ImageAttemptHistory;
   reviewImage?: ImageBinding;
   firstFrameImage?: ImageBinding;
@@ -142,6 +167,7 @@ export interface Ontology {
   anchors: Anchor[];
   evidence: Evidence[];
   shots: Shot[];
+  imageConsistency?: ImageConsistency;
   postProgram?: PostProgram;
 }
 export interface Requirements {

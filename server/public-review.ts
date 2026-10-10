@@ -5,6 +5,7 @@ import { resolve } from "node:path";
 import { createHash } from "node:crypto";
 import JSZip from "jszip";
 import type { Project } from "../shared/types.ts";
+import { inspectImageConsistency } from "../shared/image-consistency.ts";
 import { projectSnapshot, type ReviewSnapshot } from "../src/review/projectSnapshot.ts";
 import { PublicReview } from "../src/review/PublicReview.tsx";
 import { Store } from "./store.ts";
@@ -20,6 +21,10 @@ export function publicSnapshot(project: Project, fileUrl: (id: string) => string
   const visible = new Set(project.artifacts.filter(a => a.kind === "image" && a.metadata.origin === "ai-generated").map(a => a.fileId));
   for (const artifact of project.artifacts) if (artifact.kind === "image" && artifact.metadata.origin === "ai-generated" && typeof artifact.metadata.thumbnailFileId === "string") visible.add(artifact.metadata.thumbnailFileId);
   for (const file of project.files) if (file.metadata?.publicShareApproved === true) visible.add(file.id);
+  const privateSourceIds = new Set(project.ontology.imageConsistency?.characters.flatMap(profile => profile.referenceSourceAssetId ? [profile.referenceSourceAssetId] : []) || []);
+  const privateSourceFiles = new Set(project.ontology.assets.filter(asset => privateSourceIds.has(asset.id)).flatMap(asset => [asset.fileId, asset.previewImage?.fileId].filter((id):id is string => !!id)));
+  const privateSourceHashes = new Set(project.files.filter(file => privateSourceFiles.has(file.id)).map(file => file.sha256));
+  for (const file of project.files) if (privateSourceHashes.has(file.sha256)) visible.delete(file.id);
   const publicProject = structuredClone(project);
   publicProject.files = publicProject.files.filter(f => visible.has(f.id));
   publicProject.artifacts = publicProject.artifacts.filter(a => visible.has(a.fileId));
@@ -33,6 +38,15 @@ export function publicSnapshot(project: Project, fileUrl: (id: string) => string
   }
   const snapshot = structuredClone(projectSnapshot(publicProject, fileUrl));
   for (const item of snapshot.items) {
+    // Report readiness from the real private project without serializing the private reference bytes.
+    const consistency = inspectImageConsistency(project, item.id);
+    if (consistency.enabled) item.consistency = { isIdentityMaster:consistency.isIdentityMaster, ready:consistency.ready, requiredAssetIds:[...consistency.requiredSourceAssetIds, ...consistency.requiredIdentityAssetIds], issues:consistency.issues.map(issue=>issue.message) };
+    // Technical publication notes are shared; private human review comments stay behind login.
+    for (const candidate of [...item.candidates, ...(item.image ? [item.image] : [])]) {
+      const artifact = project.artifacts.find(a => a.id === candidate.id);
+      const technical = artifact?.metadata.technicalReview as {notes?:unknown} | undefined;
+      candidate.note = Array.isArray(technical?.notes) ? technical.notes.filter((note:unknown):note is string=>typeof note === "string").join("；") : undefined;
+    }
     if (item.source) item.source.url = safeLink(item.source.url);
     for (const reference of item.references) reference.url = safeLink(reference.url);
   }
@@ -41,14 +55,15 @@ export function publicSnapshot(project: Project, fileUrl: (id: string) => string
   snapshot.flow = snapshot.flow.map(node => ({ ...node, reason: node.reason ? "此任务需要在工作台查看原因并处理。" : undefined }));
   return snapshot;
 }
-export function publicReviewCsp(): string {
+export function publicReviewCsp(online = false): string {
   const path = resolve("dist-review/review.js");
   const script = existsSync(path) ? readFileSync(path, "utf8").replace(/<\/script/gi, "<\\/script") : "";
   const digest = createHash("sha256").update(script).digest("base64");
-  return `default-src 'none'; script-src 'sha256-${digest}'; style-src 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'`;
+  return `default-src 'none'; script-src 'sha256-${digest}'; style-src 'unsafe-inline'; img-src 'self' data:; connect-src ${online ? "'self'" : "'none'"}; frame-ancestors 'none'; base-uri 'none'; form-action 'none'`;
 }
-export function renderPublicReviewHtml(project: Project, fileUrl: (id: string) => string, requireInteractive = false): string {
+export function renderPublicReviewHtml(project: Project, fileUrl: (id: string) => string, requireInteractive = false, onlineReview?: { apiBase: string; projectId: string }): string {
   const snapshot = publicSnapshot(project, fileUrl);
+  if (onlineReview) snapshot.onlineReview = onlineReview;
   const scriptPath = resolve("dist-review/review.js"), stylePath = resolve("dist-review/review.css");
   if (requireInteractive) ensure(existsSync(scriptPath) && existsSync(stylePath), "审稿组件尚未构建，请先运行 npm run build", 503, "review_build_missing");
   const styles = existsSync(stylePath) ? readFileSync(stylePath, "utf8") : ["src/review/review.css", "src/review/public.css"].filter(existsSync).map(p => readFileSync(p, "utf8")).join("\n");

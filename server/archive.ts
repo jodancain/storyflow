@@ -100,6 +100,7 @@ function portableOntology(o: Ontology): Ontology {
   return {
     schemaVersion: 1,
     title: o.title,
+    ...(o.imageConsistency ? { imageConsistency: structuredClone(o.imageConsistency) } : {}),
     spec: pick(o.spec, [
       "fps",
       "width",
@@ -132,6 +133,7 @@ function portableOntology(o: Ontology): Ontology {
         "rejectIf",
         "previewImage",
         "imageAttempt",
+        "imageComposition",
       ]),
       ...(a.source
         ? { source: pick(a.source, ["url", "author", "license", "use"]) }
@@ -165,6 +167,7 @@ function portableOntology(o: Ontology): Ontology {
         "reviewImage",
         "firstFrameImage",
         "imageAttempt",
+        "imageComposition",
         "mustShow",
         "rejectIf",
       ]),
@@ -232,6 +235,7 @@ type ArchiveProject = {
   reviews: Review[];
   artifacts: Artifact[];
   selections: any[];
+  reviewSubmissionHistory?: unknown[];
   createdAt: string;
   updatedAt: string;
 };
@@ -295,6 +299,7 @@ export async function exportProject(store: Store, id: string): Promise<Buffer> {
       "brief",
     ]) as Requirements,
     ontology,
+    reviewSubmissionHistory: portableMetadata([...(store.raw(id).reviewSubmissionHistory || []), ...store.reviewSubmissions(id)]),
     reviews: p.reviews.map((r) =>
       ({...pick(r, ["targetId", "targetHash", "status", "note", "updatedAt"]), ...(r.imported ? {imported: portableMetadata(r.imported)} : {})}),
     ) as Review[],
@@ -602,6 +607,9 @@ export async function importProject(
     400,
     "archive_jobs",
   );
+  if (data.reviewSubmissionHistory !== undefined) {
+    ensure(Array.isArray(data.reviewSubmissionHistory) && data.reviewSubmissionHistory.length <= 10000 && data.reviewSubmissionHistory.every(record => object(record)), "审图提交历史格式无效", 400, "archive_review_history");
+  }
   checkRequirements(data.requirements);
   const errors = validateOntology(data.ontology).filter(
     (i) => i.severity === "error",
@@ -742,6 +750,7 @@ export async function importProject(
         name: data.name,
         requirements: data.requirements,
         ontology: data.ontology,
+        ...(data.reviewSubmissionHistory ? { reviewSubmissionHistory: portableMetadata(data.reviewSubmissionHistory).map((record:any)=>({...record, importedHistory:true, jobsReplayed:false, sourceProjectId:data.sourceProjectId})) } : {}),
         createdAt: now,
         updatedAt: now,
       };

@@ -71,11 +71,13 @@ export async function restore(dataDir: string, input: string, replace = false) {
       renameSync(join(stage, name), join(dataDir, name));
       added.push(name);
     }
-    mkdirSync(join(dataDir, "work"), { recursive: true, mode: 0o700 });
+    if(existsSync(join(stage,"work"))) renameSync(join(stage,"work"),join(dataDir,"work"));
+    else mkdirSync(join(dataDir, "work"), { recursive: true, mode: 0o700 });
     added.push("work");
     installed = true;
     return {
       assets: manifest.assets.length,
+      receipts: manifest.receipts?.length || 0,
       createdAt: manifest.createdAt,
       rollback: old.length ? rollback : null,
       restored: true,
