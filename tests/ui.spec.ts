@@ -125,7 +125,7 @@ function fixture(): Project {
     updatedAt: "2026-10-10T01:00:00Z",
   };
 }
-async function mockApi(page: Page, setup = false) {
+async function mockApi(page: Page, setup = false, imageConfigured = false) {
   let project = fixture(),
     authenticated = !setup,
     created = false;
@@ -146,6 +146,19 @@ async function mockApi(page: Page, setup = false) {
         contentType: "application/json",
         body: JSON.stringify(data),
       });
+    if (path.startsWith("/api/files/")) return route.fulfill({status:200,contentType:"image/svg+xml",body:`<svg xmlns="http://www.w3.org/2000/svg" width="360" height="640"><rect width="360" height="640" fill="${path.includes("second") ? "#d7c3a8" : "#c4bfdc"}"/><circle cx="180" cy="180" r="90" fill="#f6e4d7"/><rect x="75" y="280" width="210" height="310" rx="70" fill="#fff"/></svg>`});
+    if (path.startsWith("/api/artifacts/") && method === "POST") {
+      const artifact = project.artifacts.find(a => path.includes(a.id));
+      if (!artifact) return ok({error:"候选不存在"},404);
+      if (path.endsWith("/review")) { artifact.accepted=body.accepted; artifact.metadata={...artifact.metadata,reviewNote:body.note,reviewStatus:body.accepted ? "pass" : "change"}; }
+      if (path.endsWith("/select")) {
+        const binding={artifactId:artifact.id,fileId:artifact.fileId,sha256:project.files.find(f=>f.id===artifact.fileId)!.sha256};
+        if (artifact.assetId) { const asset=project.ontology.assets.find(a=>a.id===artifact.assetId)!; if(body.usage==="preview")asset.previewImage=binding; else { if(!artifact.accepted)return ok({error:"先审核"},422);asset.fileId=artifact.fileId;asset.sha256=binding.sha256;asset.gap=false; } }
+        project.revision+=1;
+      }
+      return ok(project);
+    }
+    if (path.endsWith("/image-generations")) return ok({runId:"fixture-run",jobs:[]});
     if (path === "/api/auth")
       return ok({ setupRequired: setup && !authenticated, authenticated });
     if (path === "/api/auth/setup" || path === "/api/auth/login") {
@@ -160,6 +173,7 @@ async function mockApi(page: Page, setup = false) {
           fal: { configured: false, reason: "尚未配置医生口型服务" },
           opus: { configured: false, reason: "尚未配置策划服务" },
           media: { configured: true, model: "FFmpeg" },
+          image: { configured: imageConfigured, model: "fixture-image", reason: "图片服务尚未配置" },
         },
       });
     if (path === "/api/projects" && method === "GET")
@@ -612,4 +626,88 @@ test("工程与镜头导入按实际接口筛选文件", async ({ page }) => {
   await expect(
     page.locator(".library-heading input[type=file]"),
   ).toHaveAttribute("accept", ".zip");
+});
+
+
+test("真实资产候选可比较、明确批准与采用，返回保留筛选", async ({ page }, testInfo) => {
+  const mock=await mockApi(page,false,true), p=mock.getProject();
+  p.files=["first","second"].map((id,index)=>({id:`file-${id}`,projectId:p.id,name:`${id}.svg`,mime:"image/svg+xml",sha256:String(index+1).repeat(64),bytes:300,relativePath:`fixtures/${id}`,createdAt:p.createdAt}));
+  p.artifacts=["first","second"].map((id,index)=>({id:`candidate-${id}`,projectId:p.id,jobId:`image-${id}`,kind:"image",assetId:"portrait",fileId:`file-${id}`,sourceHash:"image-hash",accepted:false,metadata:{origin:"ai-generated",modelRequested:"fixture-image",reviewStatus:"pending",parentAssets:[]},createdAt:index ? "2026-10-10T01:01:00Z":p.createdAt}));
+  p.ontology.assets[0].previewImage={artifactId:"candidate-first",fileId:"file-first",sha256:"1".repeat(64)};
+  p.imageTargetHashes={portrait:"image-hash"};
+  await openProject(page);
+  await page.getByRole("button",{name:"03 审核 确认每一处细节 →"}).click();
+  await page.getByRole("button",{name:"资产图与首帧",exact:true}).click();
+  await page.getByLabel("搜索资产与分镜").fill("医生");
+  await page.getByRole("button",{name:"审图：指定医生参考照",exact:true}).click();
+  const dialog=page.getByRole("dialog",{name:"审图：指定医生参考照"});
+  await expect(dialog.getByRole("button",{name:"采用为制作资产",exact:true})).toBeDisabled();
+  await dialog.getByLabel("并排比较").selectOption("candidate-second");
+  await expect(dialog.getByAltText("指定医生参考照对比候选")).toBeVisible();
+  await page.screenshot({path:testInfo.outputPath("candidate-review.png"),animations:"disabled"});
+  await dialog.getByLabel("当前候选审图意见").fill("核对指定医生身份，批准当前候选。");
+  await dialog.getByRole("button",{name:"确认此图通过",exact:true}).click();
+  await expect(dialog.getByRole("button",{name:"采用为制作资产",exact:true})).toBeEnabled();
+  await dialog.getByRole("button",{name:"作为审稿展示图",exact:true}).click();
+  expect(mock.requests.filter(r=>r.path.endsWith("/select")).at(-1)?.body.usage).toBe("preview");
+  expect(p.ontology.assets[0].fileId).toBeUndefined();
+  await dialog.getByRole("button",{name:"采用为制作资产",exact:true}).click();
+  expect(p.ontology.assets[0].fileId).toBe("file-first");
+  await page.keyboard.press("Escape");
+  await expect(page.getByLabel("搜索资产与分镜")).toHaveValue("医生");
+  expect(mock.requests.filter(r=>r.path.endsWith("/image-generations"))).toHaveLength(0);
+});
+
+test("图片无配置不提交且手机审图保持视口", async ({page}) => {
+  const mock=await mockApi(page);await page.setViewportSize({width:390,height:850});await openProject(page);
+  await page.getByRole("button",{name:"补齐专属资产图 ↗",exact:true}).click();
+  await expect(page.getByText("图片服务尚未配置",{exact:true})).toBeVisible();
+  await expect.poll(()=>page.locator(".sf-image-grid").first().evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(" ").length)).toBe(1);
+  await page.getByRole("button",{name:"审图：指定医生参考照",exact:true}).click();
+  await page.getByText("生成新的候选图",{exact:true}).click();
+  await expect(page.getByRole("button",{name:"提交生成一个候选",exact:true})).toBeDisabled();
+  await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBe(true);
+  await page.keyboard.press("Escape");
+  expect(mock.requests.filter(r=>r.path.endsWith("/image-generations"))).toHaveLength(0);
+});
+
+
+test("旧父图候选禁止用于制作，导入意见需要明确转成待审",async({page})=>{
+  const mock=await mockApi(page,false,true),p=mock.getProject();
+  p.files=[{id:"file-first",projectId:p.id,name:"fixture.svg",mime:"image/svg+xml",sha256:"1".repeat(64),bytes:300,relativePath:"fixture",createdAt:p.createdAt}];
+  p.artifacts=[{id:"candidate-first",projectId:p.id,jobId:"image-first",kind:"image",assetId:"portrait",fileId:"file-first",sourceHash:"same-target-hash",accepted:true,metadata:{origin:"ai-generated",reviewStatus:"pass"},createdAt:p.createdAt}];
+  p.imageCandidateCurrent={"candidate-first":false};
+  p.ontology.assets[0].previewImage={artifactId:"candidate-first",fileId:"file-first",sha256:"1".repeat(64)};
+  p.reviews=[{targetId:"S01",targetHash:"imported-opinion",status:"pending",note:"请把口腔溃疡与对应症状素材核对。",updatedAt:p.updatedAt,imported:{sourceRevision:1,snapshotHash:"prior-hash",targetHash:p.compiled.targetHashes.S01,originalStatus:"pass",match:"historical"}}];
+  await openProject(page);await page.getByRole("button",{name:"03 审核 确认每一处细节 →"}).click();
+  await page.getByText(/导入审稿意见 · 待人工核对/).click();
+  await page.getByRole("button",{name:"采用意见为当前待审",exact:true}).click();
+  expect(mock.getProject().reviews.find(r=>r.targetId==="S01")?.status).toBe("pending");
+  await page.getByRole("button",{name:"资产图与首帧",exact:true}).click();
+  await page.getByRole("button",{name:"审图：指定医生参考照",exact:true}).click();
+  await expect(page.getByText("此图基于旧修订，保留供对比，不能作为当前制作输入。",{exact:true})).toBeVisible();
+  await expect(page.getByRole("button",{name:"采用为制作资产",exact:true})).toBeDisabled();
+});
+
+
+test("实际参考图可取消与明确发送，卡片缩略图与技术返修独立显示",async({page})=>{
+  const mock=await mockApi(page,false,true),p=mock.getProject();
+  p.files=["first","thumb"].map((id,index)=>({id:`file-${id}`,projectId:p.id,name:`${id}.png`,mime:"image/png",sha256:String(index+1).repeat(64),bytes:300,relativePath:`fixtures/${id}`,createdAt:p.createdAt}));
+  p.artifacts=[{id:"candidate-first",projectId:p.id,jobId:"image-first",kind:"image",assetId:"portrait",fileId:"file-first",sourceHash:"fixture-hash",accepted:false,metadata:{origin:"ai-generated",reviewStatus:"pending",thumbnailFileId:"file-thumb",technicalReview:{contentReview:"needs_revision"},reviewNote:"技术检查：请核对医生服装，尚未人工定稿。"},createdAt:p.createdAt}];
+  p.ontology.assets[0].previewImage={artifactId:"candidate-first",fileId:"file-first",sha256:"1".repeat(64)};
+  await openProject(page);await page.getByRole("button",{name:"03 审核 确认每一处细节 →"}).click();await page.getByRole("button",{name:"资产图与首帧",exact:true}).click();
+  await page.getByLabel("筛选图片状态").selectOption("change");
+  const card=page.getByRole("button",{name:"审图：指定医生参考照",exact:true});
+  await expect(card.locator("img")).toHaveAttribute("src","/api/files/file-thumb");
+  await expect(card.getByText("技术建议返修",{exact:true})).toBeVisible();
+  await expect(card.getByText("生成成功 · 待审",{exact:true})).toBeVisible();
+  await card.click();await expect(page.getByAltText("指定医生参考照当前候选")).toHaveAttribute("src","/api/files/file-first");
+  await expect(page.getByRole("note").getByText("技术检查：请核对医生服装，尚未人工定稿。",{exact:true})).toBeVisible();await page.keyboard.press("Escape");
+  await page.getByLabel("筛选图片状态").selectOption("all");await page.getByRole("button",{name:"逐镜首帧",exact:true}).click();await page.getByRole("button",{name:"审图：向医生寻求帮助",exact:true}).click();
+  await page.getByText("生成新的候选图",{exact:true}).click();
+  const checkbox=page.getByLabel("参考图 指定医生参考照",{exact:true});await expect(checkbox).toBeChecked();await checkbox.uncheck();await expect(checkbox).not.toBeChecked();await checkbox.check();
+  await page.getByLabel("补充图片要求").fill("更明亮的人物面部");
+  expect(mock.requests.filter(r=>r.path.endsWith("/image-generations"))).toHaveLength(0);
+  await page.getByRole("button",{name:"提交生成一个候选",exact:true}).click();
+  const request=mock.requests.filter(r=>r.path.endsWith("/image-generations"));expect(request).toHaveLength(1);expect(request[0].body.targets[0].referenceAssetIds).toEqual(["portrait"]);expect(request[0].body.targets[0].shotId).toBe("S02");expect(request[0].body.targets[0].prompt).toContain("医生口型");expect(request[0].body.targets[0].prompt).toContain("更明亮的人物面部");
 });

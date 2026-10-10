@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "template": "lupus-v6",
   "files": [
     {
@@ -14,7 +14,8 @@
         "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。该图用来核对分布，不能代替女主症状成片。最终虚构人物应表现双颊+鼻梁的连续红斑，并避免鼻唇沟被整片涂红；外观不能确诊。"
       },
       "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
-      "changes": "由 Wikimedia 提供的缩略图，仅尺寸缩小；未改变医学内容。"
+      "changes": "由 Wikimedia 提供的缩略图，仅尺寸缩小；未改变医学内容。",
+      "publicShareApproved": true
     },
     {
       "assetId": "REF-A-SYM-HAIR",
@@ -28,7 +29,8 @@
         "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。数量无时间尺度、无正常基线；不能仅凭该发团声称异常脱发或狼疮。情节应表现“她发现比自己平时多”，不要把正常梳落头发当确诊指标。"
       },
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
-      "changes": "由 Wikimedia 提供的缩略图，仅尺寸缩小；未改变医学内容。"
+      "changes": "由 Wikimedia 提供的缩略图，仅尺寸缩小；未改变医学内容。",
+      "publicShareApproved": true
     },
     {
       "assetId": "REF-A-SYM-JOINT",
@@ -42,7 +44,8 @@
         "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。原图描述关节炎疼痛，不能证明为狼疮。可指导“系蝴蝶结时手指停顿、轻揉关节”的动作；静态图本身不测量疼痛。"
       },
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
-      "changes": "由 Wikimedia 提供的缩略图，仅尺寸缩小；未改变医学内容。"
+      "changes": "由 Wikimedia 提供的缩略图，仅尺寸缩小；未改变医学内容。",
+      "publicShareApproved": true
     },
     {
       "assetId": "REF-A-SYM-ORAL",
@@ -56,7 +59,8 @@
         "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。来源称普通 aphthous stomatitis。狼疮也可出现口腔病变，且常无痛、常见上腭；本图只能核对“口腔内真实损害”视觉，不能直接说此人/该溃疡由狼疮造成。"
       },
       "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "changes": "由 Wikimedia 提供的缩略图，仅尺寸缩小；未改变医学内容。"
+      "changes": "由 Wikimedia 提供的缩略图，仅尺寸缩小；未改变医学内容。",
+      "publicShareApproved": true
     },
     {
       "assetId": "REF-REF-PAPER-NOTE-01",
@@ -70,7 +74,8 @@
         "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。仅参考纸本和握笔动作；不是女主，不含已核对的病史文字。原照戒指、指甲油、笔杆文字不沿用到专属镜头。"
       },
       "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "changes": "Commons提供的缩略图，内容未修改，保持原比例。"
+      "changes": "Commons提供的缩略图，内容未修改，保持原比例。",
+      "publicShareApproved": true
     },
     {
       "assetId": "REF-A-TEST-BLOOD-TUBE",
@@ -84,7 +89,8 @@
         "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。不能声称图内已经装有血样。S10最终血样应有合理内容、独立管架并与尿杯分隔。不能用管盖颜色推断诊断结果。"
       },
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "changes": "Commons提供的PNG预览，未改内容。"
+      "changes": "Commons提供的PNG预览，未改内容。",
+      "publicShareApproved": true
     },
     {
       "assetId": "REF-A-MED-TEST",
@@ -98,7 +104,8 @@
         "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。只能作“留尿检查”的物体图，严禁充当泡沫尿或阳性检验结果。"
       },
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "changes": "由 Wikimedia 提供的缩略图，仅尺寸缩小；未改变医学内容。"
+      "changes": "由 Wikimedia 提供的缩略图，仅尺寸缩小；未改变医学内容。",
+      "publicShareApproved": true
     },
     {
       "assetId": "REF-P05",
@@ -112,7 +119,8 @@
         "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。模特不代表狼疮患者，不移植为本片女主身份；照片不是疗效或具体SPF证据。"
       },
       "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
-      "changes": "Wikimedia supplied thumbnail downloaded unchanged; original aspect preserved"
+      "changes": "Wikimedia supplied thumbnail downloaded unchanged; original aspect preserved",
+      "publicShareApproved": true
     },
     {
       "assetId": "REF-P04",
@@ -126,7 +134,8 @@
         "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。普通伞照片没有UPF/防紫外线性能认证，不能宣称该产品具有医学防晒效果。"
       },
       "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
-      "changes": "Wikimedia supplied thumbnail downloaded unchanged; original aspect preserved"
+      "changes": "Wikimedia supplied thumbnail downloaded unchanged; original aspect preserved",
+      "publicShareApproved": true
     },
     {
       "assetId": "REF-P06",
@@ -140,7 +149,8 @@
         "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。不是狼疮具体治疗方案；不能据图推荐品种、剂量或停药。"
       },
       "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "changes": "Wikimedia supplied thumbnail downloaded unchanged; original aspect preserved"
+      "changes": "Wikimedia supplied thumbnail downloaded unchanged; original aspect preserved",
+      "publicShareApproved": true
     },
     {
       "assetId": "REF-P03",
@@ -154,7 +164,8 @@
         "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。不是本片女主住所，不用阳光画面证明光敏反应；若改编本图须遵守同许可要求。"
       },
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
-      "changes": "Wikimedia supplied thumbnail downloaded unchanged; original aspect preserved"
+      "changes": "Wikimedia supplied thumbnail downloaded unchanged; original aspect preserved",
+      "publicShareApproved": true
     },
     {
       "assetId": "REF-P07",
@@ -168,7 +179,3494 @@
         "use": "仅作形态、道具或构图参考；不是本片演员、真实病例或已批准的动态素材。公开图片仅作通用就诊构图，不指称其中人物患狼疮，不推断或扩写患者身份/病史。"
       },
       "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
-      "changes": "Wikimedia supplied thumbnail downloaded unchanged; original aspect preserved"
+      "changes": "Wikimedia supplied thumbnail downloaded unchanged; original aspect preserved",
+      "publicShareApproved": true
     }
-  ]
+  ],
+  "candidates": [
+    {
+      "target": {
+        "assetId": "A-MED-AUTOIMMUNE"
+      },
+      "path": "assets/generated/originals/A-MED-AUTOIMMUNE.png",
+      "sha256": "1219bd9848d8718a1bef52746ef0d0be32f5ed317e351bd17ea4cc817175a866",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-MED-AUTOIMMUNE.jpg",
+        "sha256": "a8816c68a40d4547214e6df4d6db40d85f46e720800cbce34139bda3a4ed7896",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "claude-opus-5-5",
+        "modelActual": "claude-opus-5-5",
+        "productionMethod": "opus-declarative-render",
+        "parentAssets": [],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "schemaValidated": true,
+          "contentReview": "pending",
+          "medicalReview": "pending"
+        },
+        "reviewNote": "",
+        "promptHash": "b6ce7d57fd853acd4995d0fafd9469558a8eae3a765e00b0a62dc2acad011166",
+        "requestId": null,
+        "httpStatus": 200,
+        "imagePostNumber": null,
+        "generatedAt": 1791601845.399721,
+        "programHash": "e1a485ab4ce8bbe58e68ac4cb7291a4f3a464057236b5219b489a5f9b935984f",
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [
+          "https://www.niams.nih.gov/health-topics/lupus"
+        ],
+        "crop": {
+          "path": "portraits/A-MED-AUTOIMMUNE.jpg",
+          "sha256": "f1c366dd28b57518478133b6073fcf1ed3b2e63b0d13ec3839ce47f63fe18a8b",
+          "width": 1080,
+          "height": 1920,
+          "crop": [
+            0,
+            0,
+            1080,
+            1920
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-CHAR-P01"
+      },
+      "path": "assets/generated/originals/A-CHAR-P01.png",
+      "sha256": "f08757edeacaf74212272ffb569cfb3165eedf29eb0271e8f8e4436e0f0386d7",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-CHAR-P01.jpg",
+        "sha256": "2c9dfec2cc779832ceeb52bfa4a952613af8cab73aedcdce3efcc3df9e49c50f",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable"
+        },
+        "reviewNote": "",
+        "promptHash": "f75f3877d44a0de4580ebe0d96b597d736f73d6873ccdb18a84907cb908c3a90",
+        "requestId": "1b6819cb-e31e-4850-bb3d-b30aa9e86869",
+        "httpStatus": 200,
+        "imagePostNumber": 1,
+        "generatedAt": 1791601690.872206,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-CHAR-P01.jpg",
+          "sha256": "1389983d82e87c145bff5ee9981df180788f697cfe8a370d2255cf831d809929",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-CHAR-D00"
+      },
+      "path": "assets/generated/originals/A-CHAR-D00.png",
+      "sha256": "d8cfd3042bffbde6dc1062378d5305de8f2903eaa43e46616eb18ecfd52308ca",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-CHAR-D00.jpg",
+        "sha256": "d01d6ad8a1211c9c6a3dc37cfae5a024e201de1debb184c3dd4a43db0e2ad4ae",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [],
+        "parentShots": [],
+        "externalReferences": [
+          {
+            "role": "user-authorized-private-reference",
+            "sha256": "50cb7082242c9493041ed5b72a65e379defb329f7bf3e569b4ed94c2fc6c9121",
+            "included": false
+          }
+        ],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable"
+        },
+        "reviewNote": "",
+        "promptHash": "2c285cbbedd42caa0531c19338a6c244103a6e2bf84ffae9c89cb65405b01c32",
+        "requestId": "127f99ad-609d-4676-963e-75e011a25a96",
+        "httpStatus": 200,
+        "imagePostNumber": 2,
+        "generatedAt": 1791601693.885513,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-CHAR-D00.jpg",
+          "sha256": "59076894f6e7cb9d8e87f53b10318f5978b3f05004511090e7ff20ee2f1ca0e9",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-CHAR-F01"
+      },
+      "path": "assets/generated/originals/A-CHAR-F01.png",
+      "sha256": "5a4a04471c09ef4dc8258ee4e0c747e3924cfff67e23de5bc1cca9cc9a0998b8",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-CHAR-F01.jpg",
+        "sha256": "37fd98c7fb22305ca85979be01b1a43dbc524fb5de61a3dea5e17ce1db7794d7",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable"
+        },
+        "reviewNote": "",
+        "promptHash": "c416c353cdfa299e893c7363ce0d27509b6e61e76b99bb7c56d5e77aaa6cbf1d",
+        "requestId": "d51dd302-1c82-4714-9f03-3b4bc38e8bcb",
+        "httpStatus": 200,
+        "imagePostNumber": 3,
+        "generatedAt": 1791601690.348599,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-CHAR-F01.jpg",
+          "sha256": "e5deee980ed35d9b9a2d16a11d70c2fc7a0fa543a10d01af31b7c7b2be6779af",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-SET-HOME"
+      },
+      "path": "assets/generated/originals/A-SET-HOME.png",
+      "sha256": "742f874bcf9db74d2460cd7b5d63407eedbec2f62a4826a5e6f351f56dcd41ce",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-SET-HOME.jpg",
+        "sha256": "e1c7a8e1087a58ddbc9ae744a77695e55450eda8f5c391b34e4a54039ea0f872",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable"
+        },
+        "reviewNote": "",
+        "promptHash": "edf38e36b258ec3b2bde89c1c09613fd15f89c3fcf2bd4a001f048b0bb9e175a",
+        "requestId": "a0af47a6-158e-4a41-923e-1c44d2bba2b0",
+        "httpStatus": 200,
+        "imagePostNumber": 4,
+        "generatedAt": 1791601723.211839,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-SET-HOME.jpg",
+          "sha256": "bc85c284bd62b5694ff7e4e2a60a4b5619c6cdf47abb21efb77a9220250050f3",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-SET-CLINIC"
+      },
+      "path": "assets/generated/originals/A-SET-CLINIC.png",
+      "sha256": "e818b3611ae9cde365f72940ec1724c67689045b4160cc41debe977605793deb",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-SET-CLINIC.jpg",
+        "sha256": "0e0686757cf58e1fc7db39dafce4ffc09243de279fdc9545efb6574272516707",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "needs_revision",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable",
+          "notes": [
+            "场景槽要求无人物，实际输出含两位非锁定人物；不能作为身份来源。后续若引用只约束房间布局，角色以各自身份图为准。"
+          ]
+        },
+        "reviewNote": "场景槽要求无人物，实际输出含两位非锁定人物；不能作为身份来源。后续若引用只约束房间布局，角色以各自身份图为准。",
+        "promptHash": "2d47e3e54f2ffe3de6dbd7e1729b4a2bfbb2ddc96edbeafbf32660b001a1bf66",
+        "requestId": "09148c93-2c73-43f5-9c06-1a884dab9737",
+        "httpStatus": 200,
+        "imagePostNumber": 5,
+        "generatedAt": 1791601726.707829,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-SET-CLINIC.jpg",
+          "sha256": "84a1ada729fd46a2d3245e633281b3d9c53d9bad0ae69ac478b3153138c7c775",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-SET-OUTSIDE"
+      },
+      "path": "assets/generated/originals/A-SET-OUTSIDE.png",
+      "sha256": "6d7a2dae29757cc7f4d47b0bf1d15124b7bf1ec100ab0905ce010e5df7539063",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-SET-OUTSIDE.jpg",
+        "sha256": "390bf2668134bac9e6d940c3a63c37b5beeec9365ed6ca2edfa1bb2c0dae663a",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "needs_revision",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable",
+          "notes": [
+            "场景槽要求无人，实际输出含未锁定路人；后续仅约束建筑与树荫布局，必须去掉背景人，角色只取锁定身份图。"
+          ]
+        },
+        "reviewNote": "场景槽要求无人，实际输出含未锁定路人；后续仅约束建筑与树荫布局，必须去掉背景人，角色只取锁定身份图。",
+        "promptHash": "9c756b5ef23047a4051b95e71ee62a379f86f94877238e7284d7c917020fd6de",
+        "requestId": "8481f2fa-7e55-42c6-8473-1aecaff22be1",
+        "httpStatus": 200,
+        "imagePostNumber": 6,
+        "generatedAt": 1791601734.763319,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-SET-OUTSIDE.jpg",
+          "sha256": "e7d90eb14d20b506839389274976a342816e4eb8090d275d377015ad54468143",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-PROP-GIFT"
+      },
+      "path": "assets/generated/originals/A-PROP-GIFT.png",
+      "sha256": "ab14cc3669321fc82b1ec69fcbea575778f0a3581d8722f0c74810e8f17f205d",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-PROP-GIFT.jpg",
+        "sha256": "559a4c95a0ddda054612d8ebe6034822c5a0148d7a031452415211f78830c19b",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [
+          {
+            "assetId": "A-PROP-WRAPPED-BOOK",
+            "sha256": "e76183e5b3977b911608bf8300ee24dd3263eb746ed38d7ac610187c0cae7d80"
+          },
+          {
+            "assetId": "A-PROP-BLUE-RIBBON",
+            "sha256": "da87d6c82a98366e21d26802386961fa676157196de424cffaa15841e3c78b21"
+          },
+          {
+            "assetId": "A-PROP-GIFT-CARD",
+            "sha256": "422b7d30069dce9d004067ebc32d1b185d2cb222df29bc428b77e52395cbd850"
+          }
+        ],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable"
+        },
+        "reviewNote": "",
+        "promptHash": "8ae0b0b4f1a23daf2c1698e185c85fbea53847b704008d047df722b405662aff",
+        "requestId": "e9541ea2-9d99-4581-a527-13e9e849df3b",
+        "httpStatus": 200,
+        "imagePostNumber": 24,
+        "generatedAt": 1791601980.665992,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-PROP-GIFT.jpg",
+          "sha256": "3c558258db1c51298e5a6f0040c7173a85d8acb23f3f05943a69c68d8decf9ed",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-PROP-NOTE"
+      },
+      "path": "assets/generated/originals/A-PROP-NOTE.png",
+      "sha256": "c38632454af60add0d8a0949d422b6877bdd2aaaa8f80e956b82c016ecdd0c41",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-PROP-NOTE.jpg",
+        "sha256": "396d83c6d8ca91bacc5b5829518ebf6a2d85be4b1bfc3c660454edf5f0d67c99",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable"
+        },
+        "reviewNote": "",
+        "promptHash": "ba1b0f50c5f6f99e88101da4c490e20d5240041355f6186bc36993f26c296229",
+        "requestId": "94faa787-ad11-450d-ba46-76fcf2435a8d",
+        "httpStatus": 200,
+        "imagePostNumber": 7,
+        "generatedAt": 1791601759.093029,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-PROP-NOTE.jpg",
+          "sha256": "cb313b48b5499579b5948c1c26e531d3606aed2a5b05924d4ada7396e2d35982",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-SYM-JOINT"
+      },
+      "path": "assets/generated/originals/A-SYM-JOINT.png",
+      "sha256": "0640492b2dd93ad388d6aafe459d1135410ac576cc6d977f4668b1b14fc1564b",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-SYM-JOINT.jpg",
+        "sha256": "de0114b5828291c1563c26a75bead37d0b0912f235976e4a51666edf558fa2dc",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [
+          {
+            "assetId": "A-CHAR-P01",
+            "sha256": "f08757edeacaf74212272ffb569cfb3165eedf29eb0271e8f8e4436e0f0386d7"
+          },
+          {
+            "assetId": "A-PROP-GIFT",
+            "sha256": "ab14cc3669321fc82b1ec69fcbea575778f0a3581d8722f0c74810e8f17f205d"
+          },
+          {
+            "assetId": "A-SET-HOME",
+            "sha256": "742f874bcf9db74d2460cd7b5d63407eedbec2f62a4826a5e6f351f56dcd41ce"
+          }
+        ],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "needs_revision",
+          "identityReview": "pending",
+          "medicalReview": "pending",
+          "notes": [
+            "辅助手接触点偏拇指根/手腕，未清楚呈现指定手指关节托扶；需要人工核对左右手及痛点，不能据此标记动作准确。"
+          ]
+        },
+        "reviewNote": "辅助手接触点偏拇指根/手腕，未清楚呈现指定手指关节托扶；需要人工核对左右手及痛点，不能据此标记动作准确。",
+        "promptHash": "de95f9e30ead7ee617a36fff53f9b7e20a568044dea122682ba132bbdbfaf56e",
+        "requestId": "c228d20a-b44a-4748-b283-61a5429d385b",
+        "httpStatus": 200,
+        "imagePostNumber": 31,
+        "generatedAt": 1791602090.77181,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-SYM-JOINT.jpg",
+          "sha256": "004a2af5795acd6b9c9abbb3eb51fc4fad20affe0275e7c556e134eb845b9881",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-SYM-MALAR"
+      },
+      "path": "assets/generated/originals/A-SYM-MALAR.png",
+      "sha256": "af70d45a4fd321e12f9e50503a231f433186187e3c36c5e20066290180624ad3",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-SYM-MALAR.jpg",
+        "sha256": "e1c1e6e9e903bb94de291b13c1df607153c8f1b4808d45686433a797abff9e0b",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [
+          {
+            "assetId": "A-CHAR-P01",
+            "sha256": "f08757edeacaf74212272ffb569cfb3165eedf29eb0271e8f8e4436e0f0386d7"
+          }
+        ],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "pending"
+        },
+        "reviewNote": "",
+        "promptHash": "d9d562af026d0ca239ca5ecd233e0752e191815d8f956830861adeacb9374361",
+        "requestId": "4c834ba4-2555-412b-bba9-e4ae24a19fd6",
+        "httpStatus": 200,
+        "imagePostNumber": 25,
+        "generatedAt": 1791601978.059867,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-SYM-MALAR.jpg",
+          "sha256": "c115ed95bce20962614e4c4a309556e85c0e103cf9877e1e152c1ac37437a485",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-SYM-HAIR"
+      },
+      "path": "assets/generated/originals/A-SYM-HAIR.png",
+      "sha256": "d80ba1f89b426d3e53f182bdedf4e62f350c3f06cb4b838fade908394f6acc9e",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-SYM-HAIR.jpg",
+        "sha256": "83b4154377746b66d97a4c913aa890764fb6a669bfa15083b4cc04d70465e21c",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [
+          {
+            "assetId": "A-CHAR-P01",
+            "sha256": "f08757edeacaf74212272ffb569cfb3165eedf29eb0271e8f8e4436e0f0386d7"
+          },
+          {
+            "assetId": "A-SET-HOME",
+            "sha256": "742f874bcf9db74d2460cd7b5d63407eedbec2f62a4826a5e6f351f56dcd41ce"
+          }
+        ],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "pending"
+        },
+        "reviewNote": "",
+        "promptHash": "66b9d79b3464baaa2d5a08b33c7be5244eea84d8c8102d2535a9b13f4ca41c8c",
+        "requestId": "25984636-bd22-4464-ac72-36d0af58a9c0",
+        "httpStatus": 200,
+        "imagePostNumber": 26,
+        "generatedAt": 1791601979.153843,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-SYM-HAIR.jpg",
+          "sha256": "494686db9357e98db57ad424a6182c5e0315db3a1505a43c26232637a194bec4",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-SYM-ORAL"
+      },
+      "path": "assets/generated/originals/A-SYM-ORAL.png",
+      "sha256": "13179c6c4ce33b4b7ef52eb6c5f07ef52bc72ce188d6f7f4c3e3787449a9af7f",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-SYM-ORAL.jpg",
+        "sha256": "0569bd7d670e93e7c8bd28c009418bc3c22f183d71ec73018bac6d229961efe9",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "pending"
+        },
+        "reviewNote": "",
+        "promptHash": "4e47e383d3ee3c82796978a4fdaecc0066e0a120e90073c3b2cbc7134ef2ae68",
+        "requestId": "35649c52-ef04-4631-8dad-a430ac65ac34",
+        "httpStatus": 200,
+        "imagePostNumber": 8,
+        "generatedAt": 1791601768.339635,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-SYM-ORAL.jpg",
+          "sha256": "7c59c3cde647662a75325a34f81c8d90655e50aa3bce2e3be9abff873beb7b02",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-TEST-BLOOD-URINE"
+      },
+      "path": "assets/generated/originals/A-TEST-BLOOD-URINE.png",
+      "sha256": "d8cd25fb04fc82bc4add07a494f03b48c5d474cacf915e7d07e011b2ea6e21ad",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-TEST-BLOOD-URINE.jpg",
+        "sha256": "24123237c9a2f51488673f0a3a30cc490c6b39f24a38ed5b51ed7bc7406369a1",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [
+          {
+            "assetId": "A-CHAR-LAB-HANDS",
+            "sha256": "ab6eb0c9d33cbec1bb6ef60f13e22a99f47288b53942cc10c4aed4abcd402055"
+          },
+          {
+            "assetId": "A-PROP-BLOOD-TUBE",
+            "sha256": "ea3033cd77422f2fc70e98e1eb41f62d3d3f468cffcb277fb08781b436d0f38f"
+          },
+          {
+            "assetId": "A-PROP-URINE-CUP",
+            "sha256": "8902fb5e17bd928701298477192fb9d32833f88971c2e24890f688f411939197"
+          },
+          {
+            "assetId": "A-PROP-LAB-TRAY",
+            "sha256": "46c417112c2ebb69f9a368bb4c79abe3b497eb9d35b5bd8ed6d814db2ec05fa2"
+          }
+        ],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable"
+        },
+        "reviewNote": "",
+        "promptHash": "0d97aa136f002655edf40dafde0955e0e892f3b75cbf28819a0484a0d95eaa8a",
+        "requestId": "532f957b-a966-4ccf-a202-c032ee15738a",
+        "httpStatus": 200,
+        "imagePostNumber": 28,
+        "generatedAt": 1791602027.475463,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-TEST-BLOOD-URINE.jpg",
+          "sha256": "1ee0f508e7b88e2e31d81d80b8470410809467dbd63bfb645223bc807e0a9f5c",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-CARE-PLAN"
+      },
+      "path": "assets/generated/originals/A-CARE-PLAN.png",
+      "sha256": "e5fd8d7ad20dd774516832a180096a7f827ba897bec3e09df86d8088ed9d2d28",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-CARE-PLAN.jpg",
+        "sha256": "7f4a49aac5f1776b2ed776ac47ab01c098f6c0e6b49c7c262c353f8939f14878",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [
+          {
+            "assetId": "A-PROP-FOLLOWUP-BOOK",
+            "sha256": "378e37e503a7fabd55d8617d469fe94eed394079a7e18d26d117f05ca5fd2504"
+          },
+          {
+            "assetId": "A-PROP-REMINDER-CARD",
+            "sha256": "946e3c60677ff74240e8509a6f3401da7671f9db0fa1cb1ebbde3ce7756d0851"
+          },
+          {
+            "assetId": "A-PROP-PILLBOX",
+            "sha256": "1f37708f8b88b5c066dd81f782583fc8af266e21dc3fc8d3e6d6f1191e7ae7b0"
+          },
+          {
+            "assetId": "A-PROP-PEN",
+            "sha256": "942e4ec447d101b9cbe9fc528ba9aab92eb922e5f001206532b4e6f1dbc017bc"
+          }
+        ],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable"
+        },
+        "reviewNote": "",
+        "promptHash": "5a7d2dd7622eaee268d9cd3c70fc0bdcfeaef023a70083f3d3c1a995dfa190de",
+        "requestId": "f28730be-6381-48c4-877d-e183830ef594",
+        "httpStatus": 200,
+        "imagePostNumber": 29,
+        "generatedAt": 1791602029.346594,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-CARE-PLAN.jpg",
+          "sha256": "63b1867817b4ea092df625e99c12a8ad6630728b907f1ecd0a86f98b75586853",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-CARE-SUN"
+      },
+      "path": "assets/generated/originals/A-CARE-SUN.png",
+      "sha256": "ad96c6a20ace2ad9c147015e31fdceb6810614e4cd3ee7c430c4b05f32a3aabd",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-CARE-SUN.jpg",
+        "sha256": "c0c49c79d1dd4bd31b9930fb5f64e85a5a3248ee69a68c8101ad5e2f83733581",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [
+          {
+            "assetId": "A-CHAR-P01",
+            "sha256": "f08757edeacaf74212272ffb569cfb3165eedf29eb0271e8f8e4436e0f0386d7"
+          },
+          {
+            "assetId": "A-PROP-SUNSCREEN",
+            "sha256": "e67a90e0b16f434f701b0e0c3534b6fc37e7b7a0b606a1e5d70e9500ff4af27a"
+          },
+          {
+            "assetId": "A-WARDROBE-OUTER",
+            "sha256": "e2ff7c680192a2ad5615e7c05de9f227528e4363faee6f8123570ad90edaeb37"
+          },
+          {
+            "assetId": "A-PROP-UMBRELLA",
+            "sha256": "81e22eab8992b1b345e455c16fa2f9b37abf63e394b69485f492cbc728522b72"
+          }
+        ],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable"
+        },
+        "reviewNote": "",
+        "promptHash": "5039a80cecb2f4c4a3fef7ab0962866dedc2a72ee2c98b07d6dca122e0093974",
+        "requestId": "c8ebe89c-bc32-472b-8255-e131f9f9a42f",
+        "httpStatus": 200,
+        "imagePostNumber": 30,
+        "generatedAt": 1791602041.293112,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-CARE-SUN.jpg",
+          "sha256": "68d491203c111768950820613df1d84039c87de70f243a08f4c1f54ff194376b",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-CHAR-LAB-HANDS"
+      },
+      "path": "assets/generated/originals/A-CHAR-LAB-HANDS.png",
+      "sha256": "ab6eb0c9d33cbec1bb6ef60f13e22a99f47288b53942cc10c4aed4abcd402055",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-CHAR-LAB-HANDS.jpg",
+        "sha256": "920ba3de51e272c68647b22049a9c7e91737404d225ab4e13d20b57e7e455ef8",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable"
+        },
+        "reviewNote": "",
+        "promptHash": "7955fd2a45dff1cfb0a4fba97474e1442366df24526cfe1f56d9a66a4f4ad81f",
+        "requestId": "8d55f84e-4232-431c-bc77-c43065bc24a3",
+        "httpStatus": 200,
+        "imagePostNumber": 9,
+        "generatedAt": 1791601770.399782,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-CHAR-LAB-HANDS.jpg",
+          "sha256": "e5f9e4cd6b58b14261a9dac1e9c2c5ef43490b13d5dd507b577d80908b0a098c",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-PROP-BLOOD-TUBE"
+      },
+      "path": "assets/generated/originals/A-PROP-BLOOD-TUBE.png",
+      "sha256": "ea3033cd77422f2fc70e98e1eb41f62d3d3f468cffcb277fb08781b436d0f38f",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-PROP-BLOOD-TUBE.jpg",
+        "sha256": "1c20239efb583b936f6e1b3b3a42cb8bbb8826f4bddfb11e1e6bac514fc0ca7a",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable"
+        },
+        "reviewNote": "",
+        "promptHash": "3acade9709a7512927b55727e899fcfcd5b26f169232b4fceb3eb8bf8a3e96dd",
+        "requestId": "c2c7e07b-2837-4958-b8e4-026961817077",
+        "httpStatus": 200,
+        "imagePostNumber": 10,
+        "generatedAt": 1791601792.721001,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-PROP-BLOOD-TUBE.jpg",
+          "sha256": "e9848a124aef896e0313d8bbd7d02dbd6c10016ac00dc2c3b0a2f9948f27cabf",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-PROP-URINE-CUP"
+      },
+      "path": "assets/generated/originals/A-PROP-URINE-CUP.png",
+      "sha256": "8902fb5e17bd928701298477192fb9d32833f88971c2e24890f688f411939197",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-PROP-URINE-CUP.jpg",
+        "sha256": "bb2a000c464768e687da066f5b9b458c171cd8a9e8978a5ac40ba5cd3afb7eb6",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable"
+        },
+        "reviewNote": "",
+        "promptHash": "f9dd7368319f98f4cce316616d3e43707c415394141ac72d8ff16d1622aae700",
+        "requestId": "96d6da99-8148-41e5-a199-2dde0a5a5dd9",
+        "httpStatus": 200,
+        "imagePostNumber": 11,
+        "generatedAt": 1791601796.790915,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-PROP-URINE-CUP.jpg",
+          "sha256": "186476eff0e98c1208ee3680a434ae32c8fbb1ddcaf54edf2680819fa9893923",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-PROP-LAB-TRAY"
+      },
+      "path": "assets/generated/originals/A-PROP-LAB-TRAY.png",
+      "sha256": "46c417112c2ebb69f9a368bb4c79abe3b497eb9d35b5bd8ed6d814db2ec05fa2",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-PROP-LAB-TRAY.jpg",
+        "sha256": "62e67a279564685ea6ede2658778d588b616abeba67ada86354f60f473035a35",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable"
+        },
+        "reviewNote": "",
+        "promptHash": "9c4b1a5dae0e3705f89165e199137c6f24cea4e3c3e77429bd7ed166db10df16",
+        "requestId": "1c6290d2-65f1-4744-ac1f-8cec70d57ed2",
+        "httpStatus": 200,
+        "imagePostNumber": 12,
+        "generatedAt": 1791601804.5926359,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-PROP-LAB-TRAY.jpg",
+          "sha256": "3ca16ef3d3b18bd7c3e711915892bd9c5bcef5e0177d0cffaadd58b27a82dec0",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-PROP-PEN"
+      },
+      "path": "assets/generated/originals/A-PROP-PEN.png",
+      "sha256": "942e4ec447d101b9cbe9fc528ba9aab92eb922e5f001206532b4e6f1dbc017bc",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-PROP-PEN.jpg",
+        "sha256": "853363a14d66983fe9e8a145a00f091d774859067a1145bc56fd3dfe7f3bc1e7",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable"
+        },
+        "reviewNote": "",
+        "promptHash": "afb8a430bd5b8a662b188626ee4b2d1f91ec705b420aa7509d46e82232fbe55a",
+        "requestId": "e14bd7e5-cb8e-4c70-9c15-68770dbbd9d2",
+        "httpStatus": 200,
+        "imagePostNumber": 13,
+        "generatedAt": 1791601823.938776,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-PROP-PEN.jpg",
+          "sha256": "ae3836ec30b7cc17cc5a67de53a381054071f605b8a3ff385ee50f19e2bc823d",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-PROP-FOLLOWUP-BOOK"
+      },
+      "path": "assets/generated/originals/A-PROP-FOLLOWUP-BOOK.png",
+      "sha256": "378e37e503a7fabd55d8617d469fe94eed394079a7e18d26d117f05ca5fd2504",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-PROP-FOLLOWUP-BOOK.jpg",
+        "sha256": "0797ebea24863b6ca1154a1ae0a031eaa8d95bea8a99af416ef466180144e32e",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable"
+        },
+        "reviewNote": "",
+        "promptHash": "aeef865c0727e4a6f619a5632bfbd06d3e0479502e8fac0d207c74ece409ca21",
+        "requestId": "ee6f5bff-5b26-4df4-b6dd-ba621c5a4f6b",
+        "httpStatus": 200,
+        "imagePostNumber": 14,
+        "generatedAt": 1791601830.354731,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-PROP-FOLLOWUP-BOOK.jpg",
+          "sha256": "8f9fa1e074618784999324b01284a36e0c01fe217703cde474569b1919f0f6c7",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-PROP-REMINDER-CARD"
+      },
+      "path": "assets/generated/originals/A-PROP-REMINDER-CARD.png",
+      "sha256": "946e3c60677ff74240e8509a6f3401da7671f9db0fa1cb1ebbde3ce7756d0851",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-PROP-REMINDER-CARD.jpg",
+        "sha256": "c0a1258dd437d329ca5772de016d3dfa3954fd7aecc6a363a76b6e0c71fcfdaf",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable"
+        },
+        "reviewNote": "",
+        "promptHash": "61c2c11c6817bb48a305f3c1dbd1fe9745778eaef59421a4383f79e676ea48da",
+        "requestId": "702e7825-ebf7-4f7b-bec8-6ebcabcc3f27",
+        "httpStatus": 200,
+        "imagePostNumber": 15,
+        "generatedAt": 1791601836.8241842,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-PROP-REMINDER-CARD.jpg",
+          "sha256": "03e349e91fb13372ab596b0a4aba4f5272c02c558210fc78d60f48ef4a2774f0",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-PROP-PILLBOX"
+      },
+      "path": "assets/generated/originals/A-PROP-PILLBOX.png",
+      "sha256": "1f37708f8b88b5c066dd81f782583fc8af266e21dc3fc8d3e6d6f1191e7ae7b0",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-PROP-PILLBOX.jpg",
+        "sha256": "f0fc175569bba9ce7685b014a5273e4cd7df16182b47a1648fa44b5748720297",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable"
+        },
+        "reviewNote": "",
+        "promptHash": "ee48499fbb64e10697763ea7bd953184c622e4e5cae5e540dd6fdda700e4f1cb",
+        "requestId": "646e453a-8150-498c-bc64-c0b1a18f4c0a",
+        "httpStatus": 200,
+        "imagePostNumber": 16,
+        "generatedAt": 1791601852.876908,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-PROP-PILLBOX.jpg",
+          "sha256": "79388ecc93d2f8ceb2f0ecb46b9869622e13899bcee8e02d9b6bd5087bd48f86",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-PROP-SUNSCREEN"
+      },
+      "path": "assets/generated/originals/A-PROP-SUNSCREEN.png",
+      "sha256": "e67a90e0b16f434f701b0e0c3534b6fc37e7b7a0b606a1e5d70e9500ff4af27a",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-PROP-SUNSCREEN.jpg",
+        "sha256": "65aafad223099c926dd0d4e6481209032fb7a17496d20f90cab346571bed13f3",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable"
+        },
+        "reviewNote": "",
+        "promptHash": "0b324dcc3200873e187708277559997f8706cf8e2aef67e4ae617269516afe0e",
+        "requestId": "c6abb82e-4444-4e6b-abf4-b73803a54c1b",
+        "httpStatus": 200,
+        "imagePostNumber": 17,
+        "generatedAt": 1791601861.3641899,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-PROP-SUNSCREEN.jpg",
+          "sha256": "f07659c949dd4f0a7716e926a538b0dcdb325cb81c004206dde8762f061d821c",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-WARDROBE-OUTER"
+      },
+      "path": "assets/generated/originals/A-WARDROBE-OUTER.png",
+      "sha256": "e2ff7c680192a2ad5615e7c05de9f227528e4363faee6f8123570ad90edaeb37",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-WARDROBE-OUTER.jpg",
+        "sha256": "e41dd7848a93d869f087fc6214c626fe3a760ed3a96f634255311494d5e50dca",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable"
+        },
+        "reviewNote": "",
+        "promptHash": "a67dcbb256825fb14cd57c1ca9b9a1a9c6ad7643bcfad1df225eb9c0f41cde02",
+        "requestId": "b3a73a2d-80ff-4f3e-92f9-b97034dc1636",
+        "httpStatus": 200,
+        "imagePostNumber": 18,
+        "generatedAt": 1791601868.650918,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-WARDROBE-OUTER.jpg",
+          "sha256": "056bc3843bc1bb85972c107eac652623515bc6e1fd34ef57a2ba5e57aa1815a9",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-PROP-UMBRELLA"
+      },
+      "path": "assets/generated/originals/A-PROP-UMBRELLA.png",
+      "sha256": "81e22eab8992b1b345e455c16fa2f9b37abf63e394b69485f492cbc728522b72",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-PROP-UMBRELLA.jpg",
+        "sha256": "f9a3c26aa4bfefc7535c491880a5a18927874c546fdf2547dc1dced0f855bfc1",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable"
+        },
+        "reviewNote": "",
+        "promptHash": "da6e0514b3bec2659889eb696242ed5067e86e095793e8b9f3187bd174f4aa34",
+        "requestId": "f3c7015e-4735-47a9-99ff-67e8f87c16d6",
+        "httpStatus": 200,
+        "imagePostNumber": 19,
+        "generatedAt": 1791601887.076386,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-PROP-UMBRELLA.jpg",
+          "sha256": "0f474deb7c0bc2dbccd5fdd910f7e9a2a7cc7490fa3a725e43a94b120a02ef97",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-PROP-SHOULDER-BAG"
+      },
+      "path": "assets/generated/originals/A-PROP-SHOULDER-BAG.png",
+      "sha256": "bff58302a4db30f6942476932773ae619f1fb056657f497b88cd6293579948aa",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-PROP-SHOULDER-BAG.jpg",
+        "sha256": "0fc42c88c88c2c3a8ee665274061afe0eba26f8befab8e78c68aca7847174168",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "needs_revision",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable",
+          "notes": [
+            "肩包内自行加入蓝色包装、已成结的礼物，与锁定牛皮纸包书不同；包型可参考，但需清除或替换冲突内装物后定稿。"
+          ]
+        },
+        "reviewNote": "肩包内自行加入蓝色包装、已成结的礼物，与锁定牛皮纸包书不同；包型可参考，但需清除或替换冲突内装物后定稿。",
+        "promptHash": "80f07a4eee688e04c156b9b43267a39ec0ba53e0f469012e0ddfa3b1d8eda4e8",
+        "requestId": "537e5f9f-2d1a-4d52-aeee-4daf9cfa3fe8",
+        "httpStatus": 200,
+        "imagePostNumber": 20,
+        "generatedAt": 1791601895.669803,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-PROP-SHOULDER-BAG.jpg",
+          "sha256": "09311c49c04ca053f95bc2528ecfd159d3e95eec5db3e725d6bd734e73d5ef54",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-PROP-WRAPPED-BOOK"
+      },
+      "path": "assets/generated/originals/A-PROP-WRAPPED-BOOK.png",
+      "sha256": "e76183e5b3977b911608bf8300ee24dd3263eb746ed38d7ac610187c0cae7d80",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-PROP-WRAPPED-BOOK.jpg",
+        "sha256": "0c1c56698d6f6ede5fa262f2897e6e20b9f1942fdcb3d73933d7b49e2c86b934",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable"
+        },
+        "reviewNote": "",
+        "promptHash": "fb3221b5a9cbbb479191ba22c3742a1a7d25e63a684754811f5d6d37bc7a5ddd",
+        "requestId": "ae777c38-36bc-4d01-94d2-31cb745a0793",
+        "httpStatus": 200,
+        "imagePostNumber": 21,
+        "generatedAt": 1791601900.3526242,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-PROP-WRAPPED-BOOK.jpg",
+          "sha256": "f47da216ba1f452b223bfe379a93068ffeb30d0ee144234c378992e7f70581f9",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-PROP-BLUE-RIBBON"
+      },
+      "path": "assets/generated/originals/A-PROP-BLUE-RIBBON.png",
+      "sha256": "da87d6c82a98366e21d26802386961fa676157196de424cffaa15841e3c78b21",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-PROP-BLUE-RIBBON.jpg",
+        "sha256": "e42c0d834edec6f456c1c93d76e38891a6f2fe636f43f89fb053e293c6069b53",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "needs_revision",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable",
+          "notes": [
+            "独立丝带槽自行加入未锁定的浅色书本；蓝色及宽度可参考，但不能把书本一起当作礼物身份基准。"
+          ]
+        },
+        "reviewNote": "独立丝带槽自行加入未锁定的浅色书本；蓝色及宽度可参考，但不能把书本一起当作礼物身份基准。",
+        "promptHash": "f3e34b92ffe6743d7a9ffb86bf6b13ccb132c017b468f791e352f67ad939a1b2",
+        "requestId": "238bd95c-de70-4d96-8a14-5ed37f7f03ae",
+        "httpStatus": 200,
+        "imagePostNumber": 22,
+        "generatedAt": 1791601920.743922,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-PROP-BLUE-RIBBON.jpg",
+          "sha256": "f4f35f58bf13aece4cd9283c3b5b2ddf6d3cb7eb43ac025d097ca8a1cc4b588a",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "assetId": "A-PROP-GIFT-CARD"
+      },
+      "path": "assets/generated/originals/A-PROP-GIFT-CARD.png",
+      "sha256": "422b7d30069dce9d004067ebc32d1b185d2cb222df29bc428b77e52395cbd850",
+      "mime": "image/png",
+      "publicShareApproved": true,
+      "thumbnail": {
+        "path": "assets/generated/thumbs/A-PROP-GIFT-CARD.jpg",
+        "sha256": "750d29465b829ec47ca5257c3025276a022b525d62393a5f3a62bc024cb3ef17",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable"
+        },
+        "reviewNote": "",
+        "promptHash": "cdfe5e78f16e457532c9663267212af5c94daa1be8ab46f6ccf76f230448f398",
+        "requestId": "d0506b0a-b5ea-4b94-b6a1-344ea37373d2",
+        "httpStatus": 200,
+        "imagePostNumber": 23,
+        "generatedAt": 1791601928.121482,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/A-PROP-GIFT-CARD.jpg",
+          "sha256": "41e644210cf71867ee742c5b66f50d1c15c19cdf23ea85db48e74007bd7949dd",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "shotId": "S01"
+      },
+      "path": "assets/generated/portraits/S01.jpg",
+      "sha256": "61f43dc97d62702e355b6adc6f76bcab0369b34f841a82344d05cfa03305ef81",
+      "mime": "image/jpeg",
+      "publicShareApproved": true,
+      "original": {
+        "path": "assets/generated/originals/S01.png",
+        "sha256": "c4f8ac6963a316801ab40827f29681620fd443243fb814bec21ced7353adca17",
+        "mime": "image/png",
+        "publicShareApproved": true
+      },
+      "thumbnail": {
+        "path": "assets/generated/thumbs/S01.jpg",
+        "sha256": "6f09d3bfe81e30268fee13e00640b99f7ed00c05965742ee4eb8192d3a954266",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [
+          {
+            "assetId": "A-CHAR-P01",
+            "sha256": "f08757edeacaf74212272ffb569cfb3165eedf29eb0271e8f8e4436e0f0386d7"
+          },
+          {
+            "assetId": "A-SET-HOME",
+            "sha256": "742f874bcf9db74d2460cd7b5d63407eedbec2f62a4826a5e6f351f56dcd41ce"
+          },
+          {
+            "assetId": "A-PROP-GIFT",
+            "sha256": "ab14cc3669321fc82b1ec69fcbea575778f0a3581d8722f0c74810e8f17f205d"
+          },
+          {
+            "assetId": "A-PROP-WRAPPED-BOOK",
+            "sha256": "e76183e5b3977b911608bf8300ee24dd3263eb746ed38d7ac610187c0cae7d80"
+          },
+          {
+            "assetId": "A-PROP-BLUE-RIBBON",
+            "sha256": "da87d6c82a98366e21d26802386961fa676157196de424cffaa15841e3c78b21"
+          },
+          {
+            "assetId": "A-PROP-GIFT-CARD",
+            "sha256": "422b7d30069dce9d004067ebc32d1b185d2cb222df29bc428b77e52395cbd850"
+          }
+        ],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "needs_revision",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable",
+          "notes": [
+            "居家开场多出白袍人物，偏离女主独处准备礼物的叙事；不得直接定稿。"
+          ]
+        },
+        "reviewNote": "居家开场多出白袍人物，偏离女主独处准备礼物的叙事；不得直接定稿。",
+        "promptHash": "4713eedc641b2a05e45a4c1dcb72d4b0330363c8baa1798be7508c3ac29529c1",
+        "requestId": "975d4b35-59e6-4432-99c9-9a45c1267e32",
+        "httpStatus": 200,
+        "imagePostNumber": 32,
+        "generatedAt": 1791602164.627934,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/S01.jpg",
+          "sha256": "61f43dc97d62702e355b6adc6f76bcab0369b34f841a82344d05cfa03305ef81",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "shotId": "S02"
+      },
+      "path": "assets/generated/portraits/S02.jpg",
+      "sha256": "3b6277062664701a391022f66b5a2d18c022246735b6cf3bcb5d6a113def6ec8",
+      "mime": "image/jpeg",
+      "publicShareApproved": true,
+      "original": {
+        "path": "assets/generated/originals/S02.png",
+        "sha256": "2dff14fe43edacd9a0fe50d3679e0ffddfdd7f79f981432bffc0fe4c97a176e9",
+        "mime": "image/png",
+        "publicShareApproved": true
+      },
+      "thumbnail": {
+        "path": "assets/generated/thumbs/S02.jpg",
+        "sha256": "245452ac647e36ccd4667cef69a0aa9139284de51fd41fbd8ef18f7bd10c060e",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [
+          {
+            "assetId": "A-CHAR-P01",
+            "sha256": "f08757edeacaf74212272ffb569cfb3165eedf29eb0271e8f8e4436e0f0386d7"
+          },
+          {
+            "assetId": "A-SET-HOME",
+            "sha256": "742f874bcf9db74d2460cd7b5d63407eedbec2f62a4826a5e6f351f56dcd41ce"
+          },
+          {
+            "assetId": "A-PROP-GIFT",
+            "sha256": "ab14cc3669321fc82b1ec69fcbea575778f0a3581d8722f0c74810e8f17f205d"
+          },
+          {
+            "assetId": "A-SYM-JOINT",
+            "sha256": "0640492b2dd93ad388d6aafe459d1135410ac576cc6d977f4668b1b14fc1564b"
+          },
+          {
+            "assetId": "A-PROP-WRAPPED-BOOK",
+            "sha256": "e76183e5b3977b911608bf8300ee24dd3263eb746ed38d7ac610187c0cae7d80"
+          },
+          {
+            "assetId": "A-PROP-BLUE-RIBBON",
+            "sha256": "da87d6c82a98366e21d26802386961fa676157196de424cffaa15841e3c78b21"
+          }
+        ],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "needs_revision",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable",
+          "notes": [
+            "右手托扶点落在左腕附近，未清楚命中脚本要求的手指关节；须返修动作接触点。"
+          ]
+        },
+        "reviewNote": "右手托扶点落在左腕附近，未清楚命中脚本要求的手指关节；须返修动作接触点。",
+        "promptHash": "ec15c608b03b29e1f56742c363173d9f6695e19a93cb02a96650e99b28c4a6ef",
+        "requestId": "63ad0aca-7c96-4b38-85f5-43e135e3d35c",
+        "httpStatus": 200,
+        "imagePostNumber": 33,
+        "generatedAt": 1791602176.877436,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/S02.jpg",
+          "sha256": "3b6277062664701a391022f66b5a2d18c022246735b6cf3bcb5d6a113def6ec8",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "shotId": "S03"
+      },
+      "path": "assets/generated/portraits/S03.jpg",
+      "sha256": "cfbf0401cf333a12b0ae59d5a289d2db42cf8a1f667c63c16f0a3bcd6257a77f",
+      "mime": "image/jpeg",
+      "publicShareApproved": true,
+      "original": {
+        "path": "assets/generated/originals/S03.png",
+        "sha256": "7a7cfe4b911542ce7eb7432ce4314d508cd5907dc417e7f7c549615b488d4fd0",
+        "mime": "image/png",
+        "publicShareApproved": true
+      },
+      "thumbnail": {
+        "path": "assets/generated/thumbs/S03.jpg",
+        "sha256": "1cb4119cb68707406dbfdc0621c7a26297672611792224d061ce79e290bea82b",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [
+          {
+            "assetId": "A-CHAR-P01",
+            "sha256": "f08757edeacaf74212272ffb569cfb3165eedf29eb0271e8f8e4436e0f0386d7"
+          },
+          {
+            "assetId": "A-SET-HOME",
+            "sha256": "742f874bcf9db74d2460cd7b5d63407eedbec2f62a4826a5e6f351f56dcd41ce"
+          },
+          {
+            "assetId": "A-PROP-GIFT",
+            "sha256": "ab14cc3669321fc82b1ec69fcbea575778f0a3581d8722f0c74810e8f17f205d"
+          },
+          {
+            "assetId": "A-SYM-MALAR",
+            "sha256": "af70d45a4fd321e12f9e50503a231f433186187e3c36c5e20066290180624ad3"
+          },
+          {
+            "assetId": "A-PROP-WRAPPED-BOOK",
+            "sha256": "e76183e5b3977b911608bf8300ee24dd3263eb746ed38d7ac610187c0cae7d80"
+          },
+          {
+            "assetId": "A-PROP-BLUE-RIBBON",
+            "sha256": "da87d6c82a98366e21d26802386961fa676157196de424cffaa15841e3c78b21"
+          },
+          {
+            "assetId": "A-PROP-GIFT-CARD",
+            "sha256": "422b7d30069dce9d004067ebc32d1b185d2cb222df29bc428b77e52395cbd850"
+          }
+        ],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "needs_revision",
+          "identityReview": "pending",
+          "medicalReview": "pending",
+          "notes": [
+            "前景蓝丝带已呈现成结状态，早于S17结完成；此时应仍未系好，连续性须返修。"
+          ]
+        },
+        "reviewNote": "前景蓝丝带已呈现成结状态，早于S17结完成；此时应仍未系好，连续性须返修。",
+        "promptHash": "39b6049579792c12717f8ad0a0e9528d88d25feadc7adae7111b613811484f57",
+        "requestId": "9f7a8f50-951b-44c3-a912-bfc0c0910bc6",
+        "httpStatus": 200,
+        "imagePostNumber": 34,
+        "generatedAt": 1791602176.7582211,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/S03.jpg",
+          "sha256": "cfbf0401cf333a12b0ae59d5a289d2db42cf8a1f667c63c16f0a3bcd6257a77f",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "shotId": "S04"
+      },
+      "path": "assets/generated/portraits/S04.jpg",
+      "sha256": "bbde1678fe13dc70c40eff294bc8641582cdace1137a1774ca771676e44e8fb2",
+      "mime": "image/jpeg",
+      "publicShareApproved": true,
+      "original": {
+        "path": "assets/generated/originals/S04.png",
+        "sha256": "3bd57d1530195f15ee2cf968448823918a9fdca5968b6310d137189ba3282c9b",
+        "mime": "image/png",
+        "publicShareApproved": true
+      },
+      "thumbnail": {
+        "path": "assets/generated/thumbs/S04.jpg",
+        "sha256": "ae857f860e8cc5fef7fc68ef8dc87369e76059289cebb7168f80501c00d0b083",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [
+          {
+            "assetId": "A-CHAR-P01",
+            "sha256": "f08757edeacaf74212272ffb569cfb3165eedf29eb0271e8f8e4436e0f0386d7"
+          },
+          {
+            "assetId": "A-SET-HOME",
+            "sha256": "742f874bcf9db74d2460cd7b5d63407eedbec2f62a4826a5e6f351f56dcd41ce"
+          },
+          {
+            "assetId": "A-SYM-HAIR",
+            "sha256": "d80ba1f89b426d3e53f182bdedf4e62f350c3f06cb4b838fade908394f6acc9e"
+          },
+          {
+            "assetId": "A-PROP-NOTE",
+            "sha256": "c38632454af60add0d8a0949d422b6877bdd2aaaa8f80e956b82c016ecdd0c41"
+          }
+        ],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable"
+        },
+        "reviewNote": "",
+        "promptHash": "09398443545273c11ffac31f7eeaa9603fbe6757c144b595f5290642cc8f9b0e",
+        "requestId": "6eaa10c5-2b88-4f66-b3be-29382efd62dd",
+        "httpStatus": 200,
+        "imagePostNumber": 35,
+        "generatedAt": 1791602208.587091,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/S04.jpg",
+          "sha256": "bbde1678fe13dc70c40eff294bc8641582cdace1137a1774ca771676e44e8fb2",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "shotId": "S05"
+      },
+      "path": "assets/generated/portraits/S05.jpg",
+      "sha256": "c1d31604f2d362773b067c4b09d93ec01d606d136c2346544ba580124acc2df1",
+      "mime": "image/jpeg",
+      "publicShareApproved": true,
+      "original": {
+        "path": "assets/generated/originals/S05.png",
+        "sha256": "930bb2b195627596538c8ab5abe2f25f74b99e22f4edc13ff1824a7e7be56d60",
+        "mime": "image/png",
+        "publicShareApproved": true
+      },
+      "thumbnail": {
+        "path": "assets/generated/thumbs/S05.jpg",
+        "sha256": "988a10e43bf9e66c832fb3a7400b4c70600331f04594338014929e5c67e6f2ac",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [
+          {
+            "assetId": "A-SYM-ORAL",
+            "sha256": "13179c6c4ce33b4b7ef52eb6c5f07ef52bc72ce188d6f7f4c3e3787449a9af7f"
+          }
+        ],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "pending"
+        },
+        "reviewNote": "",
+        "promptHash": "abec5e0409a261f8ac7645ff03e86c18252b87dbafab849fc8e30b2f7e4c13c7",
+        "requestId": "66883857-77e9-4f9b-bc0d-ee57155b0912",
+        "httpStatus": 200,
+        "imagePostNumber": 36,
+        "generatedAt": 1791602227.545713,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/S05.jpg",
+          "sha256": "c1d31604f2d362773b067c4b09d93ec01d606d136c2346544ba580124acc2df1",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "shotId": "S07"
+      },
+      "path": "assets/generated/portraits/S07.jpg",
+      "sha256": "3e1bc3e1f26f8fe5ec65ccaec16b7463f0b69a50dfa2703cfa45e6cb560200ab",
+      "mime": "image/jpeg",
+      "publicShareApproved": true,
+      "original": {
+        "path": "assets/generated/originals/S07.png",
+        "sha256": "7a36deb564cbe6dbe424d2f8887b4d34be9919066ed7a26de44b58ce4a4d6cc4",
+        "mime": "image/png",
+        "publicShareApproved": true
+      },
+      "thumbnail": {
+        "path": "assets/generated/thumbs/S07.jpg",
+        "sha256": "be186d3fb0958825bf9da81bde6358c3786771e8bd052aeefda9088e86323ad5",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [
+          {
+            "assetId": "A-CHAR-P01",
+            "sha256": "f08757edeacaf74212272ffb569cfb3165eedf29eb0271e8f8e4436e0f0386d7"
+          },
+          {
+            "assetId": "A-SET-HOME",
+            "sha256": "742f874bcf9db74d2460cd7b5d63407eedbec2f62a4826a5e6f351f56dcd41ce"
+          },
+          {
+            "assetId": "A-PROP-GIFT",
+            "sha256": "ab14cc3669321fc82b1ec69fcbea575778f0a3581d8722f0c74810e8f17f205d"
+          },
+          {
+            "assetId": "A-PROP-NOTE",
+            "sha256": "c38632454af60add0d8a0949d422b6877bdd2aaaa8f80e956b82c016ecdd0c41"
+          },
+          {
+            "assetId": "A-PROP-WRAPPED-BOOK",
+            "sha256": "e76183e5b3977b911608bf8300ee24dd3263eb746ed38d7ac610187c0cae7d80"
+          },
+          {
+            "assetId": "A-PROP-BLUE-RIBBON",
+            "sha256": "da87d6c82a98366e21d26802386961fa676157196de424cffaa15841e3c78b21"
+          },
+          {
+            "assetId": "A-PROP-GIFT-CARD",
+            "sha256": "422b7d30069dce9d004067ebc32d1b185d2cb222df29bc428b77e52395cbd850"
+          }
+        ],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable"
+        },
+        "reviewNote": "",
+        "promptHash": "03975a0558233cc536d8332cfc1aea2e782874208e507c714744605311d2da8f",
+        "requestId": "b1cb1c49-47ce-4c7e-8602-ca018b804e6a",
+        "httpStatus": 200,
+        "imagePostNumber": 37,
+        "generatedAt": 1791602230.899178,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/S07.jpg",
+          "sha256": "3e1bc3e1f26f8fe5ec65ccaec16b7463f0b69a50dfa2703cfa45e6cb560200ab",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "shotId": "S08"
+      },
+      "path": "assets/generated/portraits/S08.jpg",
+      "sha256": "8f7732bbc65bcd6b16feab8a54c64bd2903214ecb62591c3872906dca2d79147",
+      "mime": "image/jpeg",
+      "publicShareApproved": true,
+      "original": {
+        "path": "assets/generated/originals/S08.png",
+        "sha256": "ec9ca3ef8de68f92c207fc4d18684aa7f54e7fd0fee7c72107fae41432bca2be",
+        "mime": "image/png",
+        "publicShareApproved": true
+      },
+      "thumbnail": {
+        "path": "assets/generated/thumbs/S08.jpg",
+        "sha256": "2d3be2e95465c6a213c4bd84b7087e2efb94b7224f7f473b032e67aa3b572a91",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [
+          {
+            "assetId": "A-CHAR-P01",
+            "sha256": "f08757edeacaf74212272ffb569cfb3165eedf29eb0271e8f8e4436e0f0386d7"
+          },
+          {
+            "assetId": "A-CHAR-D00",
+            "sha256": "d8cfd3042bffbde6dc1062378d5305de8f2903eaa43e46616eb18ecfd52308ca"
+          },
+          {
+            "assetId": "A-SET-CLINIC",
+            "sha256": "e818b3611ae9cde365f72940ec1724c67689045b4160cc41debe977605793deb"
+          },
+          {
+            "assetId": "A-PROP-NOTE",
+            "sha256": "c38632454af60add0d8a0949d422b6877bdd2aaaa8f80e956b82c016ecdd0c41"
+          }
+        ],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable"
+        },
+        "reviewNote": "",
+        "promptHash": "205ab1935fbfb575bcf9e90bc2795e42a0ec78c747847265ec35b2df080bb162",
+        "requestId": "3761b127-052c-4aa8-8d32-e1baf7cbdfb0",
+        "httpStatus": 200,
+        "imagePostNumber": 38,
+        "generatedAt": 1791602256.0501099,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/S08.jpg",
+          "sha256": "8f7732bbc65bcd6b16feab8a54c64bd2903214ecb62591c3872906dca2d79147",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "shotId": "S09"
+      },
+      "path": "assets/generated/portraits/S09.jpg",
+      "sha256": "daf2b808301eb3c33687d867b403303335a898227e4a94fc63ee44eaa8f87dcd",
+      "mime": "image/jpeg",
+      "publicShareApproved": true,
+      "original": {
+        "path": "assets/generated/originals/S09.png",
+        "sha256": "0dae26e6945db22ee27d4c5bac0a460de0481dcfe202206cad7eece378b75970",
+        "mime": "image/png",
+        "publicShareApproved": true
+      },
+      "thumbnail": {
+        "path": "assets/generated/thumbs/S09.jpg",
+        "sha256": "babf5b1d1e73b13e91848231459010580bbf7795a5ad83e50dcf983d9ef2900a",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [
+          {
+            "assetId": "A-CHAR-D00",
+            "sha256": "d8cfd3042bffbde6dc1062378d5305de8f2903eaa43e46616eb18ecfd52308ca"
+          },
+          {
+            "assetId": "A-SET-CLINIC",
+            "sha256": "e818b3611ae9cde365f72940ec1724c67689045b4160cc41debe977605793deb"
+          },
+          {
+            "assetId": "A-PROP-NOTE",
+            "sha256": "c38632454af60add0d8a0949d422b6877bdd2aaaa8f80e956b82c016ecdd0c41"
+          }
+        ],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "needs_revision",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable",
+          "notes": [
+            "医生外貌与锁定医生相近，但前景患者发式变成盘起/扎起状态，需核对与及肩直发女主一致性；建议只留医生机位或绑定女主身份后返修。"
+          ]
+        },
+        "reviewNote": "医生外貌与锁定医生相近，但前景患者发式变成盘起/扎起状态，需核对与及肩直发女主一致性；建议只留医生机位或绑定女主身份后返修。",
+        "promptHash": "7eb31af187117c8144e8a8fa74bd8dc6b01136aed33905d3a93c21bab018c483",
+        "requestId": "30d0d86b-f25b-4df3-adee-6ae2b1234e0f",
+        "httpStatus": 200,
+        "imagePostNumber": 39,
+        "generatedAt": 1791602271.270506,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/S09.jpg",
+          "sha256": "daf2b808301eb3c33687d867b403303335a898227e4a94fc63ee44eaa8f87dcd",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "shotId": "S10"
+      },
+      "path": "assets/generated/portraits/S10.jpg",
+      "sha256": "281faec72012e60e41fc475df8b45c372a61c9aaed9132ced76feebcc63bcc2a",
+      "mime": "image/jpeg",
+      "publicShareApproved": true,
+      "original": {
+        "path": "assets/generated/originals/S10.png",
+        "sha256": "a798aed3984e3b5aaca41010ea15c33419e98c7c2dab63d5bfb367a3a8ad5249",
+        "mime": "image/png",
+        "publicShareApproved": true
+      },
+      "thumbnail": {
+        "path": "assets/generated/thumbs/S10.jpg",
+        "sha256": "08d0fc6548accac4932953b5cf55716427d1fb2beb442e042af668b7e6d0aee0",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [
+          {
+            "assetId": "A-SET-CLINIC",
+            "sha256": "e818b3611ae9cde365f72940ec1724c67689045b4160cc41debe977605793deb"
+          },
+          {
+            "assetId": "A-TEST-BLOOD-URINE",
+            "sha256": "d8cd25fb04fc82bc4add07a494f03b48c5d474cacf915e7d07e011b2ea6e21ad"
+          },
+          {
+            "assetId": "A-CHAR-LAB-HANDS",
+            "sha256": "ab6eb0c9d33cbec1bb6ef60f13e22a99f47288b53942cc10c4aed4abcd402055"
+          },
+          {
+            "assetId": "A-PROP-BLOOD-TUBE",
+            "sha256": "ea3033cd77422f2fc70e98e1eb41f62d3d3f468cffcb277fb08781b436d0f38f"
+          },
+          {
+            "assetId": "A-PROP-URINE-CUP",
+            "sha256": "8902fb5e17bd928701298477192fb9d32833f88971c2e24890f688f411939197"
+          },
+          {
+            "assetId": "A-PROP-LAB-TRAY",
+            "sha256": "46c417112c2ebb69f9a368bb4c79abe3b497eb9d35b5bd8ed6d814db2ec05fa2"
+          }
+        ],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "needs_revision",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable",
+          "notes": [
+            "本镜应以匿名检验人员手和两种样本为主，实际多出未锁定患者脸；人物身份与女主基准不符，须返修或另审不露脸构图。"
+          ]
+        },
+        "reviewNote": "本镜应以匿名检验人员手和两种样本为主，实际多出未锁定患者脸；人物身份与女主基准不符，须返修或另审不露脸构图。",
+        "promptHash": "6007cd3cb24941ed91da96d71b1f949cf445b11e671a341b3774d05cfb63fd7f",
+        "requestId": "99a6111d-b6d3-4d97-a363-f4b7c01b8a72",
+        "httpStatus": 200,
+        "imagePostNumber": 40,
+        "generatedAt": 1791602281.46703,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/S10.jpg",
+          "sha256": "281faec72012e60e41fc475df8b45c372a61c9aaed9132ced76feebcc63bcc2a",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "shotId": "S11"
+      },
+      "path": "assets/generated/portraits/S11.jpg",
+      "sha256": "cc457f6f658b5809dbd48521df19a621075b9e4f6f52def8c6cc374e12d4251f",
+      "mime": "image/jpeg",
+      "publicShareApproved": true,
+      "original": {
+        "path": "assets/generated/originals/S11.png",
+        "sha256": "327850c6f49122f4097d3fefae23b20cb2cccb9a715fe34149ccdf48f4986bb8",
+        "mime": "image/png",
+        "publicShareApproved": true
+      },
+      "thumbnail": {
+        "path": "assets/generated/thumbs/S11.jpg",
+        "sha256": "3a7f2778a04f654afa3dc9d32656dc4717a323184c24a248126549d405ccb48b",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [
+          {
+            "assetId": "A-CHAR-D00",
+            "sha256": "d8cfd3042bffbde6dc1062378d5305de8f2903eaa43e46616eb18ecfd52308ca"
+          },
+          {
+            "assetId": "A-SET-CLINIC",
+            "sha256": "e818b3611ae9cde365f72940ec1724c67689045b4160cc41debe977605793deb"
+          },
+          {
+            "assetId": "A-PROP-NOTE",
+            "sha256": "c38632454af60add0d8a0949d422b6877bdd2aaaa8f80e956b82c016ecdd0c41"
+          }
+        ],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "needs_revision",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable",
+          "notes": [
+            "前景患者使用扎起发式，与已锁定女主及肩直发不一致；医生主体相近，但患者连续性须返修。"
+          ]
+        },
+        "reviewNote": "前景患者使用扎起发式，与已锁定女主及肩直发不一致；医生主体相近，但患者连续性须返修。",
+        "promptHash": "59d2276163b86b6887de98279a0b18b4043a10075e537e96c22ad9aa0da6d222",
+        "requestId": "4f58035b-d65c-4764-b4a7-a4bc1d6d9b72",
+        "httpStatus": 200,
+        "imagePostNumber": 41,
+        "generatedAt": 1791602301.905659,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/S11.jpg",
+          "sha256": "cc457f6f658b5809dbd48521df19a621075b9e4f6f52def8c6cc374e12d4251f",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "shotId": "S12"
+      },
+      "path": "assets/generated/portraits/S12.jpg",
+      "sha256": "cade943eefd06c6739ca35c6984682c8260d15cfa177753ec85b80899159d789",
+      "mime": "image/jpeg",
+      "publicShareApproved": true,
+      "original": {
+        "path": "assets/generated/originals/S12.png",
+        "sha256": "db375646d80efe27d0b7ec82c0851c1d4af8da9451aa4f1794a3db01e339d00a",
+        "mime": "image/png",
+        "publicShareApproved": true
+      },
+      "thumbnail": {
+        "path": "assets/generated/thumbs/S12.jpg",
+        "sha256": "b95310180f9cb21e7957e03202aeb9481024db9528c61351ab873ef9d3ae57c3",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [
+          {
+            "assetId": "A-SET-CLINIC",
+            "sha256": "e818b3611ae9cde365f72940ec1724c67689045b4160cc41debe977605793deb"
+          }
+        ],
+        "parentShots": [
+          {
+            "shotId": "S11",
+            "sha256": "327850c6f49122f4097d3fefae23b20cb2cccb9a715fe34149ccdf48f4986bb8"
+          }
+        ],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "needs_revision",
+          "identityReview": "pending",
+          "medicalReview": "pending",
+          "notes": [
+            "模型在病历板上自行生成了未经审核的细胞/抗体循环图，未使用本轮Opus声明式机制图；不得将其当作有效医学图示或作为后期正确图的替代。",
+            "前景患者发式仍与锁定女主不一致。"
+          ]
+        },
+        "reviewNote": "模型在病历板上自行生成了未经审核的细胞/抗体循环图，未使用本轮Opus声明式机制图；不得将其当作有效医学图示或作为后期正确图的替代。；前景患者发式仍与锁定女主不一致。",
+        "promptHash": "25f3fd013c85b7483599fd38ba2e5540fa90ef057402df31f548345f91a5dc09",
+        "requestId": "c865fac5-9e4b-4990-9fa7-a5950e9a2276",
+        "httpStatus": 200,
+        "imagePostNumber": 48,
+        "generatedAt": 1791602447.410895,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/S12.jpg",
+          "sha256": "cade943eefd06c6739ca35c6984682c8260d15cfa177753ec85b80899159d789",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "shotId": "S13"
+      },
+      "path": "assets/generated/portraits/S13.jpg",
+      "sha256": "96408078d54df26ed1318d18014c5158dbb505a7e444080a44b59176880b724b",
+      "mime": "image/jpeg",
+      "publicShareApproved": true,
+      "original": {
+        "path": "assets/generated/originals/S13.png",
+        "sha256": "e9eb1347cc860e8e1b52269518637f095776ac8585887dc8e62fa9711cabe1d1",
+        "mime": "image/png",
+        "publicShareApproved": true
+      },
+      "thumbnail": {
+        "path": "assets/generated/thumbs/S13.jpg",
+        "sha256": "ae5318cb8bb77c5623eb79eca4cdad310488425b51277d0f12218f16391a1664",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [
+          {
+            "assetId": "A-CHAR-P01",
+            "sha256": "f08757edeacaf74212272ffb569cfb3165eedf29eb0271e8f8e4436e0f0386d7"
+          },
+          {
+            "assetId": "A-SET-CLINIC",
+            "sha256": "e818b3611ae9cde365f72940ec1724c67689045b4160cc41debe977605793deb"
+          },
+          {
+            "assetId": "A-CARE-PLAN",
+            "sha256": "e5fd8d7ad20dd774516832a180096a7f827ba897bec3e09df86d8088ed9d2d28"
+          },
+          {
+            "assetId": "A-PROP-PEN",
+            "sha256": "942e4ec447d101b9cbe9fc528ba9aab92eb922e5f001206532b4e6f1dbc017bc"
+          },
+          {
+            "assetId": "A-PROP-FOLLOWUP-BOOK",
+            "sha256": "378e37e503a7fabd55d8617d469fe94eed394079a7e18d26d117f05ca5fd2504"
+          }
+        ],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable"
+        },
+        "reviewNote": "",
+        "promptHash": "08d9d0251d0060d8d7ad47a8eececfdc1ee0ee71d5ccbfac98db1e88bda82f8c",
+        "requestId": "b33a5a75-d737-498b-a2c1-8676cd9b5f32",
+        "httpStatus": 200,
+        "imagePostNumber": 42,
+        "generatedAt": 1791602321.263225,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/S13.jpg",
+          "sha256": "96408078d54df26ed1318d18014c5158dbb505a7e444080a44b59176880b724b",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "shotId": "S14"
+      },
+      "path": "assets/generated/portraits/S14.jpg",
+      "sha256": "ec26aca0064fa51b2f9122dd5b7a735520dd7a417d1f51b34c5a86140541bbea",
+      "mime": "image/jpeg",
+      "publicShareApproved": true,
+      "original": {
+        "path": "assets/generated/originals/S14.png",
+        "sha256": "0ec96a7c4ddc092b6772b260a79f523e1efb0102562cb5de561bd844a1d5ed08",
+        "mime": "image/png",
+        "publicShareApproved": true
+      },
+      "thumbnail": {
+        "path": "assets/generated/thumbs/S14.jpg",
+        "sha256": "4453e9e8776822657f011f3fb2b83f6aad0185bc8cd6ed4416d914e88ef30e68",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [
+          {
+            "assetId": "A-CHAR-D00",
+            "sha256": "d8cfd3042bffbde6dc1062378d5305de8f2903eaa43e46616eb18ecfd52308ca"
+          },
+          {
+            "assetId": "A-SET-CLINIC",
+            "sha256": "e818b3611ae9cde365f72940ec1724c67689045b4160cc41debe977605793deb"
+          },
+          {
+            "assetId": "A-CARE-PLAN",
+            "sha256": "e5fd8d7ad20dd774516832a180096a7f827ba897bec3e09df86d8088ed9d2d28"
+          },
+          {
+            "assetId": "A-CARE-SUN",
+            "sha256": "ad96c6a20ace2ad9c147015e31fdceb6810614e4cd3ee7c430c4b05f32a3aabd"
+          },
+          {
+            "assetId": "A-PROP-FOLLOWUP-BOOK",
+            "sha256": "378e37e503a7fabd55d8617d469fe94eed394079a7e18d26d117f05ca5fd2504"
+          }
+        ],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "needs_revision",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable",
+          "notes": [
+            "前景患者使用扎起发式，与已锁定女主及肩直发不一致；医生主体相近，但患者连续性须返修。"
+          ]
+        },
+        "reviewNote": "前景患者使用扎起发式，与已锁定女主及肩直发不一致；医生主体相近，但患者连续性须返修。",
+        "promptHash": "23a8eca7788a2642952e85d35dea43f9f83b54b707760be84090ab203cd9e0a7",
+        "requestId": "7859346d-c63c-42ef-a89d-d45bbb2c000d",
+        "httpStatus": 200,
+        "imagePostNumber": 43,
+        "generatedAt": 1791602328.737878,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/S14.jpg",
+          "sha256": "ec26aca0064fa51b2f9122dd5b7a735520dd7a417d1f51b34c5a86140541bbea",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "shotId": "S15"
+      },
+      "path": "assets/generated/portraits/S15.jpg",
+      "sha256": "976eee5245c8f26c8a3100103c7af33e6c03e51e71535bae45cd58678942f9c0",
+      "mime": "image/jpeg",
+      "publicShareApproved": true,
+      "original": {
+        "path": "assets/generated/originals/S15.png",
+        "sha256": "55005d317e3d0a0192ed966457c2ecacf83d21f54bd0546801b88f5ba4cb1505",
+        "mime": "image/png",
+        "publicShareApproved": true
+      },
+      "thumbnail": {
+        "path": "assets/generated/thumbs/S15.jpg",
+        "sha256": "786231a79f5c688eda36370cf7597ba02e16db6895c033f3cea51bc64f734fe7",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [
+          {
+            "assetId": "A-CHAR-P01",
+            "sha256": "f08757edeacaf74212272ffb569cfb3165eedf29eb0271e8f8e4436e0f0386d7"
+          },
+          {
+            "assetId": "A-SET-HOME",
+            "sha256": "742f874bcf9db74d2460cd7b5d63407eedbec2f62a4826a5e6f351f56dcd41ce"
+          },
+          {
+            "assetId": "A-CARE-PLAN",
+            "sha256": "e5fd8d7ad20dd774516832a180096a7f827ba897bec3e09df86d8088ed9d2d28"
+          },
+          {
+            "assetId": "A-PROP-FOLLOWUP-BOOK",
+            "sha256": "378e37e503a7fabd55d8617d469fe94eed394079a7e18d26d117f05ca5fd2504"
+          },
+          {
+            "assetId": "A-PROP-REMINDER-CARD",
+            "sha256": "946e3c60677ff74240e8509a6f3401da7671f9db0fa1cb1ebbde3ce7756d0851"
+          },
+          {
+            "assetId": "A-PROP-PILLBOX",
+            "sha256": "1f37708f8b88b5c066dd81f782583fc8af266e21dc3fc8d3e6d6f1191e7ae7b0"
+          }
+        ],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable"
+        },
+        "reviewNote": "",
+        "promptHash": "c2d8b36c153b8d382a69257ca73ba06d2e0ea8b81aec4003c4fd92e2a29b19d7",
+        "requestId": "db189a70-b5f0-49fe-9b21-4556903c9519",
+        "httpStatus": 200,
+        "imagePostNumber": 44,
+        "generatedAt": 1791602353.1576269,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/S15.jpg",
+          "sha256": "976eee5245c8f26c8a3100103c7af33e6c03e51e71535bae45cd58678942f9c0",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "shotId": "S16"
+      },
+      "path": "assets/generated/portraits/S16.jpg",
+      "sha256": "ab532f233db69040ad8cd163f19fee066a8accaf1ffe88ae9809d40c8035d064",
+      "mime": "image/jpeg",
+      "publicShareApproved": true,
+      "original": {
+        "path": "assets/generated/originals/S16.png",
+        "sha256": "92a6f334b34ea3a3fb9e4a761c3f5cb621d9a71e0fbf5e68d99e2dd36b29471f",
+        "mime": "image/png",
+        "publicShareApproved": true
+      },
+      "thumbnail": {
+        "path": "assets/generated/thumbs/S16.jpg",
+        "sha256": "a53475248ddd7981242a5fcab71a5d8dee6fc4180be0cb10a9e25ed6e897746a",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [
+          {
+            "assetId": "A-CHAR-P01",
+            "sha256": "f08757edeacaf74212272ffb569cfb3165eedf29eb0271e8f8e4436e0f0386d7"
+          },
+          {
+            "assetId": "A-SET-HOME",
+            "sha256": "742f874bcf9db74d2460cd7b5d63407eedbec2f62a4826a5e6f351f56dcd41ce"
+          },
+          {
+            "assetId": "A-CARE-SUN",
+            "sha256": "ad96c6a20ace2ad9c147015e31fdceb6810614e4cd3ee7c430c4b05f32a3aabd"
+          },
+          {
+            "assetId": "A-WARDROBE-OUTER",
+            "sha256": "e2ff7c680192a2ad5615e7c05de9f227528e4363faee6f8123570ad90edaeb37"
+          },
+          {
+            "assetId": "A-PROP-SUNSCREEN",
+            "sha256": "e67a90e0b16f434f701b0e0c3534b6fc37e7b7a0b606a1e5d70e9500ff4af27a"
+          }
+        ],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable"
+        },
+        "reviewNote": "",
+        "promptHash": "5810e99ea4af45bbdc5a1190e24d6db68a8fb2c7c6f0881e6dcda83871079875",
+        "requestId": "fd72dcfb-ab6b-4419-b5a4-7620eb4a84d7",
+        "httpStatus": 200,
+        "imagePostNumber": 45,
+        "generatedAt": 1791602369.192559,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/S16.jpg",
+          "sha256": "ab532f233db69040ad8cd163f19fee066a8accaf1ffe88ae9809d40c8035d064",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "shotId": "S17"
+      },
+      "path": "assets/generated/portraits/S17.jpg",
+      "sha256": "1e20521cffc29fee15a4ef7c5061e636537970c7057f014cf1d4f06bf4e19d3f",
+      "mime": "image/jpeg",
+      "publicShareApproved": true,
+      "original": {
+        "path": "assets/generated/originals/S17.png",
+        "sha256": "c86f20ae4aa23bfde860020d4194870609d581562229315e739a65809f0d0676",
+        "mime": "image/png",
+        "publicShareApproved": true
+      },
+      "thumbnail": {
+        "path": "assets/generated/thumbs/S17.jpg",
+        "sha256": "5de23badc5f3374e320a2273dbdef7984e3e87c3e2f42047ad5170792d1e68c6",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [
+          {
+            "assetId": "A-CHAR-P01",
+            "sha256": "f08757edeacaf74212272ffb569cfb3165eedf29eb0271e8f8e4436e0f0386d7"
+          },
+          {
+            "assetId": "A-SET-HOME",
+            "sha256": "742f874bcf9db74d2460cd7b5d63407eedbec2f62a4826a5e6f351f56dcd41ce"
+          },
+          {
+            "assetId": "A-PROP-GIFT",
+            "sha256": "ab14cc3669321fc82b1ec69fcbea575778f0a3581d8722f0c74810e8f17f205d"
+          },
+          {
+            "assetId": "A-PROP-WRAPPED-BOOK",
+            "sha256": "e76183e5b3977b911608bf8300ee24dd3263eb746ed38d7ac610187c0cae7d80"
+          },
+          {
+            "assetId": "A-PROP-BLUE-RIBBON",
+            "sha256": "da87d6c82a98366e21d26802386961fa676157196de424cffaa15841e3c78b21"
+          },
+          {
+            "assetId": "A-PROP-GIFT-CARD",
+            "sha256": "422b7d30069dce9d004067ebc32d1b185d2cb222df29bc428b77e52395cbd850"
+          }
+        ],
+        "parentShots": [
+          {
+            "shotId": "S02",
+            "sha256": "2dff14fe43edacd9a0fe50d3679e0ffddfdd7f79f981432bffc0fe4c97a176e9"
+          }
+        ],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "pending",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable"
+        },
+        "reviewNote": "",
+        "promptHash": "d87ac071c2a5f4a313c0281668ecf2c2d69329875f3d2b7cb57269608e0034ea",
+        "requestId": "ddaca24b-1573-42b1-b020-861b3d20b90e",
+        "httpStatus": 200,
+        "imagePostNumber": 49,
+        "generatedAt": 1791602457.83138,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/S17.jpg",
+          "sha256": "1e20521cffc29fee15a4ef7c5061e636537970c7057f014cf1d4f06bf4e19d3f",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "shotId": "S18"
+      },
+      "path": "assets/generated/portraits/S18.jpg",
+      "sha256": "cfd0bb083802ee010634731ba9111158c46f857d49cd147ebd15a41cae499954",
+      "mime": "image/jpeg",
+      "publicShareApproved": true,
+      "original": {
+        "path": "assets/generated/originals/S18.png",
+        "sha256": "80a7bd8fe433229502caed6b8262cdb3b322c50be2e1bc1c15aeb208ee1f7576",
+        "mime": "image/png",
+        "publicShareApproved": true
+      },
+      "thumbnail": {
+        "path": "assets/generated/thumbs/S18.jpg",
+        "sha256": "4bf1e222238809f6041a4746213213905032748813fd28045769005a13f15f6a",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [
+          {
+            "assetId": "A-CHAR-P01",
+            "sha256": "f08757edeacaf74212272ffb569cfb3165eedf29eb0271e8f8e4436e0f0386d7"
+          },
+          {
+            "assetId": "A-SET-OUTSIDE",
+            "sha256": "6d7a2dae29757cc7f4d47b0bf1d15124b7bf1ec100ab0905ce010e5df7539063"
+          },
+          {
+            "assetId": "A-PROP-GIFT",
+            "sha256": "ab14cc3669321fc82b1ec69fcbea575778f0a3581d8722f0c74810e8f17f205d"
+          },
+          {
+            "assetId": "A-CARE-SUN",
+            "sha256": "ad96c6a20ace2ad9c147015e31fdceb6810614e4cd3ee7c430c4b05f32a3aabd"
+          },
+          {
+            "assetId": "A-WARDROBE-OUTER",
+            "sha256": "e2ff7c680192a2ad5615e7c05de9f227528e4363faee6f8123570ad90edaeb37"
+          },
+          {
+            "assetId": "A-PROP-UMBRELLA",
+            "sha256": "81e22eab8992b1b345e455c16fa2f9b37abf63e394b69485f492cbc728522b72"
+          },
+          {
+            "assetId": "A-PROP-SHOULDER-BAG",
+            "sha256": "bff58302a4db30f6942476932773ae619f1fb056657f497b88cd6293579948aa"
+          },
+          {
+            "assetId": "A-PROP-WRAPPED-BOOK",
+            "sha256": "e76183e5b3977b911608bf8300ee24dd3263eb746ed38d7ac610187c0cae7d80"
+          }
+        ],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "needs_revision",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable",
+          "notes": [
+            "门边多出蓝色衣袖的第三方手，脚本未安排该人物；若是朋友也与已锁定灰袖不符。女主、长袖、左肩包、伞和礼物主要资产可辨。"
+          ]
+        },
+        "reviewNote": "门边多出蓝色衣袖的第三方手，脚本未安排该人物；若是朋友也与已锁定灰袖不符。女主、长袖、左肩包、伞和礼物主要资产可辨。",
+        "promptHash": "b4b66982f1499bfbacd6bae2d7dd063c9bc32a726d6dce645d79b9c94e96c860",
+        "requestId": "988d40f4-a1c5-434b-8ee6-7f9ecd7442e8",
+        "httpStatus": 200,
+        "imagePostNumber": 46,
+        "generatedAt": 1791602396.1499908,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/S18.jpg",
+          "sha256": "cfd0bb083802ee010634731ba9111158c46f857d49cd147ebd15a41cae499954",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "shotId": "S19"
+      },
+      "path": "assets/generated/portraits/S19.jpg",
+      "sha256": "ef897602e6c713a940924291d4a4eaf6dcec55a1fb45ef1c3e2b92a738046a1a",
+      "mime": "image/jpeg",
+      "publicShareApproved": true,
+      "original": {
+        "path": "assets/generated/originals/S19.png",
+        "sha256": "dcfeec837552900a96a15b4f46900b24e4291c460b5fd5ce2a1a8a97b4706589",
+        "mime": "image/png",
+        "publicShareApproved": true
+      },
+      "thumbnail": {
+        "path": "assets/generated/thumbs/S19.jpg",
+        "sha256": "78ee2c12651207604711f4a1c7339c92197c92ccef00f747d83962e912d20c2f",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [
+          {
+            "assetId": "A-CHAR-P01",
+            "sha256": "f08757edeacaf74212272ffb569cfb3165eedf29eb0271e8f8e4436e0f0386d7"
+          },
+          {
+            "assetId": "A-SET-OUTSIDE",
+            "sha256": "6d7a2dae29757cc7f4d47b0bf1d15124b7bf1ec100ab0905ce010e5df7539063"
+          },
+          {
+            "assetId": "A-PROP-GIFT",
+            "sha256": "ab14cc3669321fc82b1ec69fcbea575778f0a3581d8722f0c74810e8f17f205d"
+          },
+          {
+            "assetId": "A-CARE-SUN",
+            "sha256": "ad96c6a20ace2ad9c147015e31fdceb6810614e4cd3ee7c430c4b05f32a3aabd"
+          },
+          {
+            "assetId": "A-WARDROBE-OUTER",
+            "sha256": "e2ff7c680192a2ad5615e7c05de9f227528e4363faee6f8123570ad90edaeb37"
+          },
+          {
+            "assetId": "A-PROP-UMBRELLA",
+            "sha256": "81e22eab8992b1b345e455c16fa2f9b37abf63e394b69485f492cbc728522b72"
+          },
+          {
+            "assetId": "A-PROP-SHOULDER-BAG",
+            "sha256": "bff58302a4db30f6942476932773ae619f1fb056657f497b88cd6293579948aa"
+          },
+          {
+            "assetId": "A-CHAR-F01",
+            "sha256": "5a4a04471c09ef4dc8258ee4e0c747e3924cfff67e23de5bc1cca9cc9a0998b8"
+          }
+        ],
+        "parentShots": [],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "needs_revision",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable",
+          "notes": [
+            "女主浅色防晒外套消失，仅剩针织衣；和S18服装状态不连续。",
+            "礼物边缘出现盒盖样结构且厚度改变，偏离锁定的牛皮纸包书；空白小卡也不清楚。",
+            "此图双方已共同持礼物，更接近本镜句尾状态，不能未经调整绑定为预定开镜首帧。"
+          ]
+        },
+        "reviewNote": "女主浅色防晒外套消失，仅剩针织衣；和S18服装状态不连续。；礼物边缘出现盒盖样结构且厚度改变，偏离锁定的牛皮纸包书；空白小卡也不清楚。；此图双方已共同持礼物，更接近本镜句尾状态，不能未经调整绑定为预定开镜首帧。",
+        "promptHash": "8319194f27bb0af0fc884c494562c8bae63aac7019057ab90b770c31f8ed24b7",
+        "requestId": "262e7c3c-a2cb-423e-aabc-c6fb4ce55f7a",
+        "httpStatus": 200,
+        "imagePostNumber": 47,
+        "generatedAt": 1791602404.910453,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/S19.jpg",
+          "sha256": "ef897602e6c713a940924291d4a4eaf6dcec55a1fb45ef1c3e2b92a738046a1a",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    },
+    {
+      "target": {
+        "shotId": "S20"
+      },
+      "path": "assets/generated/portraits/S20.jpg",
+      "sha256": "a6cfe6dda43364ab4b10987a2ee40181181055d9608ea8e7138926dd82ea25d6",
+      "mime": "image/jpeg",
+      "publicShareApproved": true,
+      "original": {
+        "path": "assets/generated/originals/S20.png",
+        "sha256": "c2223a08e2f462baaa0946fd77544ae410a81c32946a6133739e9bb2a4461785",
+        "mime": "image/png",
+        "publicShareApproved": true
+      },
+      "thumbnail": {
+        "path": "assets/generated/thumbs/S20.jpg",
+        "sha256": "0f98dccee43781c9e110e4f2b41082a4ba622a7113dee7f4fdf1178c4e8c4d02",
+        "mime": "image/jpeg",
+        "publicShareApproved": true
+      },
+      "sourceHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "metadata": {
+        "origin": "ai-generated",
+        "reviewStatus": "pending",
+        "modelRequested": "gpt-image-2",
+        "modelActual": null,
+        "productionMethod": "image-provider",
+        "parentAssets": [
+          {
+            "assetId": "A-CHAR-P01",
+            "sha256": "f08757edeacaf74212272ffb569cfb3165eedf29eb0271e8f8e4436e0f0386d7"
+          },
+          {
+            "assetId": "A-SET-OUTSIDE",
+            "sha256": "6d7a2dae29757cc7f4d47b0bf1d15124b7bf1ec100ab0905ce010e5df7539063"
+          },
+          {
+            "assetId": "A-PROP-GIFT",
+            "sha256": "ab14cc3669321fc82b1ec69fcbea575778f0a3581d8722f0c74810e8f17f205d"
+          },
+          {
+            "assetId": "A-CHAR-F01",
+            "sha256": "5a4a04471c09ef4dc8258ee4e0c747e3924cfff67e23de5bc1cca9cc9a0998b8"
+          },
+          {
+            "assetId": "A-PROP-WRAPPED-BOOK",
+            "sha256": "e76183e5b3977b911608bf8300ee24dd3263eb746ed38d7ac610187c0cae7d80"
+          },
+          {
+            "assetId": "A-PROP-BLUE-RIBBON",
+            "sha256": "da87d6c82a98366e21d26802386961fa676157196de424cffaa15841e3c78b21"
+          },
+          {
+            "assetId": "A-PROP-GIFT-CARD",
+            "sha256": "422b7d30069dce9d004067ebc32d1b185d2cb222df29bc428b77e52395cbd850"
+          }
+        ],
+        "parentShots": [
+          {
+            "shotId": "S19",
+            "sha256": "dcfeec837552900a96a15b4f46900b24e4291c460b5fd5ce2a1a8a97b4706589"
+          }
+        ],
+        "externalReferences": [],
+        "technicalReview": {
+          "imageDecodes": true,
+          "contentReview": "needs_revision",
+          "identityReview": "pending",
+          "medicalReview": "not-applicable",
+          "notes": [
+            "沿用S19的服装/礼物偏差：防晒外套缺失、包书呈盒盖样结构。",
+            "镜头仍为人物中景，未按脚本切至礼物交接特写；首帧释放动作已开始，须核对S19句尾衔接。"
+          ]
+        },
+        "reviewNote": "沿用S19的服装/礼物偏差：防晒外套缺失、包书呈盒盖样结构。；镜头仍为人物中景，未按脚本切至礼物交接特写；首帧释放动作已开始，须核对S19句尾衔接。",
+        "promptHash": "0299d03ff7a66950440c8e69e5484de8801d3843893bb8f0abddf6b983a991c6",
+        "requestId": "61c0b19b-64d0-4140-85b4-a061fd0960fb",
+        "httpStatus": 200,
+        "imagePostNumber": 50,
+        "generatedAt": 1791602464.536802,
+        "programHash": null,
+        "generationSnapshotHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+        "sourceUrls": [],
+        "crop": {
+          "path": "portraits/S20.jpg",
+          "sha256": "a6cfe6dda43364ab4b10987a2ee40181181055d9608ea8e7138926dd82ea25d6",
+          "width": 864,
+          "height": 1536,
+          "crop": [
+            80,
+            0,
+            944,
+            1536
+          ],
+          "stretch": false
+        },
+        "firstFrameBound": false
+      }
+    }
+  ],
+  "imageAttempts": [
+    {
+      "target": {
+        "assetId": "A-SYM-FOAM"
+      },
+      "origin": "external-history",
+      "state": "failed",
+      "code": "moderation_blocked",
+      "submitted": true,
+      "reason": "供应商拒绝了此图请求；本轮不重试。",
+      "modelRequested": "gpt-image-2",
+      "modelActual": null,
+      "blockingParent": null,
+      "sourceStoryHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+      "imagePostNumber": 27
+    },
+    {
+      "target": {
+        "shotId": "S06"
+      },
+      "origin": "external-history",
+      "state": "blocked",
+      "code": "blocked_provider_policy",
+      "submitted": false,
+      "reason": "前置泡沫示意图被供应商拒绝；本镜未提交。",
+      "modelRequested": "gpt-image-2",
+      "modelActual": null,
+      "blockingParent": "A-SYM-FOAM",
+      "sourceStoryHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d"
+    }
+  ],
+  "batch": {
+    "schema": "storyflow-v02-image-manifest/1",
+    "storyHash": "c283d15da11490c7ddea878465eddb35e986465efbf22c52e13fa55d3dc2c55d",
+    "assetTargetCount": 32,
+    "shotTargetCount": 20,
+    "imagePosts": 50,
+    "imagePostLimit": 52,
+    "imageRetries": 0,
+    "generatedCount": 50,
+    "approvedCount": 0,
+    "allCandidatesNeedHumanReview": true,
+    "actualModelPolicy": "null means provider response did not disclose a model; requested model is not proof of underlying model"
+  }
 }

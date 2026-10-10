@@ -78,7 +78,7 @@ test("SQLite process mutex releases after SIGKILL despite stale diagnostic file"
       "tsx",
       "--input-type=module",
       "-e",
-      `import {acquireDataLock} from ${JSON.stringify(new URL("../server/data-lock.ts", import.meta.url).href)};acquireDataLock(${JSON.stringify(root)},'runtime');console.log('ready');setInterval(()=>{},1000)`,
+      `import {acquireDataLock} from ${JSON.stringify(new URL("../server/data-lock.ts", import.meta.url).href)};const release=acquireDataLock(${JSON.stringify(root)},'runtime');console.log('ready');setInterval(()=>void release,1000)`,
     ],
     { stdio: ["ignore", "pipe", "pipe"] },
   );

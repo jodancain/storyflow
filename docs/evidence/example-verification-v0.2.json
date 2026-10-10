@@ -1,0 +1,16 @@
+{
+  "projectId": "8a6cf020-6bf7-489a-a4e7-35a902b8d992",
+  "revision": 2,
+  "contentHash": "47f969c875bdc837f10c8992162fa2d44e805cb151b2e070ec5515223da712b3",
+  "images": 50,
+  "assets": 31,
+  "shots": 19,
+  "files": 131,
+  "approved": 0,
+  "jobs": 0,
+  "lineageCurrent": 50,
+  "sourceArchiveSha256": "b3cc3309f5637935079246c021d2ec6a45b6364b03998dfb51a0dcd121e77497",
+  "publicArchiveSha256": "c4c7edc421d13995665d339662df63954d859c4c77ae45bc06db3c4ab876e1a9",
+  "migrationPassed": true,
+  "migratedCurrent": 50
+}

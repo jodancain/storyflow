@@ -53,7 +53,7 @@ jobs:
           docker exec storyflow-ci node -e "const fs=require('fs'); if(process.getuid()===0)throw Error('root');fs.writeFileSync('/data/storyflow/persistence-check','retained')"
           node --input-type=module <<'JS'
           import assert from 'node:assert/strict';
-          import {writeFileSync} from 'node:fs';
+          import {writeFileSync,readFileSync} from 'node:fs';
           const base='http://127.0.0.1:18296';
           const setup=await fetch(`${base}/api/auth/setup`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({password:'ci-storyflow-fixture-password'})});
           assert.equal(setup.status,200);
@@ -63,10 +63,15 @@ jobs:
           assert.equal(created.status,201);
           const project=await created.json();
           assert.equal(project.ontology.shots.length,20);
-          assert.equal(project.files.length,12);
+          const manifest=JSON.parse(readFileSync('examples/lupus-v6.assets.json','utf8'));
+          const candidateCount=(manifest.candidates || []).length;
+          const expectedFiles=manifest.files.length+(manifest.candidates || []).reduce((n,c)=>n+1+Number(Boolean(c.original))+Number(Boolean(c.thumbnail)),0);
+          assert.equal(project.files.length,expectedFiles);
+          assert.equal(project.artifacts.filter(a=>a.kind==='image').length,candidateCount);
+          assert.equal(project.jobs.length,0,'Template history must never enqueue provider calls');
           const file=project.files[0];
-          writeFileSync('/tmp/storyflow-ci-project.json',JSON.stringify({cookie,id:project.id,revision:project.revision,file:{id:file.id,sha256:file.sha256,bytes:file.bytes}}),{mode:0o600});
-          console.log('Created real template project: 20 shots, 12 assets.');
+          writeFileSync('/tmp/storyflow-ci-project.json',JSON.stringify({cookie,id:project.id,revision:project.revision,fileCount:expectedFiles,candidateCount,file:{id:file.id,sha256:file.sha256,bytes:file.bytes}}),{mode:0o600});
+          console.log(`Created real template project: 20 shots, ${expectedFiles} files, ${candidateCount} pending image candidates.`);
           JS
           docker rm -f storyflow-ci
           docker run -d --name storyflow-ci -p 127.0.0.1:18296:18296 -v storyflow-ci-data:/data/storyflow storyflow:ci
@@ -88,7 +93,9 @@ jobs:
           assert.equal(project.id,state.id);
           assert.equal(project.revision,state.revision);
           assert.equal(project.ontology.shots.length,20);
-          assert.equal(project.files.length,12);
+          assert.equal(project.files.length,state.fileCount);
+          assert.equal(project.artifacts.filter(a=>a.kind==='image').length,state.candidateCount);
+          assert.equal(project.jobs.length,0);
           const file=project.files.find(f=>f.id===state.file.id);
           assert.equal(file?.sha256,state.file.sha256);
           const download=await fetch(`${base}/api/files/${state.file.id}?download=1`,{headers});

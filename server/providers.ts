@@ -8,6 +8,8 @@ import type {
   ProviderHandle,
   Requirements,
   VideoInput,
+  ImageInput,
+  ImageReceipt,
 } from "../shared/types.js";
 import { validateGraphics } from "./render-overlay.js";
 
@@ -166,6 +168,12 @@ export class Providers {
   }
   capabilities() {
     return {
+      image: {
+        available: !!(this.config.imageBase && this.config.imageKey),
+        model: this.config.imageModel || "gpt-image-2",
+        protocol: "openai-images",
+        maxBatch: 52,
+      },
       seedance: {
         available: !!(this.config.seedanceBase && this.config.seedanceKey),
         model: this.config.seedanceModel,
@@ -234,6 +242,78 @@ export class Providers {
         "invalid_response",
       );
     }
+  }
+  /** One POST only. The complete receipt is persisted before parsing or downloading. */
+  async generateImage(input: ImageInput, onPrepared: Prepared, onReceived: (body: Buffer) => Promise<void>): Promise<ImageReceipt> {
+    assert(this.config.imageBase && this.config.imageKey, "Image API is not configured");
+    assert(input.prompt.length > 0 && input.prompt.length <= 40000, "Invalid image prompt");
+    assert(input.references.length <= 16, "At most 16 image references are supported");
+    const base = clean(this.config.imageBase), model = this.config.imageModel || "gpt-image-2";
+    const size = input.width === input.height ? "1024x1024" : input.width < input.height ? "1024x1536" : "1536x1024";
+    const parameters = {model, prompt:input.prompt, size, n:1};
+    const references = input.references.map(r => ({assetId:r.assetId,fileId:r.fileId,sha256:r.sha256,mime:r.mime}));
+    let body: BodyInit;
+    const headers: Record<string,string> = {authorization:`Bearer ${this.config.imageKey}`};
+    if (input.references.length) {
+      const form = new FormData();
+      for (const [k,v] of Object.entries(parameters)) form.append(k,String(v));
+      for (const ref of input.references) {
+        assert(["image/png","image/jpeg","image/webp"].includes(ref.mime), "Unsupported image reference MIME");
+        assert(digest(ref.bytes) === ref.sha256, "Reference image hash mismatch");
+        form.append(input.references.length > 1 ? "image[]" : "image", new Blob([new Uint8Array(ref.bytes)],{type:ref.mime}),`${ref.assetId}.${ref.mime.split("/")[1]}`);
+      }
+      body = form;
+    } else { body=JSON.stringify(parameters); headers["content-type"]="application/json"; }
+    const receipt = {provider:"openai-images",baseUrl:base,modelRequested:model,modelActual:null,
+      requestHash:digest(JSON.stringify({parameters,references})),request:parameters,
+      references,referenceMode:references.length ? "image-edit" : "text-to-image",
+      requestedCanvas:{width:input.width,height:input.height},providerSize:size};
+    await onPrepared(receipt);
+    const response = await this.request(`${base}/images/${references.length ? "edits" : "generations"}`,{method:"POST",headers,body,signal:AbortSignal.timeout(360000)},true);
+    if (!response.ok) throw new ProviderError(`Image provider HTTP ${response.status}`, response.status >= 500 || [408,429].includes(response.status), `http_${response.status}`);
+    let raw: Buffer;
+    try { raw = await limitedBody(response, 64 * 1024 * 1024); }
+    catch { throw new ProviderError("Image response was interrupted after acceptance; do not resubmit.",true,"invalid_response"); }
+    await onReceived(raw);
+    return this.parseImageReceipt(raw);
+  }
+  parseImageReceipt(raw: Buffer): ImageReceipt {
+    let value: any;
+    try { value=JSON.parse(raw.toString("utf8")); }
+    catch { throw new ProviderError("Persisted image response is not valid JSON",false,"invalid_response"); }
+    const item=value.data?.[0];
+    assert(item && (typeof item.b64_json === "string" || typeof item.url === "string"), "Image response contains no image");
+    const metadata = {modelActual: typeof value.model === "string" ? value.model.slice(0,200) : typeof value.properties?.upstream_model_name === "string" ? value.properties.upstream_model_name.slice(0,200) : null,
+      revisedPrompt:typeof item.revised_prompt === "string" ? item.revised_prompt.slice(0,40000) : undefined,
+      providerCreated: typeof value.created === "number" ? value.created : undefined};
+    return item.b64_json ? {bytes:Buffer.from(item.b64_json,"base64"),metadata} : {url:item.url,metadata};
+  }
+  async downloadImage(receipt: ImageReceipt): Promise<{bytes:Buffer;mime:string}> {
+    let bytes=receipt.bytes;
+    if (!bytes) {
+      assert(receipt.url,"Missing image URL");
+      let url=receipt.url;
+      for(let redirects=0;redirects<=5;redirects++) {
+        await safeURL(url,this.config.allowPrivate);
+        let response:Response;
+        try { response=await this.fetchImpl(url,{redirect:"manual",signal:AbortSignal.timeout(180000)}); }
+        catch { throw new ProviderError("Image download connection failed",false,"download_error"); }
+        if([301,302,303,307,308].includes(response.status)) {
+          const location=response.headers.get("location");
+          assert(location && redirects<5,"Image redirect limit exceeded or missing location");
+          url=new URL(location,url).toString();continue;
+        }
+        assert(response.ok,`Image download HTTP ${response.status}`);
+        bytes=await limitedBody(response,50 * 1024 * 1024);break;
+      }
+      assert(bytes,"Image download returned no content");
+    }
+    assert(bytes.length > 12 && bytes.length <= 50*1024*1024,"Invalid image size");
+    const mime = bytes.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])) ? "image/png" :
+      bytes[0]===255 && bytes[1]===216 && bytes[2]===255 ? "image/jpeg" :
+      bytes.subarray(0,4).toString()==="RIFF" && bytes.subarray(8,12).toString()==="WEBP" ? "image/webp" : undefined;
+    assert(mime,"Image response is not PNG, JPEG or WebP");
+    return {bytes,mime};
   }
   async submit(
     input: VideoInput,

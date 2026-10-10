@@ -19,7 +19,32 @@ export interface Evidence {
   excerpt: string;
   locator?: string;
 }
+export interface ImageAttemptHistory {
+  origin: "external-history";
+  state: "failed" | "blocked";
+  code: string;
+  submitted: boolean;
+  reason: string;
+  modelRequested?: string;
+  modelActual?: string | null;
+  blockingParent?: string;
+  sourceStoryHash?: string;
+  imagePostNumber?: number;
+}
+export interface ImageBinding {
+  artifactId: string;
+  fileId: string;
+  sha256: string;
+}
+export interface ImageTarget {
+  assetId?: string;
+  shotId?: string;
+  prompt?: string;
+  referenceAssetIds?: string[];
+}
 export interface Asset {
+  imageAttempt?: ImageAttemptHistory;
+  previewImage?: ImageBinding;
   id: string;
   label: string;
   kind: "image" | "video" | "audio" | "document" | "graphic";
@@ -65,6 +90,9 @@ export interface Caption {
   text: string;
 }
 export interface Shot {
+  imageAttempt?: ImageAttemptHistory;
+  reviewImage?: ImageBinding;
+  firstFrameImage?: ImageBinding;
   id: string;
   title: string;
   startFrame: number;
@@ -156,7 +184,18 @@ export interface Compiled {
   prompts: Record<string, string>;
   subtitles: Caption[];
 }
+export interface ImportedOpinion {
+  sourceProjectId?: string;
+  sourceRevision?: number;
+  snapshotHash?: string;
+  targetHash?: string;
+  imageSha256?: string;
+  imageId?: string;
+  originalStatus: "pending" | "pass" | "change";
+  match: "current" | "image-only" | "historical";
+}
 export interface Review {
+  imported?: ImportedOpinion;
   targetId: string;
   targetHash: string;
   status: "pending" | "pass" | "change";
@@ -180,7 +219,8 @@ export interface Artifact {
   projectId: string;
   jobId: string;
   shotId?: string;
-  kind: "video" | "voice" | "lipsync" | "graphic" | "final";
+  kind: "image" | "video" | "voice" | "lipsync" | "graphic" | "final";
+  assetId?: string;
   fileId: string;
   sourceHash: string;
   audioFileId?: string;
@@ -200,6 +240,8 @@ export interface Project {
   artifacts: Artifact[];
   jobs: Job[];
   compiled: Compiled;
+  imageTargetHashes?: Record<string,string>;
+  imageCandidateCurrent?: Record<string,boolean>;
   createdAt: string;
   updatedAt: string;
 }
@@ -217,6 +259,7 @@ export interface Job {
   projectId: string;
   runId: string;
   kind:
+    | "image"
     | "expand"
     | "post-plan"
     | "video"
@@ -257,7 +300,22 @@ export interface VideoInput {
   audio?: { bytes: Buffer; mime: string; id: string; sha256: string };
   purpose: "video" | "voice" | "lipsync";
 }
+export interface ImageInput {
+  prompt: string;
+  width: number;
+  height: number;
+  references: {assetId: string; fileId: string; sha256: string; mime: string; bytes: Buffer}[];
+}
+export interface ImageReceipt {
+  url?: string;
+  bytes?: Buffer;
+  mime?: string;
+  metadata: Record<string, unknown>;
+}
 export interface ProviderConfig {
+  imageBase?: string;
+  imageKey?: string;
+  imageModel?: string;
   seedanceBase: string;
   seedanceKey: string;
   seedanceModel: string;

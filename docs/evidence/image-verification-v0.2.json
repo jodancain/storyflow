@@ -1,0 +1,149 @@
+{
+  "schema": "storyflow-v02-image-verification/1",
+  "verifiedAt": 1791602603.367641,
+  "imageTargets": 52,
+  "generatedCandidates": 50,
+  "assetCandidates": 31,
+  "shotCandidates": 19,
+  "photoCandidates": 49,
+  "opusDiagramCandidates": 1,
+  "imagePostCount": 50,
+  "imagePostMax": 52,
+  "imageRetryCount": 0,
+  "videoCalls": 0,
+  "audioCalls": 0,
+  "opusRequests": 3,
+  "opusPreAcceptance400": 2,
+  "opusAccepted": 1,
+  "approvedCandidates": 0,
+  "allOriginalsRetained": true,
+  "portraitAspect": "9:16 centered crop, no stretch",
+  "shaChecks": 150,
+  "allChecksPassed": true,
+  "visualReview": "All candidate thumbnails/contact sheets and all nineteen full shot images inspected; observations are not medical or human approval",
+  "expertMedicalReview": "pending",
+  "identityApproval": "pending",
+  "revisionRecommendations": [
+    {
+      "id": "A-SET-CLINIC",
+      "notes": [
+        "场景槽要求无人物，实际输出含两位非锁定人物；不能作为身份来源。后续若引用只约束房间布局，角色以各自身份图为准。"
+      ]
+    },
+    {
+      "id": "A-SET-OUTSIDE",
+      "notes": [
+        "场景槽要求无人，实际输出含未锁定路人；后续仅约束建筑与树荫布局，必须去掉背景人，角色只取锁定身份图。"
+      ]
+    },
+    {
+      "id": "A-SYM-JOINT",
+      "notes": [
+        "辅助手接触点偏拇指根/手腕，未清楚呈现指定手指关节托扶；需要人工核对左右手及痛点，不能据此标记动作准确。"
+      ]
+    },
+    {
+      "id": "A-PROP-SHOULDER-BAG",
+      "notes": [
+        "肩包内自行加入蓝色包装、已成结的礼物，与锁定牛皮纸包书不同；包型可参考，但需清除或替换冲突内装物后定稿。"
+      ]
+    },
+    {
+      "id": "A-PROP-BLUE-RIBBON",
+      "notes": [
+        "独立丝带槽自行加入未锁定的浅色书本；蓝色及宽度可参考，但不能把书本一起当作礼物身份基准。"
+      ]
+    },
+    {
+      "id": "S01",
+      "notes": [
+        "居家开场多出白袍人物，偏离女主独处准备礼物的叙事；不得直接定稿。"
+      ]
+    },
+    {
+      "id": "S02",
+      "notes": [
+        "右手托扶点落在左腕附近，未清楚命中脚本要求的手指关节；须返修动作接触点。"
+      ]
+    },
+    {
+      "id": "S03",
+      "notes": [
+        "前景蓝丝带已呈现成结状态，早于S17结完成；此时应仍未系好，连续性须返修。"
+      ]
+    },
+    {
+      "id": "S09",
+      "notes": [
+        "医生外貌与锁定医生相近，但前景患者发式变成盘起/扎起状态，需核对与及肩直发女主一致性；建议只留医生机位或绑定女主身份后返修。"
+      ]
+    },
+    {
+      "id": "S10",
+      "notes": [
+        "本镜应以匿名检验人员手和两种样本为主，实际多出未锁定患者脸；人物身份与女主基准不符，须返修或另审不露脸构图。"
+      ]
+    },
+    {
+      "id": "S11",
+      "notes": [
+        "前景患者使用扎起发式，与已锁定女主及肩直发不一致；医生主体相近，但患者连续性须返修。"
+      ]
+    },
+    {
+      "id": "S12",
+      "notes": [
+        "模型在病历板上自行生成了未经审核的细胞/抗体循环图，未使用本轮Opus声明式机制图；不得将其当作有效医学图示或作为后期正确图的替代。",
+        "前景患者发式仍与锁定女主不一致。"
+      ]
+    },
+    {
+      "id": "S14",
+      "notes": [
+        "前景患者使用扎起发式，与已锁定女主及肩直发不一致；医生主体相近，但患者连续性须返修。"
+      ]
+    },
+    {
+      "id": "S18",
+      "notes": [
+        "门边多出蓝色衣袖的第三方手，脚本未安排该人物；若是朋友也与已锁定灰袖不符。女主、长袖、左肩包、伞和礼物主要资产可辨。"
+      ]
+    },
+    {
+      "id": "S19",
+      "notes": [
+        "女主浅色防晒外套消失，仅剩针织衣；和S18服装状态不连续。",
+        "礼物边缘出现盒盖样结构且厚度改变，偏离锁定的牛皮纸包书；空白小卡也不清楚。",
+        "此图双方已共同持礼物，更接近本镜句尾状态，不能未经调整绑定为预定开镜首帧。"
+      ]
+    },
+    {
+      "id": "S20",
+      "notes": [
+        "沿用S19的服装/礼物偏差：防晒外套缺失、包书呈盒盖样结构。",
+        "镜头仍为人物中景，未按脚本切至礼物交接特写；首帧释放动作已开始，须核对S19句尾衔接。"
+      ]
+    }
+  ],
+  "blocked": [
+    {
+      "id": "A-SYM-FOAM",
+      "status": "failed",
+      "code": "moderation_blocked",
+      "retry": false
+    },
+    {
+      "id": "S06",
+      "status": "blocked_provider_policy",
+      "submitted": false
+    }
+  ],
+  "sourcesVerified": [
+    "https://www.niams.nih.gov/health-topics/lupus",
+    "https://www.niams.nih.gov/health-topics/lupus/diagnosis-treatment-and-steps-to-take",
+    "https://www.niddk.nih.gov/health-information/kidney-disease/lupus-nephritis",
+    "https://www.aad.org/public/diseases/a-z/lupus-symptoms"
+  ],
+  "frozenManifestSha256": "9b6ddf8d17253ddab1bc87bc21a07230474f6b8350507dcca89191c59941567d",
+  "packagedMediaVariants": 119
+}

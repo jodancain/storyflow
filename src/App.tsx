@@ -25,6 +25,9 @@ import {
   statusLabels,
 } from "./components";
 
+import { ImageWorkspace, ProjectProgress } from "./review/ImageWorkspace";
+import { projectSnapshot } from "./review/projectSnapshot";
+
 type Tab = "requirements" | "expand" | "review" | "video";
 type Config = {
   version: string;
@@ -76,6 +79,7 @@ export default function App() {
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [toast, setToast] = useState(""),
+    [imageReview, setImageReview] = useState(false),
     [create, setCreate] = useState(false),
     [zoom, setZoom] = useState<{ src: string; title: string } | null>(null);
   const selectedRef = useRef<string | null>(null);
@@ -384,18 +388,25 @@ export default function App() {
                   </a>
                   <a
                     className="button secondary"
+                    href={`/api/projects/${project.id}/review-snapshot`}
+                  >
+                    导出公开审稿包 ↓
+                  </a>
+                  <a
+                    className="button secondary"
                     href={`/api/projects/${project.id}/export`}
                   >
                     导出工程 ↓
                   </a>
                 </div>
               </div>
+              <ProjectProgress project={project} onAction={(stage, images) => { setImageReview(!!images); setTab(stage); }} />
               <nav className="stage-nav" aria-label="制作阶段">
                 {tabs.map((t, i) => (
                   <button
                     key={t.id}
                     className={tab === t.id ? "active" : ""}
-                    onClick={() => setTab(t.id)}
+                    onClick={() => { setImageReview(false); setTab(t.id); }}
                     aria-current={tab === t.id ? "step" : undefined}
                   >
                     <span className="stage-num">0{i + 1}</span>
@@ -410,7 +421,7 @@ export default function App() {
               <div className="tab-content" key={`${project.id}-${tab}`}>
                 {tab === "requirements" && <RequirementsPanel {...shared} />}{" "}
                 {tab === "expand" && <ExpandPanel {...shared} />}{" "}
-                {tab === "review" && <ReviewPanel {...shared} />}{" "}
+                {tab === "review" && <ReviewPanel {...shared} config={config} imageReview={imageReview} />}{" "}
                 {tab === "video" && <VideoPanel {...shared} config={config} />}
               </div>
             </>
@@ -1112,6 +1123,7 @@ function ExpandPanel(props: PanelProps) {
                     </small>
                   </div>
                   <div className="shot-main">
+                    {(() => { const image = projectSnapshot(project, fileUrl).items.find(i => i.id === s.id)?.image; return image ? <button className="shot-asset-thumbnail" onClick={() => props.onZoom(image.url, s.title)} aria-label={`放大${s.title}分镜首帧`}><img src={image.thumbnailUrl || image.url} alt={`${s.title}分镜首帧`} /><span>审稿首帧 · {image.status === "approved" ? "已定稿" : "待审核"}</span></button> : null; })()}
                     <div className="card-heading">
                       <h3>{s.title}</h3>
                       <Badge>{routeLabels[s.route]}</Badge>
@@ -1757,13 +1769,14 @@ function ShotEditor({
   );
 }
 
-function ReviewPanel(props: PanelProps) {
+function ReviewPanel(props: PanelProps & { config: Config | null; imageReview?: boolean }) {
   const { project, act, update, mutate, busy, onZoom } = props;
-  const [view, setView] = useState<"shots" | "assets" | "entities">("shots"),
+  const [view, setView] = useState<"images" | "shots" | "assets" | "entities">(props.imageReview ? "images" : "shots"),
     [filter, setFilter] = useState("all"),
     [batch, setBatch] = useState(false);
+  useEffect(() => { if (props.imageReview) setView("images"); }, [props.imageReview]);
   const targets =
-    view === "shots"
+    view === "images" ? [] : view === "shots"
       ? project.ontology.shots
       : view === "assets"
         ? project.ontology.assets
@@ -1830,6 +1843,10 @@ function ReviewPanel(props: PanelProps) {
         确认当前版本的故事、素材与医学对应。通过审核后，才可进入制作。
       </SectionHead>
       <Issues compiled={project.compiled} />
+      {project.reviews.some(r => (r as typeof r & { imported?: unknown }).imported) && <details className="card imported-opinions"><summary>导入审稿意见 · 待人工核对（{project.reviews.filter(r => (r as typeof r & { imported?: unknown }).imported).length}）</summary><p>外部审稿意见保留来源和图片版本。导入不等于批准当前工程；核对后可采用文字意见，再逐项审核。</p>{project.reviews.filter(r => (r as typeof r & { imported?: unknown }).imported).map((r, i) => {
+        const imported = (r as typeof r & { imported?: { match?: string; sourceRevision?: number; imageSha256?: string; originalStatus?: string } }).imported;
+        return <article key={`${r.targetHash}-${i}`}><div className="card-heading"><b>{r.targetId} · {project.ontology.assets.find(a => a.id === r.targetId)?.label || project.ontology.shots.find(s => s.id === r.targetId)?.title || "历史对象"}</b><Badge>{imported?.match === "current" ? "当前内容匹配" : imported?.match === "image-only" ? "图片匹配，文字待核对" : "历史版本"}</Badge></div><p>{r.note || "未填写文字意见"}</p><small>原审稿状态：{statusLabels[imported?.originalStatus || "pending"] || "待审核"} · 来源修订 {imported?.sourceRevision ?? "未记录"}</small>{imported?.imageSha256 && <p className="sf-hash">审稿图片 SHA-256：{imported.imageSha256}</p>}<button className="secondary small" disabled={busy || !project.compiled.targetHashes[r.targetId]} onClick={() => void review(r.targetId, "pending", r.note)}>采用意见为当前待审</button></article>;
+      })}</details>}
       <div className="review-summary">
         <div className="review-progress">
           <span
@@ -1848,6 +1865,7 @@ function ReviewPanel(props: PanelProps) {
       </div>
       <div className="review-toolbar">
         <div className="subnav">
+          <button className={view === "images" ? "active" : ""} onClick={() => setView("images")}>资产图与首帧</button>
           <button
             className={view === "shots" ? "active" : ""}
             onClick={() => setView("shots")}
@@ -1867,6 +1885,7 @@ function ReviewPanel(props: PanelProps) {
             人物与事实 <small>{project.ontology.entities.length}</small>
           </button>
         </div>
+        {view !== "images" && <>
         <label className="sr-only" htmlFor="review-filter">
           筛选审核状态
         </label>
@@ -1880,7 +1899,9 @@ function ReviewPanel(props: PanelProps) {
           <option value="change">需要修改</option>
           <option value="pass">已通过</option>
         </select>
+        </>}
       </div>
+      {view === "images" && <ImageWorkspace {...props} configured={!!props.config?.capabilities.image?.configured} reason={props.config?.capabilities.image?.reason} model={props.config?.capabilities.image?.model} />}
       <div className={view === "assets" ? "asset-grid" : "review-list"}>
         {targets
           .filter(
@@ -2013,7 +2034,7 @@ function ReviewPanel(props: PanelProps) {
             );
           })}
       </div>
-      {targets.length === 0 && (
+      {view !== "images" && targets.length === 0 && (
         <Empty title="这里还没有待审内容">
           先在展开阶段创建故事和素材清单。
         </Empty>
@@ -2171,7 +2192,7 @@ function AssetContents({
   const file = project.files.find((f) => f.id === asset.fileId);
   return (
     <>
-      <div className="asset-media">
+      <div className={`asset-media ${asset.purpose === "reference" ? "reference-only-media" : ""}`}>
         <MediaPreview
           fileId={asset.fileId}
           mime={file?.mime}
@@ -2203,7 +2224,7 @@ function AssetContents({
         </p>
       ) : null}
       {asset.source && (
-        <div className="asset-source">
+        <details className="asset-source"><summary>来源与形态依据</summary>{asset.purpose === "reference" && <MediaPreview fileId={asset.fileId} mime={file?.mime} label={asset.label} onZoom={onZoom} />}
           <span>
             {asset.source.author || "作者待核对"} ·{" "}
             {asset.source.license || "许可待核对"}
@@ -2214,7 +2235,7 @@ function AssetContents({
             </a>
           )}
           {asset.source.use && <small>{asset.source.use}</small>}
-        </div>
+        </details>
       )}
       <label className="bind-label">
         绑定专属文件
@@ -2349,6 +2370,7 @@ function VideoPanel(props: PanelProps & { config: Config | null }) {
                   fal: "医生口型",
                   opus: "故事与后期",
                   media: "剪辑与合成",
+                  image: "专属资产生图",
                 }[key] || key}
               </b>
               <small>
@@ -2424,6 +2446,7 @@ function VideoPanel(props: PanelProps & { config: Config | null }) {
             compiled={project.compiled}
             jobs={project.jobs}
             artifacts={project.artifacts}
+            files={project.files}
             onInspect={setNode}
           />
           <div className="workflow-notes">
@@ -2570,6 +2593,7 @@ function VideoPanel(props: PanelProps & { config: Config | null }) {
                     "这是当前本体编译出的制作计划。提交后才能查看实际结果。"}
                 </span>
               </div>
+              {task.shotId && <div className="task-input-thumbnails">{projectSnapshot(project, fileUrl).items.filter(i => i.id === task.shotId || project.ontology.shots.find(s => s.id === task.shotId)?.requiredAssetIds.includes(i.id)).filter(i => i.image).map(i => <button key={i.id} onClick={() => onZoom(i.image!.url, i.title)}><img src={i.image!.thumbnailUrl || i.image!.url} alt={i.title} /><span>{i.id === task.shotId ? "审稿首帧" : "输入资产"} · {i.title}</span></button>)}</div>}
               <h3>前置条件</h3>
               <p>{task.dependsOn.join(" → ") || "无前置制作任务"}</p>
               <JsonDetails title="计划输入" value={task.input} />
@@ -2782,10 +2806,10 @@ function ArtifactCard({
       selections?: { artifactId: string; sourceInSeconds: number }[];
     }
   ).selections?.find((s) => s.artifactId === a.id);
-  const currentHash = a.shotId
+  const currentHash = a.kind === "image" ? project.imageTargetHashes?.[a.assetId || a.shotId || ""] : a.shotId
     ? project.compiled.shotHashes[a.shotId]
     : project.compiled.postHash;
-  const stale = a.shotId && a.sourceHash !== currentHash;
+  const stale = !!currentHash && a.sourceHash !== currentHash;
   const [note, setNote] = useState(String(a.metadata.reviewNote || "")),
     [sourceIn, setSourceIn] = useState(
       Number(selection?.sourceInSeconds ?? a.metadata.sourceInSeconds ?? 0),
@@ -2809,10 +2833,11 @@ function ArtifactCard({
       </div>
       <div className="card-heading">
         <h3>
-          {a.shotId || "完整影片"} ·{" "}
+          {a.assetId || a.shotId || "完整影片"} ·{" "}
           {
             (
               {
+                image: "资产图片",
                 video: "故事底片",
                 voice: "原声",
                 lipsync: "医生口型",
@@ -2871,7 +2896,7 @@ function ArtifactCard({
           验收通过
         </button>
       </div>
-      {a.kind !== "voice" && a.kind !== "final" && (
+      {a.kind !== "image" && a.kind !== "voice" && a.kind !== "final" && (
         <div className="use-artifact">
           <label>
             素材入点（秒）

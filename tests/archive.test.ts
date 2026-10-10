@@ -100,6 +100,7 @@ function fixture(store: Store) {
       path: "/Users/private/source.png",
       apiKey: "should-not-export",
       caption: "身份图",
+      publicShareApproved: true,
     },
   });
   p = store.bind(p.id, p.revision, "portrait", image.id);
@@ -384,7 +385,7 @@ test("read-only review escapes untrusted HTML and links while describing real co
   assert.match(html, /&lt;script&gt;alert\(1\)&lt;\/script&gt;/);
   assert.doesNotMatch(
     html,
-    /<script|<img src=x|href="javascript:|Bearer private/,
+    /<script>alert\(1\)<\/script>|<img src=x|href="javascript:|Bearer private/,
   );
   assert.match(html, /需求 → 展开 → 审核 → 视频/);
   assert.match(html, /末态锚图/);

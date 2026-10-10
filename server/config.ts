@@ -21,6 +21,9 @@ export function configFromEnv() {
     publicBaseUrl: e.PUBLIC_BASE_URL || `http://127.0.0.1:${e.PORT || 18296}`,
     adminPassword: e.STORYFLOW_ADMIN_PASSWORD || "",
     providers: {
+      imageBase: e.IMAGE_BASE_URL || "",
+      imageKey: e.IMAGE_API_KEY || "",
+      imageModel: e.IMAGE_MODEL || "gpt-image-2",
       seedanceBase: e.SEEDANCE_BASE_URL || "",
       seedanceKey: e.SEEDANCE_API_KEY || "",
       seedanceModel: e.SEEDANCE_MODEL || "seedance-2-0",

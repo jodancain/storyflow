@@ -1,0 +1,178 @@
+{
+  "width": 1080,
+  "height": 1920,
+  "background": "#f9fafc",
+  "elements": [
+    {
+      "type": "text",
+      "x": 90,
+      "y": 220,
+      "text": "机制简化示意",
+      "fontSize": 60,
+      "color": "#23334f"
+    },
+    {
+      "type": "text",
+      "x": 90,
+      "y": 370,
+      "text": "自身免疫反应",
+      "fontSize": 44,
+      "color": "#23334f"
+    },
+    {
+      "type": "circle",
+      "x": 420,
+      "y": 540,
+      "radius": 36,
+      "fill": "#a8c2db",
+      "stroke": "#557797",
+      "strokeWidth": 3
+    },
+    {
+      "type": "circle",
+      "x": 560,
+      "y": 500,
+      "radius": 32,
+      "fill": "#bcd1e6",
+      "stroke": "#557797",
+      "strokeWidth": 3
+    },
+    {
+      "type": "circle",
+      "x": 700,
+      "y": 545,
+      "radius": 36,
+      "fill": "#a8c2db",
+      "stroke": "#557797",
+      "strokeWidth": 3
+    },
+    {
+      "type": "circle",
+      "x": 560,
+      "y": 610,
+      "radius": 26,
+      "fill": "#c9dbec",
+      "stroke": "#557797",
+      "strokeWidth": 3
+    },
+    {
+      "type": "arrow",
+      "x": 430,
+      "y": 670,
+      "x2": 460,
+      "y2": 840,
+      "color": "#748cab",
+      "strokeWidth": 5
+    },
+    {
+      "type": "arrow",
+      "x": 560,
+      "y": 670,
+      "x2": 560,
+      "y2": 840,
+      "color": "#748cab",
+      "strokeWidth": 5
+    },
+    {
+      "type": "arrow",
+      "x": 690,
+      "y": 670,
+      "x2": 660,
+      "y2": 840,
+      "color": "#748cab",
+      "strokeWidth": 5
+    },
+    {
+      "type": "rect",
+      "x": 200,
+      "y": 860,
+      "width": 680,
+      "height": 420,
+      "radius": 60,
+      "fill": "#f7e6ec",
+      "stroke": "#d9b3c1",
+      "strokeWidth": 3
+    },
+    {
+      "type": "rect",
+      "x": 260,
+      "y": 920,
+      "width": 560,
+      "height": 300,
+      "radius": 40,
+      "fill": "#e6edf7",
+      "stroke": "#879bb5",
+      "strokeWidth": 3
+    },
+    {
+      "type": "text",
+      "x": 472,
+      "y": 1085,
+      "text": "自身组织",
+      "fontSize": 44,
+      "color": "#23334f"
+    },
+    {
+      "type": "circle",
+      "x": 230,
+      "y": 1070,
+      "radius": 16,
+      "fill": "#efc9d5",
+      "stroke": "#d29fb1",
+      "strokeWidth": 2
+    },
+    {
+      "type": "circle",
+      "x": 850,
+      "y": 1070,
+      "radius": 16,
+      "fill": "#efc9d5",
+      "stroke": "#d29fb1",
+      "strokeWidth": 2
+    },
+    {
+      "type": "circle",
+      "x": 560,
+      "y": 1250,
+      "radius": 14,
+      "fill": "#efc9d5",
+      "stroke": "#d29fb1",
+      "strokeWidth": 2
+    },
+    {
+      "type": "text",
+      "x": 516,
+      "y": 1350,
+      "text": "炎症",
+      "fontSize": 44,
+      "color": "#23334f"
+    },
+    {
+      "type": "rect",
+      "x": 90,
+      "y": 1460,
+      "width": 900,
+      "height": 220,
+      "radius": 30,
+      "fill": "#eef3fa",
+      "stroke": "#c3d1e3",
+      "strokeWidth": 3
+    },
+    {
+      "type": "text",
+      "x": 140,
+      "y": 1545,
+      "text": "症状因人而异",
+      "fontSize": 40,
+      "color": "#23334f"
+    },
+    {
+      "type": "text",
+      "x": 140,
+      "y": 1625,
+      "text": "图示不能用于诊断",
+      "fontSize": 40,
+      "color": "#23334f"
+    }
+  ]
+}

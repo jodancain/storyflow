@@ -666,3 +666,17 @@ export async function composeMedia({
     throw error;
   }
 }
+
+/** Produce a true portrait/landscape frame without distorting the source image. */
+export async function fitImage(input: string, output: string, width: number, height: number) {
+  requireValue(Number.isInteger(width) && Number.isInteger(height) && width > 0 && height > 0 && width <= 4096 && height <= 4096,"Invalid image canvas");
+  const info=await probe(input), sw=info.video?.width, sh=info.video?.height;
+  requireValue(Number.isInteger(sw) && Number.isInteger(sh) && sw > 0 && sh > 0,"Image could not be decoded");
+  const ratio=width/height;
+  const cropWidth=Math.min(sw,Math.floor(sh*ratio)), cropHeight=Math.min(sh,Math.floor(sw/ratio));
+  const x=Math.floor((sw-cropWidth)/2), y=Math.floor((sh-cropHeight)/2);
+  await run(ffmpeg(),["-v","error","-y","-i",input,"-vf",`crop=${cropWidth}:${cropHeight}:${x}:${y},scale=${width}:${height}:flags=lanczos,setsar=1`,"-frames:v","1",output],120000);
+  const outputInfo=await probe(output);
+  requireValue(outputInfo.video?.width === width && outputInfo.video?.height === height,"Image canvas verification failed");
+  return {sourceWidth:sw,sourceHeight:sh,crop:{x,y,width:cropWidth,height:cropHeight},outputWidth:width,outputHeight:height,method:"center-crop-aspect-preserving-resize"};
+}

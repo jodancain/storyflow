@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import JSZip from "jszip";
+import {readFileSync} from "node:fs";
 import { createApp } from "../server/app.ts";
 import { Jobs } from "../server/jobs.ts";
 import { Providers } from "../server/providers.ts";
@@ -165,7 +166,11 @@ test("template imports its own redistributable files; project ZIP remaps portabl
     assert.equal(r.status, 201);
     const p = await r.json();
     assert.equal(p.ontology.shots.length, 20);
-    assert.equal(p.files.length, 12);
+    const manifest=JSON.parse(readFileSync(new URL("../examples/lupus-v6.assets.json",import.meta.url),"utf8"));
+    const expectedFiles=manifest.files.length+(manifest.candidates || []).reduce((n:number,c:any)=>n+1+Number(Boolean(c.original))+Number(Boolean(c.thumbnail)),0);
+    assert.equal(p.files.length, expectedFiles);
+    assert.equal(p.artifacts.filter((a:any)=>a.kind === "image").length,(manifest.candidates || []).length);
+    assert.equal(p.jobs.length,0);
     assert.equal(p.ontology.spec.totalFrames, 1500);
     for (const f of p.files) {
       assert.equal(s.store.bytes(f.id).length, f.bytes);
@@ -182,7 +187,8 @@ test("template imports its own redistributable files; project ZIP remaps portabl
     assert.equal(result.status, 201);
     const imported = await result.json();
     assert.notEqual(imported.id, p.id);
-    assert.equal(imported.files.length, 12);
+    assert.equal(imported.files.length, expectedFiles);
+    assert.equal(imported.artifacts.filter((a:any)=>a.kind === "image").length,(manifest.candidates || []).length);
     assert.equal(imported.jobs.length, 0);
     const html = await s.request(`/api/projects/${p.id}/review.html`);
     assert.equal(html.status, 200);

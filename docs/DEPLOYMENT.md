@@ -1,6 +1,6 @@
 # StoryFlow 独立运行与维护
 
-本仓库只准备本机开发与独立容器。`compose.yaml` 仅监听 `127.0.0.1:18296`，不修改原视频服务，不配置公网 DNS，不发布到生产。未来反向代理模板位于 `deploy/nginx/storyflow.conf`，当前未挂载或启用。
+本仓库准备本机开发与独立容器。v0.2 另行更新既有云动静态审稿页；静态包发布不代表此应用已经部署。`compose.yaml` 仅监听 `127.0.0.1:18296`，不修改原视频服务，不配置公网 DNS，不发布到生产。未来反向代理模板位于 `deploy/nginx/storyflow.conf`，当前未挂载或启用。
 
 ## 运行边界
 
@@ -22,7 +22,7 @@ python3 -m venv .venv
 .venv/bin/pip install pypdf==6.1.1
 ```
 
-在 `.env` 中设置 `PYTHON=.venv/bin/python`。`STORYFLOW_DATA_DIR` 留空使用上述默认路径；不要指向当前同步仓库。按需填写 Opus、Seedance、fal 的独立凭据，不复制旧项目配置包。
+在 `.env` 中设置 `PYTHON=.venv/bin/python`。`STORYFLOW_DATA_DIR` 留空使用上述默认路径；不要指向当前同步仓库。按需填写图片、Opus、Seedance、fal 的独立凭据，不复制旧项目配置包。
 
 ```sh
 npm run doctor
@@ -136,7 +136,7 @@ GitHub Actions 定义了两条检查：
 
 CI 不使用提供商密钥，不执行付费模型生成，不推送镜像，也不部署生产。工作流文件存在不等于 CI 已通过；真实 Docker 构建、容器验收、真实模型成片及内容验收分别记录。
 
-### 2026-10-10 本机已执行
+### v0.1 的2026-10-10本机执行记录（历史）
 
 | 检查 | 结果与范围 |
 | --- | --- |
@@ -149,3 +149,16 @@ CI 不使用提供商密钥，不执行付费模型生成，不推送镜像，�
 | 配置静态检查 | Compose / CI YAML 解析通过；named volume 和回环监听断言通过；Python 脚本编译及维护模块严格 TypeScript 检查通过。 |
 | Docker / GitHub CI | 本机未安装 Docker；[首轮 GitHub CI](https://github.com/jodancain/storyflow/actions/runs/37977592720) 的 test/container 均成功，包含实际Docker构建、非root doctor及容器重建持久卷。当前提交新增工程/素材重建检查，以对应Actions结果为准。未进行生产操作。 |
 | 模型接口 | Doctor 仅查看是否配置；本轮维护验证没有实际模型提交或付费调用。 |
+
+
+## v0.2 图片配置与静态审稿交付
+
+图片供应商使用独立的 `IMAGE_BASE_URL`、`IMAGE_API_KEY`、`IMAGE_MODEL`。base URL 应与供应商OpenAI兼容路径一致（需要时包含 `/v1`），不要填到 `/images/generations` 完整端点。默认请求模型名为 `gpt-image-2`，能力接口只返回是否配置及模型名，不返回密钥。实际模型身份取自回执，未回传时保持未知。
+
+工作台图片请求由持久队列处理，用户关闭页面不取消已提交任务。受理不明时先核对原请求；下载失败可从持久化响应恢复，不再POST。批量接口上限52项是防误操作边界，不是每次新工程都自动获准调用52次。
+
+构建命令同时生成 `dist/` 和 `dist-review/`。未包含交互审稿组件的构建不能作为完整快照交付。已登录管理员可用 `/api/projects/:id/review-snapshot` 导出固定公开包，其中只有页面和被允许展示的图片；上传静态托管时以整个包为单位更新，并在覆盖前备份旧页面。不要把整个数据卷、工程ZIP或数据库放到公网。
+
+源代码ZIP是另一台Mac继续开发的包；工程ZIP是私有数据迁移包；审稿快照ZIP是供发布/查看的安全展示包。三者用途不同，文件名和清单不能混用。
+
+本轮默认不部署 `storyflow.yundongyl.cn`，不改DNS、不安装本机Docker。既有V6静态页发布只影响其独立目录。新Mac启动、Docker构建、CI与真实公网发布仍分别记录证据；模型候选成功不等于医学内容或完整影片验收通过。

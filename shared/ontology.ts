@@ -242,6 +242,25 @@ export function validateOntology(value: unknown): Issue[] {
         "证据地址只能使用 HTTP(S)，本地资料请使用定位说明。",
       );
   });
+  const imageAttempt = (value:any,path:string) => {
+    if(value === undefined) return;
+    if(!record(value)) {issue(path,"invalid_image_history","图片历史必须是对象");return;}
+    if(value.origin !== "external-history" || !["failed","blocked"].includes(value.state) || typeof value.submitted !== "boolean" || (value.state === "blocked" && value.submitted))
+      issue(path,"invalid_image_history","图片历史状态或来源无效");
+    string(value.code,`${path}.code`,100);string(value.reason,`${path}.reason`,1000);
+    for(const key of ["modelRequested","modelActual","blockingParent"]) if(value[key] !== undefined && value[key] !== null) string(value[key],`${path}.${key}`,200);
+    if(value.sourceStoryHash !== undefined && !/^[a-f0-9]{64}$/.test(value.sourceStoryHash)) issue(`${path}.sourceStoryHash`,"invalid_image_history","需要来源哈希");
+    if(value.imagePostNumber !== undefined && (!Number.isInteger(value.imagePostNumber) || value.imagePostNumber<1 || value.imagePostNumber>52)) issue(`${path}.imagePostNumber`,"invalid_image_history","提交序号无效");
+  };
+  const imageBinding = (value: any, path: string) => {
+    if (value === undefined) return;
+    if (!record(value)) { issue(path, "invalid_image_binding", "图片绑定须为对象"); return; }
+    for (const k of ["artifactId", "fileId"])
+      if (typeof value[k] !== "string" || !idPattern.test(value[k]))
+        issue(`${path}.${k}`, "invalid_image_binding", "图片须引用本工程的候选及文件 ID");
+    if (typeof value.sha256 !== "string" || !/^[a-f0-9]{64}$/.test(value.sha256))
+      issue(`${path}.sha256`, "invalid_image_binding", "图片须保存内容 SHA-256");
+  };
   validItems("assets").forEach((a, i) => {
     const p = `assets[${i}]`;
     string(a.label, `${p}.label`, 500);
@@ -276,6 +295,8 @@ export function validateOntology(value: unknown): Issue[] {
         "参考条目已登记，但文件尚未在本项目绑定。",
         "warning",
       );
+    imageAttempt(a.imageAttempt, `${p}.imageAttempt`);
+    imageBinding(a.previewImage, `${p}.previewImage`);
     if (a.mustShow !== undefined) strings(a.mustShow, `${p}.mustShow`);
     if (a.rejectIf !== undefined) strings(a.rejectIf, `${p}.rejectIf`);
     if (a.source !== undefined) {
@@ -350,6 +371,9 @@ export function validateOntology(value: unknown): Issue[] {
   const lineIds = new Set<string>();
   validItems("shots").forEach((s, i) => {
     const p = `shots[${i}]`;
+    imageAttempt(s.imageAttempt, `${p}.imageAttempt`);
+    imageBinding(s.reviewImage, `${p}.reviewImage`);
+    imageBinding(s.firstFrameImage, `${p}.firstFrameImage`);
     string(s.title, `${p}.title`, 500);
     interval(s, p);
     for (const field of ["action", "startState", "endState", "scale", "camera"])
@@ -793,6 +817,7 @@ export function compileOntology(ontology: Ontology): Compiled {
         entityIds: s.entityIds,
         requiredAssetIds: s.requiredAssetIds,
         evidenceIds: s.evidenceIds,
+        firstFrameHash: s.firstFrameImage?.sha256,
         firstAnchorId: s.firstAnchorId,
         endAnchorId: s.endAnchorId,
         mustShow: s.mustShow,
@@ -864,12 +889,12 @@ export function compileOntology(ontology: Ontology): Compiled {
         ),
       });
   for (const a of assets)
-    if (typeof a.id === "string") targetHashes[a.id] = hash(a);
+    if (typeof a.id === "string") targetHashes[a.id] = hash({ ...a, imageAttempt:undefined, previewImage: a.previewImage ? {sha256:a.previewImage.sha256} : undefined });
   for (const s of shots)
     if (typeof s.id === "string")
       targetHashes[s.id] = hash({
-        shot: s,
-        context: contexts.get(s.id),
+        shot: { ...s, imageAttempt:undefined, reviewImage: s.reviewImage ? {sha256:s.reviewImage.sha256} : undefined },
+        context: {...contexts.get(s.id),assets:contexts.get(s.id)?.assets.map(({imageAttempt,...a})=>a)},
         generationHash: shotHashes[s.id],
       });
   const gaps: Compiled["gaps"] = assets
@@ -1072,4 +1097,21 @@ export function compileOntology(ontology: Ontology): Compiled {
     prompts,
     subtitles,
   };
+}
+
+/** Stable image brief hashes exclude candidate choice so selecting a result cannot invalidate itself. */
+export function imageTargetHashes(ontology: Ontology): Record<string, string> {
+  const copy=structuredClone(ontology);
+  for(const shot of copy.shots) { delete shot.reviewImage; delete shot.firstFrameImage; delete shot.imageAttempt; }
+  const compiled=compileOntology(copy), values:Record<string,string>={};
+  for(const asset of ontology.assets) {
+    const {fileId,sha256,gap,previewImage,imageAttempt,...brief}=asset;
+    values[asset.id]=hash({schema:"storyflow-image-brief-v1",spec:{width:ontology.spec.width,height:ontology.spec.height},asset:brief});
+  }
+  for(const shot of ontology.shots)
+    values[shot.id]=hash({schema:"storyflow-image-brief-v1",shotHash:compiled.shotHashes[shot.id]});
+  return values;
+}
+export function imageTargetHash(ontology: Ontology, target: {assetId?: string;shotId?: string}): string {
+  return imageTargetHashes(ontology)[target.assetId || target.shotId || ""] || hash({missingTarget:target});
 }

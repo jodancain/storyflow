@@ -13,6 +13,7 @@ import type {
 import { compileOntology, validateOntology } from "../shared/ontology.ts";
 import { Store } from "./store.ts";
 import { zipEntries } from "./ingest.ts";
+import { renderPublicReviewHtml } from "./public-review.ts";
 import { AppError, ensure, escapeHtml, iso, sha } from "./util.ts";
 
 const SCHEMA = "storyflow-project-archive";
@@ -129,6 +130,8 @@ function portableOntology(o: Ontology): Ontology {
         "gap",
         "mustShow",
         "rejectIf",
+        "previewImage",
+        "imageAttempt",
       ]),
       ...(a.source
         ? { source: pick(a.source, ["url", "author", "license", "use"]) }
@@ -159,6 +162,9 @@ function portableOntology(o: Ontology): Ontology {
         "prompt",
         "firstAnchorId",
         "endAnchorId",
+        "reviewImage",
+        "firstFrameImage",
+        "imageAttempt",
         "mustShow",
         "rejectIf",
       ]),
@@ -290,7 +296,7 @@ export async function exportProject(store: Store, id: string): Promise<Buffer> {
     ]) as Requirements,
     ontology,
     reviews: p.reviews.map((r) =>
-      pick(r, ["targetId", "targetHash", "status", "note", "updatedAt"]),
+      ({...pick(r, ["targetId", "targetHash", "status", "note", "updatedAt"]), ...(r.imported ? {imported: portableMetadata(r.imported)} : {})}),
     ) as Review[],
     artifacts: p.artifacts.map((a) => ({
       ...pick(a, [
@@ -298,6 +304,7 @@ export async function exportProject(store: Store, id: string): Promise<Buffer> {
         "projectId",
         "jobId",
         "shotId",
+        "assetId",
         "kind",
         "fileId",
         "sourceHash",
@@ -640,7 +647,7 @@ export async function importProject(
         !artifacts.has(a.id) &&
         validId(a.jobId) &&
         a.projectId === data.sourceProjectId &&
-        ["video", "voice", "lipsync", "graphic", "final"].includes(a.kind) &&
+        ["video", "voice", "lipsync", "graphic", "final", "image"].includes(a.kind) &&
         DIGEST.test(a.sourceHash),
       "产物记录无效",
       400,
@@ -660,7 +667,11 @@ export async function importProject(
         400,
         "archive_artifact_shot",
       );
-    if (a.kind !== "final")
+    if (a.kind === "image") {
+      ensure(Boolean(a.assetId) !== Boolean(a.shotId), "图片产物必须有且只有一个目标", 400, "archive_image_target");
+      ensure(fileMap.get(a.fileId)?.mime.startsWith("image/"), "图片产物文件类型不匹配", 400, "archive_image_mime");
+      if (a.assetId) ensure(data.ontology.assets.some((asset) => asset.id === a.assetId && ["image", "graphic"].includes(asset.kind)), "图片产物素材引用不存在", 400, "archive_image_target");
+    } else if (a.kind !== "final")
       ensure(
         Boolean(a.shotId),
         "镜头产物缺少镜头ID",
@@ -679,6 +690,17 @@ export async function importProject(
         "archive_audio_reference",
       );
     artifacts.set(a.id, a);
+  }
+  const checkImageBinding = (binding: any, targetId: string, targetKind: "asset" | "shot") => {
+    if (!binding) return;
+    const image = artifacts.get(binding.artifactId);
+    ensure(image?.kind === "image" && image.fileId === binding.fileId && fileMap.get(binding.fileId)?.sha256 === binding.sha256 && (targetKind === "asset" ? image.assetId : image.shotId) === targetId,
+      `图片绑定 ${targetId} 的目标、文件或哈希不符`, 400, "archive_image_binding");
+  };
+  for (const asset of data.ontology.assets) checkImageBinding(asset.previewImage, asset.id, "asset");
+  for (const shot of data.ontology.shots) {
+    checkImageBinding(shot.reviewImage, shot.id, "shot");
+    checkImageBinding(shot.firstFrameImage, shot.id, "shot");
   }
   for (const r of data.reviews)
     ensure(
@@ -749,8 +771,18 @@ export async function importProject(
         ids.set(f.id, imported.id);
       }
       const ontology = portableOntology(data.ontology);
-      for (const a of ontology.assets)
+      for (const a of ontology.assets) {
         if (a.fileId) a.fileId = ids.get(a.fileId)!;
+        if (a.previewImage) a.previewImage = remap(a.previewImage, ids);
+      }
+      for (const shot of ontology.shots) {
+        if (shot.reviewImage) shot.reviewImage = remap(shot.reviewImage, ids);
+        if (shot.firstFrameImage) {
+          // Import preserves the image for review, never silently approves a video input.
+          shot.reviewImage ||= remap(shot.firstFrameImage, ids);
+          delete shot.firstFrameImage;
+        }
+      }
       const saved = { ...placeholder, ontology };
       store.db
         .prepare("UPDATE projects SET json=? WHERE id=?")
@@ -767,6 +799,7 @@ export async function importProject(
           projectId,
           jobId: `imported:${a.id}`,
           ...(a.shotId ? { shotId: a.shotId } : {}),
+          ...(a.assetId ? { assetId: a.assetId } : {}),
           kind: a.kind,
           fileId: ids.get(a.fileId)!,
           sourceHash: a.sourceHash,
@@ -783,6 +816,7 @@ export async function importProject(
               originalArtifactId: a.id,
               originalJobId: a.jobId,
               previouslyAccepted: Boolean(a.accepted),
+              ...(a.shotId && data.ontology.shots.find(s => s.id === a.shotId)?.firstFrameImage?.artifactId === a.id ? { previousFirstFrame: true } : {}),
               originalCreatedAt: a.createdAt,
               ...(historicalSelection
                 ? { previousSelection: remap(historicalSelection, ids) }
@@ -803,6 +837,7 @@ export async function importProject(
           status: "pending",
           note: `[导入历史；原结论=${r.status}；原修订=${data.sourceRevision}；新工程须重新审核]\n${r.note}`,
           updatedAt: now,
+          ...(r.imported ? {imported: portableMetadata(r.imported)} : {}),
         };
         store.db
           .prepare("INSERT OR REPLACE INTO reviews VALUES(?,?,?,?)")
@@ -836,65 +871,10 @@ export function readOnlyReviewHtml(project: Project): string {
   );
 }
 
-function renderReviewHtml(
-  project: Project,
-  fileUrl: (file: FileRecord) => string,
-): string {
-  const o = project.ontology,
-    c = compileOntology(o),
-    esc = escapeHtml;
-  const files = new Map(project.files.map((f) => [f.id, f]));
-  const sec = (frame: number) =>
-    (frame / o.spec.fps).toFixed(2).replace(/\.00$/, "");
-  const labels = new Map([
-    ...o.entities.map((e) => [e.id, e.label] as const),
-    ...o.assets.map((a) => [a.id, a.label] as const),
-  ]);
-  const review = (id: string) => {
-    const r = project.reviews.find(
-      (r) => r.targetId === id && r.targetHash === c.targetHashes[id],
-    );
-    return r
-      ? `${{ pass: "通过", change: "要修改", pending: "待审" }[r.status]}${r.note ? ` · ${r.note}` : ""}`
-      : "待审";
-  };
-  const arrow = '<div class="arrow" aria-hidden="true">↓</div>';
-  const node = (title: string, detail: string) =>
-    `<div class="node"><strong>${esc(title)}</strong><p>${esc(detail)}</p></div>`;
-  const link = (url: unknown, text: string) => {
-    const safe = href(url);
-    return safe
-      ? `<a href="${esc(safe)}" target="_blank" rel="noopener noreferrer">${esc(text)}</a>`
-      : esc(text);
-  };
-  const shotCards = o.shots
-    .map(
-      (s) =>
-        `<article id="shot-${esc(s.id)}"><div class="meta">${esc(s.id)} · ${sec(s.startFrame)}–${sec(s.endFrame)} 秒 · ${s.endFrame - s.startFrame} 帧 · ${esc(s.route)}</div><h3>${esc(s.title)}</h3><p>${esc(s.action)}</p><dl><dt>机位／景别</dt><dd>${esc(s.camera)} · ${esc(s.scale)}</dd><dt>动作入点</dt><dd>${esc(s.startState)}</dd><dt>动作出点</dt><dd>${esc(s.endState)}</dd><dt>专属素材</dt><dd>${s.requiredAssetIds.map((id) => esc(labels.get(id) || id)).join(" / ") || "无"}</dd><dt>前镜依赖</dt><dd>${esc(s.dependencies.join(" / ") || "无")}</dd></dl>${s.dialogue.map((d) => `<blockquote>${esc(labels.get(d.speakerId) || d.speakerId)}：“${esc(d.text)}”<small>拟定台词；实际声音须逐字及口型审核</small></blockquote>`).join("")}<details><summary>提示词、字幕与验收要求</summary><pre>${esc(c.prompts[s.id])}</pre><p>必须看见：${esc(s.mustShow.join("；") || "见素材要求")}</p><p>拒收：${esc(s.rejectIf.join("；") || "按本镜内容验收")}</p><p>字幕草案：${esc(s.subtitles.map((x) => `${sec(x.startFrame)}–${sec(x.endFrame)}s ${x.text}`).join("\n") || "无")}</p></details><p class="review">${esc(review(s.id))}</p><code>审核 ${esc(c.targetHashes[s.id])}</code></article>`,
-    )
-    .join("");
-  const assetCards = o.assets
-    .map((a) => {
-      const file = a.fileId ? files.get(a.fileId) : undefined;
-      const image =
-        file &&
-        ["image/png", "image/jpeg", "image/webp", "image/gif"].includes(
-          file.mime,
-        );
-      return `<article><span class="meta">${esc(a.id)} · ${a.purpose === "reference" ? "审稿参考" : "专属制作素材"} · ${a.gap ? "待补齐" : file ? "已绑定文件" : "未绑定"}</span><h3>${esc(a.label)}</h3>${image ? `<img src="${esc(fileUrl(file!))}" alt="${esc(a.label)}" loading="lazy">` : ""}<p>${esc(a.source?.use || "实际用途待审")}</p><p>${link(a.source?.url, "原始来源")} · ${esc(a.source?.author || "作者未登记")} · ${esc(a.source?.license || "许可待核对")}</p><p>必须可见：${esc(a.mustShow?.join("；") || "见镜头要求")}</p><p>${esc(review(a.id))}</p>${file ? `<a href="${esc(fileUrl(file))}" download="${esc(file.name)}">下载绑定文件</a><code>SHA-256 ${esc(file.sha256)}</code>` : ""}</article>`;
-    })
-    .join("");
-  const taskCards = c.tasks
-    .map(
-      (t) =>
-        `<li><div class="node"><span class="meta">${esc(t.id)}</span><strong>${esc(t.kind === "voice" ? "生成并听审逐句声音" : t.kind === "lipsync" ? "同一音轨＋肖像驱动口型" : t.kind === "compose" ? "字幕／图示／已验素材合成" : t.kind === "graphic" ? "声明式图形渲染" : "视频模型生成")}</strong><p>${esc(t.shotId ? o.shots.find((s) => s.id === t.shotId)?.title : "最终成片")}</p><small>前置：${esc(t.dependsOn.join(" ＋ ") || "已确认输入")}</small></div></li>`,
-    )
-    .join("");
-  const artifactCards = project.artifacts
-    .map((a) => {
-      const f = files.get(a.fileId);
-      return `<article><h3>${esc(a.shotId || "最终成片")} · ${esc(a.kind)}</h3><p>${a.accepted ? "已记录人工验收" : "待人工验收"} · ${a.sourceHash === (a.shotId ? c.shotHashes[a.shotId] : c.postHash) ? "当前输入版本" : "历史输入版本"}</p>${f ? `<a href="${esc(fileUrl(f))}" download="${esc(f.name)}">查看／下载产物</a>` : "<p>文件不可用</p>"}<details><summary>实际产物来源与参考条件记录</summary><pre>${esc(JSON.stringify(portableMetadata(a.metadata) || {}, null, 2))}</pre></details></article>`;
-    })
-    .join("");
-  return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><title>${esc(project.name)} · 审稿快照</title><style>*{box-sizing:border-box}body{margin:0;background:#f5f7f3;color:#20372d;font:16px/1.65 system-ui,-apple-system,sans-serif}main{max-width:1180px;margin:auto;padding:28px 20px 80px}h1,h2,h3{line-height:1.3}h2{margin-top:48px}a{color:#206f51}nav{display:flex;gap:16px;flex-wrap:wrap}article,.notice{border:1px solid #d7e0d6;border-radius:16px;background:white;padding:20px;margin:16px 0}p{white-space:pre-wrap;overflow-wrap:anywhere}.meta,small{font-size:13px;color:#5c7568}small,code{display:block}code{font-size:11px;overflow-wrap:anywhere}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#eff4ee;padding:12px;border-radius:10px}dl{display:grid;grid-template-columns:110px 1fr;gap:8px}dt{color:#5c7568}dd{margin:0;overflow-wrap:anywhere}blockquote{margin:14px 0;padding:14px;border-left:3px solid #7fae90;background:#f6faf4}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}.grid article{margin:0}img{max-width:100%;max-height:300px;object-fit:contain}.node{border:1px solid #7fae90;border-radius:12px;padding:16px;background:#f2f8f0;text-align:center}.node p{margin:6px 0}.arrow{text-align:center;font-size:24px;color:#43835a}.lanes{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.decision{border:2px solid #6f9471;transform:rotate(0);border-radius:30px}.repair{color:#a33e35;text-align:center}.flowtasks{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}.review{border-top:1px solid #d7e0d6;padding-top:12px}@media(max-width:700px){main{padding:20px 12px}.lanes{grid-template-columns:1fr}.grid{grid-template-columns:1fr}dl{grid-template-columns:1fr}article{padding:16px}}@media print{details{display:block}nav{display:none}.node,article{break-inside:avoid}}</style></head><body><main><header><p class="meta">Storyflow · 只读审稿快照 · 修订 ${project.revision}</p><h1>${esc(project.name)}</h1><p>${esc(project.requirements.topic)} · ${o.spec.width}×${o.spec.height} · ${o.spec.fps}fps · ${o.spec.totalFrames}帧 / ${sec(o.spec.totalFrames)}秒</p><code>本体 SHA-256 ${esc(c.hash)}</code><nav><a href="#requirements">需求</a><a href="#flow">制作框图</a><a href="#shots">分镜</a><a href="#assets">素材</a><a href="#artifacts">产物</a></nav></header><div class="notice">这是固定版本的只读导出。按钮、意见和模型调用均不会执行。网页方案通过不等于声音、口型或成片已经验收。工程ZIP里的review.html与media目录一同解压，可离线查看已绑定素材。</div><section id="requirements"><h2>需求与故事展开</h2><p>${esc(project.requirements.brief)}</p><p>受众：${esc(project.requirements.audience)}\n风格：${esc(project.requirements.style)}\n声音：${esc(project.requirements.sound)}</p></section><section id="flow"><h2>需求 → 展开 → 审核 → 视频</h2>${node("确认需求与本体版本", "角色、场景、对象、事实依据、台词、素材与帧时间表绑定同一修订。")}${arrow}${node("校验并审核输入", "先补专属素材，审文字、形态、身份与来源。审核哈希发生变化时重新审对应内容。")}${arrow}<div class="lanes"><div>${node("视频素材分支", "模型只按真实接通的参考能力生成视频和声音。")}${arrow}${node("逐镜验收", "看身份、动作、目标事物与连续性；合格成品才解锁后镜。")}<p class="repair">不通过 ↶ 返回本镜制作</p></div><div>${node("医生声音分支", "先生成逐句原声并逐字听审。")}${arrow}${node("同一审核声音 ＋ 医生照片", "音频驱动口型；没有照片或合格音频不能执行。")}${arrow}${node("口型与听感验收", "声音错词返修声音并重新驱动；仅口型有误，保留同一句合格声音重做驱动。")}</div><div>${node("后期图形分支", "Opus产出有界声明式图形计划；由可信渲染器执行。")}${arrow}${node("图文与时序验收", "实际叠层时序依据合格底片与音轨；文字、医学关系、位置逐项核对。")}<p class="repair">不通过 ↶ 返回后期计划</p></div></div>${arrow}${node("合流：合格底片 ＋ 原音轨 ＋ 字幕／图示", "按整数帧剪辑；素材不足报缺口，不循环、冻结或加速凑时长。")}${arrow}${node("FFmpeg合成与最终验收", "技术、故事、事实、口型、听感分别验收。源素材保留，后期失败只重做后期。")}<p class="repair">素材问题 ↶ 对应源镜头；字幕／图示问题 ↶ 后期</p><div class="notice"><strong>真实控制限制</strong><p>Seedance当前适配路线只传首帧或纯文字。末态锚图、完整动作或对白准确性都是计划与验收目标，不能声称已经作为完整控制条件发送。医生路线需实际音频驱动接入；具体模型、发送参考和参数以任务/产物回执为准。框图不代替能力验证或人工验收。</p></div><details><summary>展开本工程逐镜任务依赖（${c.tasks.length}项）</summary><ol class="flowtasks">${taskCards}</ol></details>${c.issues.length ? `<details><summary>当前校验信息（${c.issues.length}项）</summary><ul>${c.issues.map((i) => `<li>${esc(i.severity)} · ${esc(i.path)} · ${esc(i.message)}</li>`).join("")}</ul></details>` : "<p>结构校验通过；这不代表实际媒体已经通过。</p>"}</section><section id="shots"><h2>逐镜审稿</h2>${shotCards}</section><section id="assets"><h2>素材与来源</h2><p>网络参考、实际生产素材和缺口分开列示。当前 ${c.gaps.length} 条登记素材尚有缺口或未绑定。</p><div class="grid">${assetCards}</div></section><section><h2>事实依据与本体对象</h2><div class="grid">${o.evidence.map((e) => `<article><h3>${link(e.url, e.title)}</h3><p>${esc(e.excerpt)}</p><small>${esc(e.locator || "")}</small></article>`).join("")}</div><details><summary>查看 ${o.entities.length} 个实体与 ${o.relations.length} 个关系</summary><pre>${esc(JSON.stringify({ entities: o.entities, relations: o.relations }, null, 2))}</pre></details></section><section id="artifacts"><h2>真实产物</h2>${artifactCards || "<p>当前没有已登记产物。分镜与示意图不能冒充已经生成的视频。</p>"}</section><footer><p class="meta">源素材、台词与审核结果以本快照记录为准；导入另一个工程会重置通过状态，不自动提交或重放任务。</p></footer></main></body></html>`;
+function renderReviewHtml(project: Project, fileUrl: (file: FileRecord) => string): string {
+  return renderPublicReviewHtml(project, id => {
+    const file = project.files.find(f => f.id === id);
+    ensure(file, "审稿引用文件不存在", 400, "review_file");
+    return fileUrl(file);
+  });
 }

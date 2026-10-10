@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Store } from "../server/store.ts";
@@ -68,6 +68,9 @@ export function tempStore() {
 }
 export function mockMedia() {
   return {
+    fitImage: async (input: string, output: string, width: number, height: number) => {
+      writeFileSync(output, readFileSync(input)); return {outputWidth:width,outputHeight:height,method:"test-mock"};
+    },
     probe: async () => ({
       duration: 4,
       video: { frames: 100, fps: 25 },

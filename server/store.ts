@@ -21,8 +21,9 @@ import type {
   Artifact,
   Job,
   Project,
+  ImportedOpinion,
 } from "../shared/types.ts";
-import { compileOntology, hash } from "../shared/ontology.ts";
+import { compileOntology, hash, imageTargetHash, imageTargetHashes } from "../shared/ontology.ts";
 import { ensure, iso, sha } from "./util.ts";
 const parse = (value: any) => JSON.parse(value);
 export class Store {
@@ -168,9 +169,37 @@ export class Store {
         }),
     });
     compiled.targetHashes.post = compiled.postHash;
+    const targetHashes=imageTargetHashes(p.ontology);
+    const current:Record<string,boolean>={}, visiting=new Set<string>();
+    const imageCurrent=(a:Artifact):boolean=>{
+      if(current[a.id] !== undefined) return current[a.id];
+      if(visiting.has(a.id)) return false;
+      visiting.add(a.id);
+      const matches=a.sourceHash===targetHashes[a.assetId || a.shotId || ""] &&
+        ((a.metadata.parentAssets || []) as any[]).every(parent=>{
+          const asset=p.ontology.assets.find((x:any)=>x.id===parent.assetId);
+          const selected=parent.assetId === a.assetId && parent.fileId
+            ? this.files(id).find(f=>f.id===parent.fileId)
+            : [asset?.previewImage,asset].find(candidate=>candidate?.fileId && candidate.sha256===parent.sha256);
+          if(selected?.sha256 !== parent.sha256) return false;
+          const upstream=artifacts.find(x=>x.kind === "image" && x.id!==a.id && x.fileId===(selected.fileId || selected.id));
+          return !upstream || imageCurrent(upstream);
+        }) && ((a.metadata.parentShots || []) as any[]).every(parent=>{
+          const shot=p.ontology.shots.find((s:any)=>s.id===parent.shotId);
+          const bindings=[shot?.reviewImage,shot?.firstFrameImage].filter(Boolean);
+          const upstream=artifacts.find(candidate=>candidate.kind === "image" && candidate.id!==a.id && candidate.shotId===parent.shotId &&
+            (parent.shotId === a.shotId && parent.fileId ? candidate.fileId===parent.fileId || candidate.metadata.originalFileId===parent.fileId : bindings.some(binding=>binding.artifactId===candidate.id)) &&
+            (candidate.metadata.originalSha256===parent.sha256 || this.file(candidate.fileId).sha256===parent.sha256));
+          return Boolean(upstream && imageCurrent(upstream));
+        });
+      visiting.delete(a.id);return current[a.id]=matches;
+    };
+    for(const a of artifacts) if(a.kind === "image") imageCurrent(a);
     return {
       ...p,
       compiled,
+      imageTargetHashes: targetHashes,
+      imageCandidateCurrent:current,
       reviews: this.reviews(id),
       files: this.files(id),
       artifacts,
@@ -274,7 +303,16 @@ export class Store {
       .run(id, targetId, review.targetHash, JSON.stringify(review));
     return this.project(id);
   }
+  importOpinion(projectId:string,targetId:string,note:string,imported:ImportedOpinion) {
+    this.raw(projectId);
+    const review:Review={targetId,targetHash:hash({schema:"storyflow-imported-opinion-v1",targetId,note,imported}),status:"pending",note,imported,updatedAt:iso()};
+    this.db.prepare("INSERT OR REPLACE INTO reviews VALUES(?,?,?,?)").run(projectId,targetId,review.targetHash,JSON.stringify(review));
+    return review;
+  }
   approved(p: Project, targetId: string) {
+    const asset=p.ontology.assets.find(a=>a.id===targetId);
+    const candidate=asset?.fileId && p.artifacts.find(a=>a.kind === "image" && a.fileId===asset.fileId);
+    if(candidate && (!candidate.accepted || !this.imageCurrent(candidate))) return false;
     return p.reviews.some(
       (r) =>
         r.targetId === targetId &&
@@ -354,6 +392,8 @@ export class Store {
         kind === asset.kind,
       "文件类型与素材槽不匹配",
     );
+    const candidate=p.artifacts.find(a=>a.kind === "image" && a.fileId===file.id);
+    ensure(!candidate || (candidate.accepted && this.imageCurrent(candidate)),"请先批准当前图片候选，再用作制作素材",409,"approval_required");
     asset.fileId = file.id;
     asset.sha256 = file.sha256;
     asset.gap = false;
@@ -467,9 +507,35 @@ export class Store {
       .run(artifact.id, artifact.projectId, JSON.stringify(artifact));
     return artifact;
   }
+  imageCurrent(a: Artifact) {
+    return a.kind === "image" && this.project(a.projectId).imageCandidateCurrent?.[a.id] === true;
+  }
+  selectImage(id: string, baseRevision: number, usage: "preview"|"production") {
+    const a=this.artifact(id), p=this.project(a.projectId);
+    ensure(a.kind === "image", "需要图片候选");
+    ensure(["preview","production"].includes(usage),"图片使用方式无效");
+    ensure(p.revision === baseRevision,"内容已更新，请刷新后再保存",409,"revision_conflict");
+    ensure(this.imageCurrent(a),"图片属于旧的制作条件，请保留为历史候选",409);
+    ensure(usage === "preview" || a.accepted,"只有已批准图片可以作为制作输入",409,"approval_required");
+    const file=this.file(a.fileId), binding={artifactId:a.id,fileId:file.id,sha256:file.sha256};
+    if (a.assetId) {
+      const asset=p.ontology.assets.find(x=>x.id===a.assetId);
+      ensure(asset,"图片素材槽不存在",404);
+      if (usage === "preview") asset.previewImage=binding;
+      else { asset.fileId=file.id; asset.sha256=file.sha256; asset.gap=false; asset.previewImage=binding; }
+    } else {
+      const shot=p.ontology.shots.find(x=>x.id===a.shotId);
+      ensure(shot,"图片所属镜头不存在",404);
+      if (usage === "preview") shot.reviewImage=binding;
+      else shot.firstFrameImage=binding;
+    }
+    return this.edit(a.projectId,baseRevision,{ontology:p.ontology});
+  }
   reviewArtifact(id: string, accepted: boolean, note = "") {
     const a = this.artifact(id);
-    if (accepted && a.shotId && a.kind !== "final")
+    if (accepted && a.kind === "image")
+      ensure(this.imageCurrent(a),"图片属于旧的制作条件，请保留为历史候选",409);
+    if (accepted && a.shotId && !["final", "image"].includes(a.kind))
       ensure(
         a.sourceHash ===
           this.project(a.projectId).compiled.shotHashes[a.shotId],
@@ -515,7 +581,7 @@ export class Store {
       });
     }
     a.accepted = accepted;
-    a.metadata = { ...a.metadata, reviewNote: note, reviewedAt: iso() };
+    a.metadata = { ...a.metadata, reviewNote: note, reviewedAt: iso(), ...(a.kind === "image" ? {reviewStatus:accepted ? "pass" : "change"} : {}) };
     this.db
       .prepare("UPDATE artifacts SET json=? WHERE id=?")
       .run(JSON.stringify(a), id);
@@ -525,7 +591,7 @@ export class Store {
     const a = this.artifact(id),
       p = this.project(a.projectId);
     ensure(
-      a.accepted && a.kind !== "voice" && a.kind !== "final" && a.shotId,
+      a.accepted && !["voice", "final", "image"].includes(a.kind) && a.shotId,
       "请先审核当前镜头产物",
     );
     ensure(

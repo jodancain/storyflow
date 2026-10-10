@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import type { Compiled, Job, Project, Review, Artifact } from "../shared/types";
+import type { Compiled, Job, Project, Review, Artifact, FileRecord } from "../shared/types";
 import { fileUrl } from "./api";
 export const statusLabels: Record<string, string> = {
   queued: "排队中",
@@ -33,6 +33,7 @@ export const routeLabels: Record<string, string> = {
   seedance: "故事视频",
   doctor: "医生讲解",
   graphic: "医学图示",
+  image: "资产生图",
   video: "故事视频",
   voice: "原声生成",
   lipsync: "医生口型",
@@ -276,7 +277,9 @@ export function WorkflowGraph({
   onInspect,
   variant = "tasks",
   artifacts = [],
+  files = [],
 }: {
+  files?: FileRecord[];
   artifacts?: Artifact[];
   variant?: "tasks" | "ontology";
   compiled: Compiled;
@@ -332,11 +335,11 @@ export function WorkflowGraph({
     row.forEach((n, i) =>
       positions.set(n.id, {
         x: (width - row.length * 218) / 2 + i * 218 + 10,
-        y: level * 150 + 26,
+        y: level * 205 + 26,
       }),
     );
   }
-  const height = Math.max(180, levels.length * 150 + 30);
+  const height = Math.max(180, levels.length * 205 + 30);
   const latest = (id: string) => {
     const task = compiled.tasks.find((t) => t.id === id);
     return [...jobs]
@@ -385,7 +388,7 @@ export function WorkflowGraph({
               b = positions.get(e.to);
             if (!a || !b) return null;
             const x = a.x + 96,
-              y = a.y + 88,
+              y = a.y + 143,
               bx = b.x + 96,
               by = b.y;
             return (
@@ -410,6 +413,9 @@ export function WorkflowGraph({
               a.shotId === plan?.shotId &&
               a.sourceHash === compiled.shotHashes[a.shotId || ""],
           );
+          const shot = compiled.reviewData.shots.find(s => s.id === plan?.shotId || s.id === n.id);
+          const assets = compiled.reviewData.assets.filter(a => a.purpose === "production" && (a.id === n.id || shot?.requiredAssetIds.includes(a.id)));
+          const previewIds = [...new Set([shot?.reviewImage?.fileId, ...assets.map(a => a.previewImage?.fileId || (a.kind === "image" ? a.fileId : undefined))].filter((id): id is string => !!id))].slice(0, 3);
           return (
             <button
               key={n.id}
@@ -444,6 +450,7 @@ export function WorkflowGraph({
                   n.kind}
               </small>
               <strong>{n.label}</strong>
+              <span className="graph-thumbnails">{previewIds.length ? previewIds.map(id => <img key={id} src={fileUrl((() => { const imageArtifact = artifacts.find(a => a.kind === "image" && a.fileId === id); return typeof imageArtifact?.metadata.thumbnailFileId === "string" && files.some(f => f.id === imageArtifact.metadata.thumbnailFileId) ? imageArtifact.metadata.thumbnailFileId : id; })())} alt="对应资产审稿图" loading="lazy" />) : <em>对应图片尚未到位</em>}</span>
               <span>
                 {variant === "ontology"
                   ? "查看对象与关联"

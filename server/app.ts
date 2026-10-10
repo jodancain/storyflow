@@ -17,7 +17,9 @@ import { Jobs } from "./jobs.ts";
 import { ingest } from "./ingest.ts";
 import { searchReferences, publicURL } from "./references.ts";
 import { exportProject, importProject, readOnlyReviewHtml } from "./archive.ts";
+import { loadExampleAssets } from "./template.ts";
 import { probe } from "./media.ts";
+import { exportReviewSnapshot, publicReviewCsp } from "./public-review.ts";
 import { ensure, AppError, boundedText, cleanError, sha } from "./util.ts";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
@@ -94,7 +96,7 @@ export function createApp(
   });
   app.use(express.json({ limit: "5mb" }));
   app.get("/healthz", (_req, res) =>
-    res.json({ ok: true, service: "storyflow", version: "0.1.0" }),
+    res.json({ ok: true, service: "storyflow", version: "0.2.0" }),
   );
   app.use("/api", (req, _res, next) => {
     if (!["GET", "HEAD", "OPTIONS"].includes(req.method)) {
@@ -169,9 +171,15 @@ export function createApp(
   app.get("/api/config", (_req, res) => {
     const c = jobs.providers.capabilities();
     res.json({
-      version: "0.1.0",
+      version: "0.2.0",
       publicBaseUrl: canonical.href,
       capabilities: {
+        image: {
+          configured:c.image?.available || false,
+          model:c.image?.model || "gpt-image-2",
+          reason:c.image?.available ? undefined : "尚未配置图片接口与密钥",
+          maxBatch:52,
+        },
         seedance: {
           configured: c.seedance.available,
           model: c.seedance.model,
@@ -212,25 +220,7 @@ export function createApp(
     }
     let p = store.create(name, r, ontology);
     if (req.body.template) {
-      const manifest = JSON.parse(
-        readFileSync(resolve(root, "examples/lupus-v6.assets.json"), "utf8"),
-      );
-      for (const item of manifest.files) {
-        ensure(/^assets\/[\w.-]+$/.test(item.path), "模板素材路径错误", 500);
-        const bytes = readFileSync(resolve(root, "examples", item.path));
-        ensure(sha(bytes) === item.sha256, "模板素材哈希错误", 500);
-        const file = store.addFile(
-          p.id,
-          basename(item.path),
-          item.mime,
-          bytes,
-          { metadata: { source: item.source, licenseUrl: item.licenseUrl } },
-        );
-        const a = ontology.assets.find((a) => a.id === item.assetId)!;
-        a.fileId = file.id;
-        a.sha256 = file.sha256;
-        a.gap = false;
-      }
+      loadExampleAssets(store,p,ontology);
       p = store.edit(p.id, p.revision, {
         ontology,
         requirements: {
@@ -316,6 +306,28 @@ export function createApp(
       Array.isArray(data.items) && data.items.length <= 1000,
       "需要审核items数组",
     );
+    if(data.schema === "storyflow-review-draft") {
+      const digest=(v:any,label:string)=>{ensure(v === undefined || (typeof v === "string" && /^[a-f0-9]{64}$/.test(v)),`${label}须为SHA-256`);return v as string|undefined;};
+      const sourceProjectId=data.projectId === undefined ? undefined : boundedText(data.projectId,128);
+      const sourceRevision=data.revision === undefined ? undefined : revision(data.revision);
+      const snapshotHash=digest(data.scriptSha256,"快照哈希");
+      const importedItems=data.items.map((v:any)=>{
+        const targetId=boundedText(v.targetId || v.id,128);
+        ensure(/^[A-Za-z0-9][A-Za-z0-9_.:-]*$/.test(targetId),"意见对象ID无效");
+        const targetHash=digest(v.targetHash || undefined,"对象哈希"),imageSha256=digest(v.imageSha256,"图片哈希");
+        const asset=p.ontology.assets.find(a=>a.id===targetId),shot=p.ontology.shots.find(s=>s.id===targetId);
+        const selected=asset?.previewImage || shot?.reviewImage || asset;
+        const sameImage=imageSha256 ? selected?.sha256===imageSha256 : !selected?.sha256;
+        const match=targetHash === p.compiled.targetHashes[targetId] && sameImage ? "current" : imageSha256 && p.artifacts.some(a=>a.kind === "image" && (a.assetId || a.shotId)===targetId && store.file(a.fileId).sha256===imageSha256) ? "image-only" : "historical";
+        return {targetId,note:boundedText(v.note || v.comment || "",10000),imported:{sourceProjectId,sourceRevision,snapshotHash,targetHash,imageSha256,imageId:v.imageId===undefined?undefined:boundedText(v.imageId,128),originalStatus:reviewStatus(v.status),match}};
+      });
+      const overall=boundedText(data.overall || "",10000);
+      store.transaction(()=>{
+        for(const item of importedItems) store.importOpinion(id,item.targetId,item.note,item.imported);
+        if(overall) store.importOpinion(id,"post",overall,{sourceProjectId,sourceRevision,snapshotHash,originalStatus:"pending",match:"historical"});
+      });
+      res.json(store.project(id));return;
+    }
     let snapshot = p.ontology;
     if (data.revision !== undefined)
       snapshot = store.revision(id, revision(data.revision)).ontology;
@@ -359,6 +371,8 @@ export function createApp(
           ),
         ),
     );
+  app.post("/api/projects/:id/image-generations", (req,res)=>
+    res.status(202).json(jobs.enqueueImages(String(req.params.id),revision(req.body.baseRevision),key(req.body.idempotencyKey),req.body.targets)));
   app.post("/api/projects/:id/runs", (req, res) => {
     if (req.body.shotIds !== undefined)
       ensure(
@@ -422,11 +436,10 @@ export function createApp(
     void jobs.tick();
     res.json(store.project(a.projectId));
   });
-  app.post("/api/artifacts/:id/select", (req, res) =>
-    res.json(
-      store.select(String(req.params.id), req.body.sourceInSeconds || 0),
-    ),
-  );
+  app.post("/api/artifacts/:id/select", (req, res) => {
+    const id=String(req.params.id), artifact=store.artifact(id);
+    res.json(artifact.kind === "image" ? store.selectImage(id,revision(req.body.baseRevision),req.body.usage) : store.select(id,req.body.sourceInSeconds || 0));
+  });
   app.post("/api/projects/:id/artifacts/import", async (req, res) => {
     const id = String(req.params.id),
       p = store.project(id),
@@ -526,11 +539,15 @@ export function createApp(
   app.get("/api/projects/:id/review.html", (req, res) => {
     res.setHeader(
       "Content-Security-Policy",
-      "default-src 'none'; style-src 'unsafe-inline'; img-src 'self' data: https:; frame-ancestors 'none'",
+      publicReviewCsp(),
     );
     res
       .type("html")
       .send(readOnlyReviewHtml(store.project(String(req.params.id))));
+  });
+  app.get("/api/projects/:id/review-snapshot", async (req, res) => {
+    const zip = await exportReviewSnapshot(store, String(req.params.id));
+    res.type("application/zip").attachment("storyflow-review-snapshot.zip").send(zip);
   });
   const importUpload = multer({
     storage: multer.memoryStorage(),

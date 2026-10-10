@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync, writeFileSync, renameSync, openSync, fsyncSync, closeSync } from "node:fs";
 import { join } from "node:path";
 import type {
   Job,
@@ -7,8 +7,10 @@ import type {
   Artifact,
   VideoInput,
   Ontology,
+  ImageTarget,
+  ImageInput,
 } from "../shared/types.ts";
-import { compileOntology, hash } from "../shared/ontology.ts";
+import { compileOntology, hash, imageTargetHash } from "../shared/ontology.ts";
 import { Store } from "./store.ts";
 import { validateDraft } from "./validation.ts";
 import { ensure, cleanError } from "./util.ts";
@@ -27,7 +29,7 @@ export class Jobs {
   recover() {
     for (const job of this.store.jobs()) {
       if (job.state !== "running") continue;
-      if (job.stage === "submitting" && !job.handle) {
+      if (job.stage === "submitting" && !job.handle && !(job.kind === "image" && existsSync(join(this.store.workDir(job.id), "image-receipt.json")))) {
         this.store.updateJob(job.id, {
           state: "uncertain",
           stage: "acceptance_unknown",
@@ -89,6 +91,44 @@ export class Jobs {
     void this.tick();
     return job;
   }
+  enqueueImages(projectId: string, baseRevision: number, key: string, targets: ImageTarget[]) {
+    ensure(Array.isArray(targets) && targets.length > 0 && targets.length <= 52,"每批须为1–52个图片目标");
+    const ih=hash({kind:"images",baseRevision,targets});
+    const prior=this.store.action(projectId,key,ih);
+    if(prior) return {runId:prior.runId,jobs:prior.ids.map((id:string)=>this.store.job(id))};
+    const p=this.store.project(projectId);
+    ensure(p.revision === baseRevision,"工程版本已经变化",409);
+    ensure(!p.compiled.issues.some(i=>i.severity === "error"),"本体存在错误，请先修正",422,"ontology_invalid");
+    const seen=new Set<string>();
+    const inputs=targets.map(target=>{
+      ensure(target && typeof target === "object" && Boolean(target.assetId) !== Boolean(target.shotId),"每个图片目标必须且只能指定assetId或shotId");
+      ensure(Object.keys(target).every(k=>["assetId","shotId","prompt","referenceAssetIds"].includes(k)),"图片目标包含未知字段");
+      const id=target.assetId || target.shotId!;
+      ensure(typeof id === "string" && !seen.has(id),"图片目标不得重复"); seen.add(id);
+      const asset=p.ontology.assets.find(a=>a.id === target.assetId), shot=p.ontology.shots.find(s=>s.id === target.shotId);
+      ensure(asset || shot,"图片目标不存在",404);
+      if(asset) ensure(["image","graphic"].includes(asset.kind),"只能为图片或图示素材槽生成图片");
+      const prompt=target.prompt ?? (asset ? `${asset.label}。必须可见：${(asset.mustShow || []).join("；")}。拒收：${(asset.rejectIf || []).join("；")}。制作独立图片资产，不添加水印。` : `${p.compiled.prompts[id]}\n仅绘制本镜头开始时刻的单张首帧。不要画分镜拼图或添加字幕。`);
+      ensure(typeof prompt === "string" && prompt.length > 0 && prompt.length <= 40000,"图片提示词须为1–40000字符");
+      const refs=target.referenceAssetIds || [];
+      ensure(Array.isArray(refs) && refs.length <= 16 && new Set(refs).size === refs.length,"参考图须为不重复的素材ID，最多16项");
+      const parentAssets=refs.map(assetId=>{
+        const a=p.ontology.assets.find(x=>x.id === assetId), selected=a?.fileId ? a : a?.previewImage;
+        ensure(a && selected?.fileId,"参考素材尚无实际图片",409,"asset_gap");
+        const f=this.store.file(selected.fileId);
+        ensure(f.projectId === projectId && f.sha256 === selected.sha256 && ["image/png","image/jpeg","image/webp"].includes(f.mime),"参考素材类型、归属或哈希错误");
+        return {assetId,fileId:f.id,sha256:f.sha256,mime:f.mime,approval:this.store.approved(p,assetId)?"approved":"pending"};
+      });
+      return {baseRevision,target:{assetId:target.assetId,shotId:target.shotId},targetHash:imageTargetHash(p.ontology,target),prompt,parentAssets,width:p.ontology.spec.width,height:p.ontology.spec.height};
+    });
+    const runId=randomUUID();
+    const jobs=this.store.transaction(()=>{
+      const added=inputs.map(input=>this.store.addJob({projectId,runId,kind:"image",shotId:input.target.shotId,dependsOn:[],inputHash:hash(input),input}));
+      this.store.recordAction(projectId,key,ih,{runId,ids:added.map(j=>j.id)});
+      return added;
+    });
+    void this.tick(); return {runId,jobs};
+  }
   enqueueRun(
     projectId: string,
     baseRevision: number,
@@ -130,6 +170,7 @@ export class Jobs {
         409,
         "approval_required",
       );
+      this.assertFirstFrame(p, shot.id);
       for (const aid of this.requiredInputs(p.ontology, shot.id)) {
         const a = p.ontology.assets.find((a) => a.id === aid);
         ensure(
@@ -305,6 +346,18 @@ export class Jobs {
       "只有明确失败或缺配置的任务可重试；受理不明必须核对",
       409,
     );
+    if(old.kind === "image") {
+      const hasReceipt=existsSync(join(this.store.workDir(old.id),"image-receipt.json"));
+      ensure(old.attempts === 0 || hasReceipt,"图片已提交，禁止重新投递；需显式发起新的候选",409);
+      const retryHash=hash({retryOf:id,inputHash:old.inputHash});
+      const prior=this.store.action(old.projectId,key,retryHash);
+      if(prior) return this.store.job(prior.id);
+      const result=this.store.transaction(()=>{
+        this.store.recordAction(old.projectId,key,retryHash,{id:old.id});
+        return this.store.updateJob(old.id,{state:"queued",stage:hasReceipt?"downloading":"queued",error:undefined});
+      });
+      void this.tick(); return result;
+    }
     const p = this.store.project(old.projectId);
     if (old.shotId && !old.handle)
       ensure(
@@ -342,6 +395,7 @@ export class Jobs {
       409,
     );
     const p = this.store.project(j.projectId);
+    ensure(["expand", "post-plan"].includes(j.kind), "此任务没有可应用的文字建议");
     const ontology =
       j.kind === "expand"
         ? j.result.ontology
@@ -356,7 +410,7 @@ export class Jobs {
     const job = this.store.job(id);
     ensure(job.state === "uncertain", "只有受理不明任务需要核对", 409);
     ensure(
-      job.kind !== "expand" && job.kind !== "post-plan",
+      job.kind !== "expand" && job.kind !== "post-plan" && job.kind !== "image",
       "文本请求没有可恢复的供应商任务ID，请保留不明状态并从新修订显式提交",
       409,
     );
@@ -487,9 +541,56 @@ export class Jobs {
         });
         return;
       }
+      if(job.kind === "image") {
+        const receiptPath=join(s.workDir(job.id),"image-receipt.json");
+        let receipt;
+        if(existsSync(receiptPath)) receipt=this.providers.parseImageReceipt(readFileSync(receiptPath));
+        else {
+          ensure(job.attempts === 0,"图片提交受理状态不明，禁止自动重投",409,"image_already_submitted");
+          const current=s.project(job.projectId);
+          ensure(imageTargetHash(current.ontology,job.input.target) === job.input.targetHash,"图片制作条件已变化，请按当前修订创建新任务",409,"stale_snapshot");
+          for(const parent of job.input.parentAssets) {
+            const a=current.ontology.assets.find(a=>a.id===parent.assetId), selected=a?.fileId?a:a?.previewImage;
+            ensure(selected?.sha256===parent.sha256,"图片参考已变化，请按当前修订创建新任务",409,"stale_snapshot");
+          }
+          const input:ImageInput={prompt:job.input.prompt,width:job.input.width,height:job.input.height,
+            references:job.input.parentAssets.map((r:any)=>({...r,bytes:s.bytes(r.fileId)}))};
+          receipt=await this.providers.generateImage(input,async request=>{
+            s.updateJob(job.id,{stage:"submitting",attempts:1,result:{request}});
+          },async raw=>{
+            const temp=`${receiptPath}.tmp`;
+            writeFileSync(temp,raw,{mode:0o600});
+            const fd=openSync(temp,"r"); try{fsyncSync(fd);}finally{closeSync(fd);}
+            renameSync(temp,receiptPath);
+            s.updateJob(job.id,{stage:"downloading",result:{...s.job(job.id).result,imageReceiptStored:true}});
+          });
+        }
+        if(s.job(job.id).state === "cancelled") return;
+        s.updateJob(job.id,{stage:"downloading",progress:0.7});
+        const image=await this.providers.downloadImage(receipt);
+        if(s.job(job.id).state === "cancelled") return;
+        const original=s.addFile(job.projectId,`${job.input.target.assetId || job.shotId}-original.${image.mime.split("/")[1]}`,image.mime,image.bytes);
+        let file=original, crop;
+        if(job.shotId) {
+          s.updateJob(job.id,{stage:"framing",progress:0.85});
+          const framed=join(s.workDir(job.id),"framed.png");
+          crop=await this.mediaEngine.fitImage(s.filePath(original.id),framed,job.input.width,job.input.height);
+          file=s.addFile(job.projectId,`${job.shotId}-candidate.png`,"image/png",readFileSync(framed));
+        }
+        if(s.job(job.id).state === "cancelled") return;
+        const request=s.job(job.id).result?.request || {};
+        const a=s.addArtifact({projectId:job.projectId,jobId:job.id,assetId:job.input.target.assetId,shotId:job.shotId,
+          kind:"image",fileId:file.id,sourceHash:job.input.targetHash,
+          metadata:{...request,...receipt.metadata,targetHash:job.input.targetHash,prompt:job.input.prompt,parentAssets:job.input.parentAssets,
+            origin:"ai-generated",reviewStatus:"pending",originalFileId:original.id,originalSha256:original.sha256,crop,baseRevision:job.input.baseRevision,
+            requestedCanvas:{width:job.input.width,height:job.input.height}}});
+        s.updateJob(job.id,{state:"complete",stage:"complete",progress:1,result:{...s.job(job.id).result,artifactId:a.id}});
+        return;
+      }
       if (job.shotId && !job.handle) {
         const p = s.project(job.projectId);
         const shot = p.ontology.shots.find((x) => x.id === job.shotId)!;
+        this.assertFirstFrame(p, shot.id);
         for (const aid of this.requiredInputs(p.ontology, shot.id))
           ensure(
             s.approved(p, aid),
@@ -646,7 +747,7 @@ export class Jobs {
       );
     } catch (error: any) {
       if (s.job(job.id).state === "cancelled") return;
-      const uncertain = error?.uncertain === true;
+      const uncertain = error?.uncertain === true || (job.kind === "image" && s.job(job.id).attempts > 0 && s.job(job.id).stage === "submitting" && !existsSync(join(s.workDir(job.id), "image-receipt.json")));
       const message = cleanError(error);
       const blocked = /not configured|未配置|missing.*key|credential/i.test(
         message,
@@ -688,6 +789,12 @@ export class Jobs {
       progress: 1,
       result: { artifactId: a.id },
     });
+  }
+  private assertFirstFrame(p: Project, shotId: string) {
+    const binding=p.ontology.shots.find(s=>s.id===shotId)?.firstFrameImage;
+    if(!binding) return;
+    const a=this.store.artifact(binding.artifactId);
+    ensure(a.projectId===p.id && a.shotId===shotId && a.kind === "image" && a.accepted && a.fileId===binding.fileId && this.store.file(a.fileId).sha256===binding.sha256 && this.store.imageCurrent(a),"当前首帧图片未批准、已撤回或已过期",409,"approval_required");
   }
   private requiredInputs(o: Ontology, shotId: string) {
     const shot = o.shots.find((s) => s.id === shotId)!;
@@ -758,7 +865,7 @@ export class Jobs {
       width: o.spec.width,
       height: o.spec.height,
       firstImage:
-        job.kind === "voice" ? undefined : loadAnchor(shot.firstAnchorId),
+        job.kind === "voice" ? undefined : shot.firstFrameImage ? {bytes:s.bytes(shot.firstFrameImage.fileId),mime:s.file(shot.firstFrameImage.fileId).mime,id:shot.firstFrameImage.artifactId,sha256:shot.firstFrameImage.sha256} : loadAnchor(shot.firstAnchorId),
       endImage: shot.endAnchorId
         ? (() => {
             const a = loadAnchor(shot.endAnchorId)!;
