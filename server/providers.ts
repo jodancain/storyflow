@@ -34,6 +34,8 @@ const digest = (v: Buffer | string) =>
   createHash("sha256").update(v).digest("hex");
 const clean = (v: string) => v.replace(/\/+$/, "");
 const OMNI = "fal-ai/bytedance/omnihuman/v1.5";
+// fal queue lookups use owner/alias, excluding the inference endpoint subpath.
+const OMNI_QUEUE_APP = "fal-ai/bytedance";
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new ProviderError(message, false, "invalid_input");
 }
@@ -427,7 +429,11 @@ export class Providers {
       ] as const) {
         if (response[field]) {
           try {
-            const url = this.falJobURL(String(response[field]), handle);
+            const url = this.falJobURL(
+              String(response[field]),
+              handle,
+              key === "statusUrl" ? "status" : "response",
+            );
             handle.receipt[key] = url;
           } catch {
             handle.receipt.ignoredResponseUrl = true;
@@ -521,7 +527,11 @@ export class Providers {
       },
     };
   }
-  private falJobURL(value: string, handle: ProviderHandle) {
+  private falJobURL(
+    value: string,
+    handle: ProviderHandle,
+    kind: "status" | "response",
+  ) {
     let url: URL;
     try {
       url = new URL(value);
@@ -533,20 +543,14 @@ export class Providers {
       );
     }
     const base = new URL(handle.baseUrl),
-      path = url.pathname;
+      expectedPath = `${base.pathname.replace(/\/$/, "")}/${OMNI_QUEUE_APP}/requests/${handle.id}${kind === "status" ? "/status" : ""}`;
     if (
       url.origin !== base.origin ||
       url.username ||
       url.password ||
       url.search ||
       url.hash ||
-      !path.startsWith(
-        `${base.pathname.replace(/\/$/, "")}/fal-ai/bytedance/omnihuman/`,
-      ) ||
-      !path.includes(`/requests/${handle.id}`) ||
-      !path.match(
-        new RegExp(`/requests/${handle.id}(?:/(?:status|response))?$`),
-      )
+      url.pathname !== expectedPath
     )
       throw new ProviderError(
         "fal task URL does not match accepted task identity",
@@ -610,10 +614,11 @@ export class Providers {
   async poll(handle: ProviderHandle): Promise<Result> {
     this.verifyHandle(handle);
     if (handle.provider === "fal") {
-      const defaultResult = `${handle.baseUrl}/fal-ai/bytedance/omnihuman/requests/${handle.id}`;
+      const defaultResult = `${handle.baseUrl}/${OMNI_QUEUE_APP}/requests/${handle.id}`;
       const statusUrl = this.falJobURL(
           String(handle.receipt.statusUrl || `${defaultResult}/status`),
           handle,
+          "status",
         ),
         headers = { authorization: `Key ${this.config.falKey}` };
       const status = await this.json(statusUrl, { headers });
@@ -647,6 +652,7 @@ export class Providers {
       const responseUrl = this.falJobURL(
           String(handle.receipt.responseUrl || defaultResult),
           handle,
+          "response",
         ),
         result = await this.json(responseUrl, { headers });
       if (result.request_id && result.request_id !== handle.id)

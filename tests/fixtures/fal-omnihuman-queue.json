@@ -1,0 +1,8 @@
+{
+  "request_id": "6c5e09fe-71d6-4b26-ae9c-93b8a4f8a920",
+  "status": "IN_QUEUE",
+  "response_url": "https://queue.fal.run/fal-ai/bytedance/requests/6c5e09fe-71d6-4b26-ae9c-93b8a4f8a920",
+  "status_url": "https://queue.fal.run/fal-ai/bytedance/requests/6c5e09fe-71d6-4b26-ae9c-93b8a4f8a920/status",
+  "cancel_url": "https://queue.fal.run/fal-ai/bytedance/requests/6c5e09fe-71d6-4b26-ae9c-93b8a4f8a920/cancel",
+  "queue_position": 0
+}

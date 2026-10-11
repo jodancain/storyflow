@@ -2,6 +2,13 @@
 
 本文件区分源码/协议验证、真实模型结果、技术审图、人工定稿与发布。v0.1 记录作为历史证据保留；v0.2 不继承旧版本的“已通过”结论。
 
+## v0.3.3 fal 队列路径兼容修复（2026-10-11）
+
+- 按 fal 官方 JS SDK `parseEndpointId()` 与队列 `status()`／`result()` 修正 OmniHuman 查询路径：提交仍为 `/fal-ai/bytedance/omnihuman/v1.5`，查询为 `/fal-ai/bytedance/requests/<id>[/status]`。旧实现多带 `omnihuman`，可能拒绝真实回执并无法续查。
+- URL 校验精确绑定 origin、owner/app、任务 ID 与状态/结果操作；重启恢复仍查询原任务，不增加提交。Seedance 代码未修改。
+- `node --import tsx --test tests/providers.test.ts`：13/13 通过；`node node_modules/typescript/bin/tsc --noEmit`：通过。新增 fixture 使用合成 ID 和官方回执 URL 格式；无网络调用、无真实 Key、无生产更改。
+- 完整 `npm run check`：Node 22.23.1，TypeScript、工作台/审稿双构建、127/127 核心测试通过（0失败、0跳过）。包含24/25fps及1080×1920严格60秒固定媒体合成。源码检查不代表生产已更新；真实 fal 鉴权、OmniHuman 生成、面部身份与同音轨口型验收仍须分别记录。官方依据：[URL 解析](https://github.com/fal-ai/fal-js/blob/main/libs/client/src/utils.ts)、[队列查询](https://github.com/fal-ai/fal-js/blob/main/libs/client/src/queue.ts)。
+
 ## v0.3.1 容器审稿页渲染修复（2026-10-10，部署验证中）
 
 用户已授权上线云动审图与生图后台。部署检查发现原运行镜像漏带 `tsconfig.json`：健康检查和 JSON API 正常，但服务端 TSX 缺少自动 JSX 配置，公开审稿 HTML 返回 `React is not defined`。切换已回退到原页面，未产生审核或模型调用。

@@ -1,4 +1,12 @@
-# v0.3.2 当前开发入口
+# v0.3.3 当前开发入口
+
+- 修正 fal OmniHuman 1.5 的队列查询路径。提交保留 `/fal-ai/bytedance/omnihuman/v1.5`；状态/结果按官方 SDK 使用 `/fal-ai/bytedance/requests/<id>[/status]`。回执 URL 精确匹配既有供应商 origin、owner/app、任务 ID 与操作，避免错误回退或跨任务请求。
+- 已受理任务恢复只查询原 ID，不重新提交。此版本没有改变 Seedance、审核批准或素材绑定逻辑，也不自动创建新生成任务。
+- Node 22.23.1 下 `npm run check` 通过：TypeScript、工作台/审稿双构建和127项核心测试。fal fixture 使用合成 ID，验证真实协议格式；它不是已完成的真实模型任务。详细范围见 [验收记录](VERIFICATION.md)。
+- 运行配置仍仅需服务端 `FAL_KEY`；模型和官方队列地址固定，无需新配置项或数据库迁移。按已授权范围使用 API 权限，密钥不进入源码、浏览器、日志或工程包。只读价格查询可验证认证；真实生成、声音和口型必须另行按实际任务验收。
+- 发布时保留私有环境与持久卷，先核对已有队列，再仅重建本应用。配置 Key 可能解除已有任务的“待配置”，不能把重新加载配置当作新的批量生成授权。源码发布、生产上线与真实模型完成分别记录。
+
+# v0.3.2 保留能力
 
 - 批量采用：`POST /api/projects/:id/production-images/adopt`，body 为 `{baseRevision,idempotencyKey,items:[{artifactId,sha256}]}`。只接受当前展示、当前有效且已批准的图片，核对真实字节；绑定写入一次修订，审核新制作快照后再调用既有 `/runs`。
 - `metadata.productionAdoption` 记录绑定修订及采用条件，原 `sourceHash` 和生成回执保持不变。有效采用必须匹配同工程持久 action；工程 ZIP 中的记录仅作历史，不继承授权，完整私有备份恢复则保留该 action。真实父图、脚本或身份变化仍使候选过期；不以重写来源绕过审核。

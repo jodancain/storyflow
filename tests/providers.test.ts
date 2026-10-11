@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
 import { Providers, ProviderError } from "../server/providers.js";
 import type {
   ProviderConfig,
@@ -42,6 +43,13 @@ const response = (data: any, status = 200) =>
     status,
     headers: { "content-type": "application/json" },
   });
+// Synthetic ID with the official fal JS SDK queue URL structure:
+// parseEndpointId(OMNI) -> owner=fal-ai, alias=bytedance, path=omnihuman/v1.5.
+// https://github.com/fal-ai/fal-js/blob/main/libs/client/src/queue.ts
+// No production receipt or provider request is used by this fixture.
+const falQueueFixture = JSON.parse(
+  readFileSync(new URL("./fixtures/fal-omnihuman-queue.json", import.meta.url), "utf8"),
+);
 function client(
   handler: (url: string, options: RequestInit) => Promise<Response> | Response,
 ) {
@@ -146,21 +154,18 @@ test("unknown acceptance never retries and does not leak provider response or ke
   );
 });
 
-test("fal binds approved audio and image; submit, status and result use one accepted ID", async () => {
+test("fal binds reviewed audio and uses official owner/alias queue URLs after one submit", async () => {
   const urls: string[] = [],
-    id = "fal-1";
+    id = falQueueFixture.request_id;
   const p = client((url, options) => {
     urls.push(url);
     if (options.method === "POST") {
+      assert.equal(url, `${config.falBase}/fal-ai/bytedance/omnihuman/v1.5`);
       const body = JSON.parse(String(options.body));
       assert.equal(body.resolution, "1080p");
       assert.ok(body.audio_url.startsWith("data:audio/wav;"));
       assert.equal(new Headers(options.headers).get("x-fal-no-retry"), "1");
-      return response({
-        request_id: id,
-        status_url: `${config.falBase}/fal-ai/bytedance/omnihuman/requests/${id}/status`,
-        response_url: `${config.falBase}/fal-ai/bytedance/omnihuman/requests/${id}`,
-      });
+      return response(falQueueFixture);
     }
     if (url.endsWith("/status"))
       return response({ request_id: id, status: "COMPLETED" });
@@ -177,7 +182,84 @@ test("fal binds approved audio and image; submit, status and result use one acce
   assert.equal(result.state, "complete");
   assert.equal(result.metadata.audioBinding.sha256, audio().sha256);
   assert.equal(urls.length, 3);
+  assert.deepEqual(urls.slice(1), [
+    falQueueFixture.status_url,
+    falQueueFixture.response_url,
+  ]);
+  assert.equal(handle.receipt.statusUrl, falQueueFixture.status_url);
+  assert.equal(handle.receipt.responseUrl, falQueueFixture.response_url);
+  assert.equal(handle.receipt.ignoredResponseUrl, undefined);
   assert.equal(handle.receipt.model, "fal-ai/bytedance/omnihuman/v1.5");
+});
+
+test("fal resumed tasks use canonical fallback without repeating the accepted POST", async () => {
+  let prepared: any;
+  const submitter = client(() => response({ request_id: falQueueFixture.request_id }));
+  await submitter.submit(
+    { ...input, purpose: "lipsync", firstImage: image(), audio: audio() },
+    async (receipt) => { prepared = receipt; },
+  );
+  const urls: string[] = [];
+  const restarted = client((url, options) => {
+    assert.notEqual(options.method, "POST");
+    urls.push(url);
+    return url.endsWith("/status")
+      ? response({ request_id: falQueueFixture.request_id, status: "COMPLETED" })
+      : response({ video: { url: "https://cdn.example/result.mp4" }, duration: 5 });
+  });
+  const handle = restarted.recoverHandle(prepared, falQueueFixture.request_id);
+  assert.equal((await restarted.poll(handle)).state, "complete");
+  assert.deepEqual(urls, [falQueueFixture.status_url, falQueueFixture.response_url]);
+});
+
+test("fal queue URLs must match the exact host, owner, app, task and operation", async () => {
+  const resultURL = falQueueFixture.response_url;
+  const invalidURLs = [
+    resultURL.replace("queue.fal.run", "other.example") + "/status",
+    resultURL.replace("queue.fal.run", "queue.fal.run:8443") + "/status",
+    resultURL.replace("https:", "http:") + "/status",
+    resultURL.replace("/fal-ai/", "/another-owner/") + "/status",
+    resultURL.replace("/bytedance/", "/another-app/") + "/status",
+    resultURL.replace("/requests/", "/omnihuman/requests/") + "/status",
+    resultURL.replace(falQueueFixture.request_id, "another-task") + "/status",
+    resultURL + "-suffix/status",
+    resultURL + "/status/extra",
+    resultURL + "/status?logs=1",
+    resultURL + "/status#fragment",
+    resultURL.replace("https://", "https://user:pass@") + "/status",
+    resultURL, // A result endpoint cannot be substituted for a status endpoint.
+  ];
+  for (const statusURL of invalidURLs) {
+    let calls = 0;
+    const p = client((_url, options) => {
+      calls++;
+      assert.equal(options.method, "POST");
+      return response({ ...falQueueFixture, status_url: statusURL });
+    });
+    const handle = await p.submit(
+      { ...input, purpose: "lipsync", firstImage: image(), audio: audio() },
+      async () => {},
+    );
+    assert.equal(handle.receipt.statusUrl, undefined, statusURL);
+    assert.equal(handle.receipt.ignoredResponseUrl, true, statusURL);
+    // A forged persisted URL is rejected before any authenticated request.
+    handle.receipt.statusUrl = statusURL;
+    await assert.rejects(() => p.poll(handle), /accepted task identity/);
+    assert.equal(calls, 1, statusURL);
+  }
+  let calls = 0;
+  const p = client((_url, options) => {
+    calls++;
+    if (options.method === "POST") return response(falQueueFixture);
+    return response({ request_id: falQueueFixture.request_id, status: "COMPLETED" });
+  });
+  const handle = await p.submit(
+    { ...input, purpose: "lipsync", firstImage: image(), audio: audio() },
+    async () => {},
+  );
+  handle.receipt.responseUrl = falQueueFixture.status_url;
+  await assert.rejects(() => p.poll(handle), /accepted task identity/);
+  assert.equal(calls, 2); // One submit and one status read; no wrong result fetch.
 });
 
 test("fal refuses changed media hashes, other-task URLs and actual failed jobs", async () => {
@@ -186,7 +268,7 @@ test("fal refuses changed media hashes, other-task URLs and actual failed jobs",
     calls++;
     return response({
       request_id: "fal-2",
-      status_url: `${config.falBase}/fal-ai/bytedance/omnihuman/requests/not-this-task/status`,
+      status_url: `${config.falBase}/fal-ai/bytedance/requests/not-this-task/status`,
     });
   });
   await assert.rejects(
