@@ -238,6 +238,8 @@ export class Jobs {
         external[dep] = artifact.id;
       }
     const runId = randomUUID();
+    const providerSpec = plans.some(t => t.kind === "video" || t.kind === "voice")
+      ? this.providers.videoSpec() : undefined;
     const jobs = this.store.transaction(() => {
       const added = plans.map((t) =>
         this.store.addJob({
@@ -246,13 +248,15 @@ export class Jobs {
           kind: t.kind,
           shotId: t.shotId,
           dependsOn: [],
-          inputHash: hash({ plan: t, shotHash: c.shotHashes[t.shotId!] }),
+          inputHash: hash({ plan: t, shotHash: c.shotHashes[t.shotId!],
+            ...(["video", "voice"].includes(t.kind) ? {providerSpec} : {}) }),
           input: {
             ontology: p.ontology,
             requirements: p.requirements,
             baseRevision,
             plan: t,
             generationHash: c.shotHashes[t.shotId!],
+            ...(["video", "voice"].includes(t.kind) ? {providerSpec} : {}),
             externalArtifactIds: t.dependsOn
               .filter((d) => external[d])
               .map((d) => external[d]),
@@ -692,6 +696,8 @@ export class Jobs {
       }
       let handle = job.handle;
       if (!handle) {
+        if (job.kind === "video" || job.kind === "voice")
+          ensure(job.input.providerSpec, "旧任务未冻结视频模型，请按当前版本重新提交", 409, "missing_provider_snapshot");
         const input = await this.videoInput(job);
         handle = await this.providers.submit(input, async (receipt) => {
           s.updateJob(job.id, {
@@ -877,6 +883,7 @@ export class Jobs {
     }
     return {
       purpose: job.kind as VideoInput["purpose"],
+      providerSpec: job.input.providerSpec,
       prompt: (job.input.plan.input.prompt as string) || shot.prompt,
       duration: (shot.endFrame - shot.startFrame) / o.spec.fps,
       fps: o.spec.fps,

@@ -22,6 +22,8 @@ import type {
   Job,
   Project,
   ImportedOpinion,
+  ImageRequalificationInput,
+  ImageRequalificationRecord,
 } from "../shared/types.ts";
 import { compileOntology, hash, imageTargetHash, imageTargetHashes } from "../shared/ontology.ts";
 import { ensure, iso, sha } from "./util.ts";
@@ -179,25 +181,12 @@ export class Store {
     compiled.targetHashes.post = compiled.postHash;
     const targetHashes=imageTargetHashes(p.ontology);
     const current:Record<string,boolean>={}, visiting=new Set<string>();
-    const adoptionActions=new Map<string,{inputHash:string;result:any}|undefined>();
-    const trustedAdoption=(a:Artifact,adoption:any):boolean=>{
-      if(adoption?.schema !== "storyflow-production-adoption-v1" ||
-        typeof adoption.actionKey !== "string" || adoption.actionKey.length < 8 || adoption.actionKey.length > 128 ||
-        typeof adoption.actionInputHash !== "string" || !/^[a-f0-9]{64}$/.test(adoption.actionInputHash)) return false;
-      if(!adoptionActions.has(adoption.actionKey)) {
-        const row=this.db.prepare("SELECT input_hash,result FROM actions WHERE project_id=? AND key=?").get(id,adoption.actionKey) as any;
-        adoptionActions.set(adoption.actionKey,row ? {inputHash:row.input_hash,result:parse(row.result)} : undefined);
-      }
-      const proof=adoptionActions.get(adoption.actionKey);
-      if(!proof || proof.inputHash !== adoption.actionInputHash || proof.result?.schema !== "storyflow-production-adoption-v1" || proof.result.id !== adoption.id || !Array.isArray(proof.result.items)) return false;
-      const record=proof.result.items.find((item:any)=>item.artifactId === a.id && item.targetId === (a.assetId || a.shotId));
-      return Boolean(record && hash(record) === hash(adoption));
-    };
     const imageCurrent=(a:Artifact):boolean=>{
       if(current[a.id] !== undefined) return current[a.id];
       if(visiting.has(a.id)) return false;
       visiting.add(a.id);
       const adoption=a.metadata.productionAdoption as {schema?:unknown; sourceHash?:unknown; adoptedBriefHash?:unknown; imageSha256?:unknown} | undefined;
+      const requalified=a.metadata.imageRequalification as ImageRequalificationRecord | undefined;
       // Adoption is a separate record of using approved bytes under a binding-only
       // revision. Imported metadata is history, not authority: only the matching
       // local action can enable it. Full SQLite backup/restore retains that action.
@@ -205,7 +194,12 @@ export class Store {
         (adoption?.schema === "storyflow-production-adoption-v1" &&
           adoption.sourceHash === a.sourceHash &&
           adoption.adoptedBriefHash === targetHashes[a.assetId || a.shotId || ""] &&
-          adoption.imageSha256 === this.file(a.fileId).sha256 && trustedAdoption(a,adoption));
+          adoption.imageSha256 === this.file(a.fileId).sha256 && this.trustedImageAction(id,a,adoption,"storyflow-production-adoption-v1")) ||
+        (requalified?.scope === "unchanged-ontology-compiler-review" &&
+          requalified.sourceHash === a.sourceHash && requalified.newBriefHash === targetHashes[a.shotId || ""] &&
+          requalified.sha256 === this.file(a.fileId).sha256 && requalified.lineageHash === hash(this.imageLineage(a)) &&
+          this.trustedImageAction(id,a,requalified,"storyflow-image-requalification-v1") &&
+          this.trustedImageAction(id,a,requalified.originalAdoption,"storyflow-production-adoption-v1"));
       const matches=briefMatches &&
         ((a.metadata.parentAssets || []) as any[]).every(parent=>{
           const asset=p.ontology.assets.find((x:any)=>x.id===parent.assetId);
@@ -559,6 +553,20 @@ export class Store {
       .run(artifact.id, artifact.projectId, JSON.stringify(artifact));
     return artifact;
   }
+  private imageLineage(a: Artifact): Record<string, unknown> {
+    return {parentAssets:a.metadata.parentAssets || [],parentShots:a.metadata.parentShots || [],
+      identityReferences:a.metadata.identityReferences || [],consistencyContract:a.metadata.consistencyContract || null};
+  }
+  private trustedImageAction(projectId: string, artifact: Artifact, evidence: any, schema: string): boolean {
+    if(evidence?.schema !== schema || typeof evidence.actionKey !== "string" || evidence.actionKey.length < 8 || evidence.actionKey.length > 128 ||
+      typeof evidence.actionInputHash !== "string" || !/^[a-f0-9]{64}$/.test(evidence.actionInputHash)) return false;
+    const row=this.db.prepare("SELECT input_hash,result FROM actions WHERE project_id=? AND key=?").get(projectId,evidence.actionKey) as any;
+    if(!row || row.input_hash !== evidence.actionInputHash) return false;
+    const proof=parse(row.result);
+    if(proof?.schema !== schema || proof.id !== evidence.id || !Array.isArray(proof.items)) return false;
+    const record=proof.items.find((item:any)=>item.artifactId === artifact.id && item.targetId === (artifact.assetId || artifact.shotId));
+    return Boolean(record && hash(record) === hash(evidence));
+  }
   imageCurrent(a: Artifact) {
     return a.kind === "image" && this.project(a.projectId).imageCandidateCurrent?.[a.id] === true;
   }
@@ -648,6 +656,71 @@ export class Store {
       return result;
     });
     return {adoption,project:this.project(projectId)};
+  }
+  /** An explicit review of the same already-adopted bytes after compiler changes.
+   * This cannot authorize changed ontology, a different parent image or an import's
+   * historical approval. It never replaces the original generation source hash.
+   */
+  requalifyProductionImages(projectId: string, baseRevision: number, key: string, value: unknown) {
+    ensure(Array.isArray(value) && value.length > 0 && value.length <= 52,"每次须复核1–52张已采用分镜图");
+    const seen=new Set<string>();
+    const items:ImageRequalificationInput[]=value.map(item=>{
+      ensure(item && typeof item === "object" && Object.keys(item).every(k=>["artifactId","sha256","oldBriefHash","newBriefHash","note"].includes(k)),"图片复核包含未知字段");
+      ensure(typeof item.artifactId === "string" && /^[a-f0-9-]{36}$/.test(item.artifactId) && !seen.has(item.artifactId),"图片候选ID无效或重复");seen.add(item.artifactId);
+      for(const field of ["sha256","oldBriefHash","newBriefHash"]) ensure(typeof item[field] === "string" && /^[a-f0-9]{64}$/.test(item[field]),"图片或制作条件哈希无效");
+      ensure(typeof item.note === "string" && item.note.trim().length > 0 && item.note.length <= 10000,"需要明确的图片复用核对意见");
+      return {artifactId:item.artifactId,sha256:item.sha256,oldBriefHash:item.oldBriefHash,newBriefHash:item.newBriefHash,note:item.note.trim()};
+    }).sort((a,b)=>a.artifactId.localeCompare(b.artifactId));
+    ensure(Number.isInteger(baseRevision) && baseRevision >= 1,"需要有效的baseRevision");
+    ensure(typeof key === "string" && key.length >= 8 && key.length <= 128,"需要有效的幂等键");
+    const inputHash=hash({kind:"image-requalification-v1",baseRevision,items});
+    const prior=this.action(projectId,key,inputHash);
+    if(prior) return {requalification:prior,project:this.project(projectId)};
+    const requalification=this.transaction(()=>{
+      const p=this.project(projectId), ontologyHash=hash(p.ontology);
+      ensure(p.revision === baseRevision,"内容已更新，请刷新后复核",409,"revision_conflict");
+      const selected=items.map(item=>{
+        const a=this.artifact(item.artifactId),f=this.file(a.fileId),adoption=a.metadata.productionAdoption as any;
+        ensure(a.projectId === projectId && f.projectId === projectId && a.kind === "image" && a.shotId && !a.assetId,"只可复核本工程已采用的分镜图",403);
+        ensure(a.accepted,"已撤回的图片不能复用",409,"approval_required");
+        ensure(!p.imageCandidateCurrent?.[a.id],"当前有效图片无需重新认定",409,"already_current");
+        ensure(this.trustedImageAction(projectId,a,adoption,"storyflow-production-adoption-v1"),"缺少本工程的原始批准采用记录，导入的历史记录不能授权复用",409,"requalification_proof_required");
+        ensure(adoption.sourceHash === a.sourceHash && adoption.imageSha256 === item.sha256 && adoption.adoptedBriefHash === item.oldBriefHash,"原始采用条件不匹配",409,"requalification_snapshot_conflict");
+        ensure(p.imageTargetHashes?.[a.shotId!] === item.newBriefHash && item.oldBriefHash !== item.newBriefHash,"当前制作条件已变化，请重新核对",409,"requalification_snapshot_conflict");
+        const approvedRevision=this.revision(projectId,adoption.revision);
+        ensure(hash(approvedRevision.ontology) === ontologyHash,"本体内容已变化；本接口只允许同一本体在编译修复后的明确复核",409,"requalification_content_changed");
+        const shot=p.ontology.shots.find(s=>s.id===a.shotId);
+        ensure([shot?.reviewImage,shot?.firstFrameImage].every(b=>b?.artifactId===a.id && b.fileId===f.id && b.sha256===item.sha256),"展示图或首帧绑定已变化",409,"requalification_binding_changed");
+        ensure(f.sha256===item.sha256 && sha(this.bytes(f.id))===item.sha256,"图片实际内容哈希不符",409,"image_hash_conflict");
+        const lineage=this.imageLineage(a);
+        for(const parent of [...(lineage.parentAssets as any[]),...(lineage.parentShots as any[])]) {
+          ensure(typeof parent.fileId === "string" && typeof parent.sha256 === "string","父图缺少可核验文件记录",409,"requalification_lineage_conflict");
+          const file=this.file(parent.fileId);
+          ensure(file.projectId===projectId && file.sha256===parent.sha256 && sha(this.bytes(file.id))===parent.sha256,"父图实际内容哈希不符",409,"requalification_lineage_conflict");
+        }
+        return {item,a,adoption,lineage};
+      });
+      const id=randomUUID(),at=iso(),nextRevision=baseRevision+1;
+      const records:ImageRequalificationRecord[]=selected.map(({item,a,adoption,lineage})=>({
+        ...item,schema:"storyflow-image-requalification-v1",scope:"unchanged-ontology-compiler-review",id,at,
+        baseRevision,revision:nextRevision,actionKey:key,actionInputHash:inputHash,targetId:a.shotId!,sourceHash:a.sourceHash,ontologyHash,
+        originalAdoption:structuredClone(adoption),originalApproval:{accepted:true,reviewedAt:a.metadata.reviewedAt ?? null,reviewNote:a.metadata.reviewNote ?? null},
+        lineage:structuredClone(lineage),lineageHash:hash(lineage),
+      }));
+      for(const [index,{a}] of selected.entries()) {
+        a.metadata={...a.metadata,imageRequalification:records[index],imageRequalificationHistory:[...(Array.isArray(a.metadata.imageRequalificationHistory)?a.metadata.imageRequalificationHistory:[]),records[index]]};
+        this.db.prepare("UPDATE artifacts SET json=? WHERE id=?").run(JSON.stringify(a),a.id);
+      }
+      const next={...this.raw(projectId),revision:nextRevision,updatedAt:at};
+      this.db.prepare("UPDATE projects SET revision=?,json=? WHERE id=?").run(nextRevision,JSON.stringify(next),projectId);
+      this.db.prepare("INSERT INTO revisions VALUES(?,?,?)").run(projectId,nextRevision,JSON.stringify(next));
+      const result={schema:"storyflow-image-requalification-v1",id,baseRevision,revision:nextRevision,createdAt:at,items:records};
+      this.recordAction(projectId,key,inputHash,result);
+      const current=this.project(projectId);
+      ensure(selected.every(({a})=>current.imageCandidateCurrent?.[a.id]),"父图或身份批准已变化，整批未复用",409,"requalification_lineage_conflict");
+      return result;
+    });
+    return {requalification,project:this.project(projectId)};
   }
   reviewArtifact(id: string, accepted: boolean, note = "") {
     const a = this.artifact(id);

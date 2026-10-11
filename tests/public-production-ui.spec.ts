@@ -7,7 +7,8 @@ test("公开生产区逐候选审核，保留原有图片草稿与手机布局",
   const snapshot:ReviewSnapshot={schemaVersion:1,projectId:"production-fixture",title:"明确标记的测试影片",revision:3,contentHash:"fixture-content",fps:25,totalFrames:1500,items:[],flow:[],evidence:[],onlineReview:{apiBase:"/api",projectId:"production-fixture"}};
   const data:PublicProduction={projectId:snapshot.projectId,revision:3,jobs:[{id:"video-job",shotId:"S01",kind:"video",state:"complete",stage:"complete",current:true,updatedAt:"2026-01-01",dependsOn:[]},{id:"lip-job",shotId:"S02",kind:"lipsync",state:"waiting_review",stage:"review_dependency",current:true,updatedAt:"2026-01-01",reason:"等待前置声音或镜头人工通过，审核后继续已排队任务。",dependsOn:[]}],candidates:[{id:"video-candidate",shotId:"S01",kind:"video",fileId:"video-file",url:"/fixture.mp4",mime:"video/mp4",sha256:"video-sha",sourceHash:"source-hash",current:true,accepted:false,reviewed:false,createdAt:"2026-01-01"},{id:"voice-candidate",shotId:"S02",kind:"voice",fileId:"voice-file",url:"/fixture.wav",mime:"audio/wav",sha256:"voice-sha",sourceHash:"voice-hash",current:true,accepted:false,reviewed:false,createdAt:"2026-01-01"}]};
   const storageKey=`storyflow-review:${snapshot.projectId}:${snapshot.contentHash}`, draft={baseRevision:3,drafts:{S01:{status:"pass",note:"原有审核评论",imageId:"image-1",imageSha256:"image-hash",targetHash:"target-hash"}}};
-  let authenticated=false; const posts:{id:string;body:any}[]=[];
+  data.candidates[1].durationMs=8000;data.candidates[1].shotDurationMs=5000;
+  let authenticated=false; const posts:{id:string;body:any}[]=[],trims:any[]=[];
   await page.addInitScript(({storageKey,draft})=>localStorage.setItem(storageKey,JSON.stringify(draft)),{storageKey,draft});
   await page.route("**/api/**", async route=>{
     const path=new URL(route.request().url()).pathname, method=route.request().method();
@@ -17,6 +18,12 @@ test("公开生产区逐候选审核，保留原有图片草稿与手机布局",
     if(path.endsWith("/review-submissions")) return json({submissions:[]});
     if(path === `/api/public-review/${snapshot.projectId}`) return json(snapshot);
     if(path.endsWith("/production")) return json(data);
+    if(method === "POST" && path.endsWith("/voice-trims")) {
+      const body=route.request().postDataJSON();trims.push(body);
+      if(!data.candidates.some(candidate=>candidate.id === "voice-cut")) data.candidates.push({...data.candidates[1],id:"voice-cut",fileId:"trimmed-file",sha256:"trimmed-sha",durationMs:5000,accepted:false,reviewed:false,voiceTrim:{parentArtifactId:"voice-candidate",startMs:body.startMs,endMs:body.endMs}});
+      if(trims.length === 1) return json({error:"裁剪回执未收到，请重试同一区间。"},503);
+      return json({artifactId:"voice-cut",accepted:false});
+    }
     if(method === "POST" && path.endsWith("/review")) {
       const id=path.split("/").at(-2)!, body=route.request().postDataJSON(); posts.push({id,body});
       const candidate=data.candidates.find(c=>c.id===id)!;candidate.accepted=body.accepted;candidate.reviewed=true;
@@ -39,6 +46,20 @@ test("公开生产区逐候选审核，保留原有图片草稿与手机布局",
   expect(posts).toEqual([{id:"video-candidate",body:{accepted:true,note:"动作和原声通过",sourceHash:"source-hash",fileSha256:"video-sha"}}]);
   await page.getByRole("button",{name:"通过声音并制作口型"}).click();
   expect(posts[1].id).toBe("voice-candidate");expect(posts[1].body.fileSha256).toBe("voice-sha");
+  const voiceCard=page.locator("#production-voice-candidate");
+  await voiceCard.getByText("明确选择声音区间",{exact:true}).click();
+  await expect(voiceCard.getByLabel("voice-candidate开始秒数")).toHaveValue("");await expect(voiceCard.getByLabel("voice-candidate结束秒数")).toHaveValue("");
+  await expect(voiceCard.getByRole("button",{name:"裁剪为新声音候选"})).toBeDisabled();
+  await voiceCard.getByLabel("voice-candidate开始秒数").fill("0");await voiceCard.getByLabel("voice-candidate结束秒数").fill("6");
+  await voiceCard.getByRole("button",{name:"裁剪为新声音候选"}).click();
+  await expect(page.getByText("所选音轨区间长于镜头，请重新选择；不会自动截断。")).toBeVisible();expect(trims).toHaveLength(0);
+  await voiceCard.getByLabel("voice-candidate开始秒数").fill("1.5");await voiceCard.getByLabel("voice-candidate结束秒数").fill("6.5");
+  await voiceCard.getByRole("button",{name:"裁剪为新声音候选"}).click();
+  await expect(page.getByText("裁剪回执未收到，请重试同一区间。")).toBeVisible();
+  await voiceCard.getByRole("button",{name:"裁剪为新声音候选"}).click();
+  await expect(page.locator("#production-voice-cut")).toContainText("已生成 · 待审核");
+  expect(trims).toHaveLength(2);expect(trims[0]).toEqual(trims[1]);expect(trims[0]).toMatchObject({baseRevision:3,fileId:"voice-file",fileSha256:"voice-sha",sourceHash:"voice-hash",startMs:1500,endMs:6500});
+  expect(posts).toHaveLength(2);await expect(page.getByRole("button",{name:"通过裁剪声音"})).toBeEnabled();
   expect(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!),storageKey)).toEqual(draft);
   await page.setViewportSize({width:390,height:850});await page.locator("#production").scrollIntoViewIfNeeded();
   await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth <= innerWidth+1)).toBe(true);

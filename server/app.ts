@@ -14,6 +14,7 @@ import {
 import { Store } from "./store.ts";
 import { submitReviews } from "./review-submissions.ts";
 import { mountPublicReviewRoutes } from "./public-review-router.ts";
+import { mountVoiceTrimRoutes } from "./voice-trims.ts";
 import { validateDraft } from "./validation.ts";
 import { Jobs } from "./jobs.ts";
 import { ingest } from "./ingest.ts";
@@ -176,6 +177,7 @@ export function createApp(
       return next(new AppError("请先登录管理员", 401, "login_required"));
     next();
   });
+  mountVoiceTrimRoutes(app, store);
   app.get("/api/config", (_req, res) => {
     const c = jobs.providers.capabilities();
     res.json({
@@ -191,11 +193,12 @@ export function createApp(
         seedance: {
           configured: c.seedance.available,
           model: c.seedance.model,
+          provider: c.seedance.provider,
           reason: c.seedance.available
             ? undefined
-            : "尚未配置 Seedance 接口与密钥",
+            : "尚未配置故事视频接口与密钥",
           firstFrameOnly: true,
-          maxSeconds: 12,
+          maxSeconds: c.seedance.maxSeconds,
         },
         fal: {
           configured: c.lipsync.available,
@@ -284,6 +287,9 @@ export function createApp(
   );
   app.post("/api/projects/:id/production-images/adopt", (req, res) =>
     res.json(store.adoptProductionImages(String(req.params.id), revision(req.body.baseRevision), key(req.body.idempotencyKey), req.body.items)),
+  );
+  app.post("/api/projects/:id/production-images/requalify", (req, res) =>
+    res.json(store.requalifyProductionImages(String(req.params.id), revision(req.body.baseRevision), key(req.body.idempotencyKey), req.body.items)),
   );
   app.put("/api/projects/:id/reviews", (req, res) => {
     const id = String(req.params.id),
@@ -461,6 +467,9 @@ export function createApp(
       p = store.project(id),
       shot = p.ontology.shots.find((s) => s.id === req.body.shotId);
     ensure(shot, "镜头不存在", 404);
+    const baseRevision = req.body.baseRevision === undefined ? p.revision : revision(req.body.baseRevision);
+    const actionKey = req.body.idempotencyKey === undefined ? undefined : key(req.body.idempotencyKey);
+    ensure(baseRevision === p.revision, "内容已更新，请刷新后再导入", 409, "revision_conflict");
     const file = store.file(boundedText(req.body.fileId, 128));
     ensure(file.projectId === id, "素材不属于此工程", 403);
     const kind = req.body.kind;
@@ -472,7 +481,7 @@ export function createApp(
       file.mime.startsWith(kind === "voice" ? "audio/" : "video/"),
       "素材媒体类型不符",
     );
-    let audio;
+    let audio: ReturnType<Store["file"]> | undefined;
     if (kind === "lipsync") {
       audio = store.file(boundedText(req.body.audioFileId, 128));
       ensure(
@@ -492,23 +501,54 @@ export function createApp(
         409,
       );
     }
+    // Media is supplied by the administrator; this is not a provider submission.
+    store.bytes(file.id);
+    if (audio) store.bytes(audio.id);
     const info = await probe(store.filePath(file.id));
-    store.addArtifact({
-      projectId: id,
-      jobId: `import-${randomUUID()}`,
-      shotId: shot.id,
-      kind,
-      fileId: file.id,
-      sourceHash: p.compiled.shotHashes[shot.id],
-      audioFileId: audio?.id,
-      audioHash: audio?.sha256,
-      metadata: {
-        ...info,
-        origin: "manual-import",
-        identityAndLipSync: "requires-human-review",
-      },
+    ensure((kind === "voice" ? info.audio : info.video) && info.duration > 0, "文件没有有效的对应媒体轨道");
+    const input = { operation: "manual-media-import", origin: "manual-import", shotId: shot.id, kind,
+      generationHash: p.compiled.shotHashes[shot.id], fileSha256: file.sha256, audioHash: audio?.sha256 || null };
+    const inputHash = hash(input), contentKey = `manual-media-import:${inputHash}`;
+    const imported = store.transaction(() => {
+      const current = store.project(id);
+      ensure(current.revision === baseRevision && current.compiled.shotHashes[shot.id] === input.generationHash,
+        "内容已更新，请刷新后再导入", 409, "revision_conflict");
+      if (audio) ensure(current.artifacts.some(a => a.kind === "voice" && a.shotId === shot.id &&
+        a.fileId === audio!.id && a.accepted && a.sourceHash === input.generationHash),
+        "驱动声音审核已变化，请重新核对", 409, "approval_required");
+      const byKey = actionKey ? store.action(id, actionKey, inputHash) : null;
+      const prior = byKey || store.action(id, contentKey, inputHash);
+      if (prior) {
+        if (actionKey && !byKey && actionKey !== contentKey) store.recordAction(id, actionKey, inputHash, prior);
+        return { created: false, ...prior };
+      }
+      // Older imports had an orphan import-* job ID. Attach that same candidate
+      // to a real local job instead of duplicating its bytes or human review.
+      let artifact = current.artifacts.find(a => a.metadata.origin === "manual-import" && a.kind === kind &&
+        a.shotId === shot.id && a.sourceHash === input.generationHash &&
+        store.file(a.fileId).sha256 === file.sha256 && (a.audioHash || null) === input.audioHash);
+      let job = artifact ? current.jobs.find(j => j.id === artifact!.jobId) : undefined;
+      if (job) ensure(job.state === "complete" && job.result?.artifactId === artifact!.id &&
+        job.input?.operation === "manual-media-import", "此素材关联任务未完成或来源不符", 409);
+      else {
+        job = store.addJob({ projectId: id, runId: randomUUID(), kind, shotId: shot.id, dependsOn: [], inputHash,
+          input: { ...input, baseRevision, sourceHash: input.generationHash, fileId: artifact?.fileId || file.id,
+            audioFileId: artifact?.audioFileId || audio?.id } });
+        if (artifact) {
+          artifact.jobId = job.id;
+          store.db.prepare("UPDATE artifacts SET json=? WHERE id=?").run(JSON.stringify(artifact), artifact.id);
+        } else artifact = store.addArtifact({ projectId: id, jobId: job.id, shotId: shot.id, kind, fileId: file.id,
+          sourceHash: input.generationHash, audioFileId: audio?.id, audioHash: audio?.sha256,
+          metadata: { ...info, origin: "manual-import", identityAndLipSync: "requires-human-review" } });
+        store.updateJob(job.id, { state: "complete", stage: "complete", progress: 1,
+          result: { artifactId: artifact.id, origin: "manual-import", fileId: artifact.fileId, fileSha256: file.sha256 } });
+      }
+      const result = { artifactId: artifact!.id, jobId: job.id, origin: "manual-import" };
+      store.recordAction(id, contentKey, inputHash, result);
+      if (actionKey && actionKey !== contentKey) store.recordAction(id, actionKey, inputHash, result);
+      return { created: true, ...result };
     });
-    res.status(201).json(store.project(id));
+    res.status(imported.created ? 201 : 200).json(store.project(id));
   });
   const upload = multer({
     storage: multer.memoryStorage(),

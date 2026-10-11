@@ -17,6 +17,7 @@ function provider() {
       return polls;
     },
     capabilities: () => ({}),
+    videoSpec: () => ({provider:"seedance",model:"fixture",baseUrl:"https://provider.example",protocol:"seedance-relay-v1",referenceMode:"first_frame",nativeAudio:true,maxSeconds:12,durationPolicy:"ceil-min4"}),
     submit: async (input: any, prepared: any) => {
       await prepared({
         provider: "seedance",
@@ -43,6 +44,25 @@ function provider() {
     }),
   };
 }
+
+test("queued video freezes model selection and rejects changed configuration without POST", async () => {
+  const t=setup();let posts=0;
+  const config={seedanceBase:"https://relay.example/v1",seedanceKey:"fixture-key",seedanceModel:"dreamina-seedance-2-0",videoModel:"",falKey:"",falBase:"",opusBase:"",opusKey:"",opusModel:"",allowPrivate:true};
+  const p=new Providers(config,{fetchImpl:(async()=>{posts++;throw new Error("must not submit changed profile");}) as typeof fetch});
+  const jobs=new Jobs(t.store,p,mockMedia());jobs.stop();
+  try {
+    const before=t.store.project(t.project.id), job=jobs.enqueueRun(before.id,before.revision,"frozen-model-test").jobs[0];
+    assert.equal(job.input.providerSpec.model,"dreamina-seedance-2-0");
+    const storyHash=before.compiled.shotHashes.s1;
+    config.videoModel="veo-3.1-generate-001";
+    await tick(jobs);
+    const after=t.store.job(job.id);
+    assert.equal(after.attempts,0);assert.match(after.error!,/configuration changed/);assert.equal(posts,0);
+    assert.equal(t.store.project(before.id).compiled.shotHashes.s1,storyHash);
+    const newer=jobs.enqueueRun(before.id,before.revision,"frozen-model-test-veo").jobs[0];
+    assert.equal(newer.input.providerSpec.model,"veo-3.1-generate-001");assert.notEqual(newer.inputHash,job.inputHash);
+  } finally {jobs.stop();t.close();}
+});
 async function tick(jobs: Jobs) {
   jobs.stopped = false;
   await jobs.tick();

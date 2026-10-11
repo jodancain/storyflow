@@ -3,6 +3,8 @@ export interface PublicProductionCandidate {
   id: string; shotId?: string; kind: "video" | "voice" | "lipsync" | "graphic" | "final";
   fileId: string; url: string; mime: string; sha256: string; sourceHash: string;
   current: boolean; accepted: boolean; reviewed: boolean; createdAt: string;
+  durationMs?: number; shotDurationMs?: number;
+  voiceTrim?: { parentArtifactId: string; startMs: number; endMs: number };
 }
 export interface PublicProductionJob {
   id: string; shotId?: string; kind: string; state: string; stage: string;

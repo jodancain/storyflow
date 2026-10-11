@@ -34,7 +34,10 @@ function setup() {
   p=t.store.project(p.id);
   return {...t,project:p,items:p.artifacts.map(a=>({artifactId:a.id,sha256:t.store.file(a.fileId).sha256}))};
 }
-const dormant=(store:Store)=>{const jobs=new Jobs(store,new Proxy({},{get:()=>{throw new Error("No provider access allowed in adoption test");}}) as any);jobs.stop();return jobs;};
+const dormant=(store:Store)=>{const jobs=new Jobs(store,new Proxy({},{get:(_target,key)=>{
+  if(key === "videoSpec") return ()=>undefined; // Pure configuration read; no provider I/O.
+  throw new Error("No provider access allowed in adoption test");
+}}) as any);jobs.stop();return jobs;};
 
 test("atomic display adoption preserves original image evidence and makes exact approved first frames usable",()=>{
   const t=setup();try{

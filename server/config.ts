@@ -23,6 +23,7 @@ export function configFromEnv() {
     publicReviewProjectIds: (e.STORYFLOW_PUBLIC_REVIEW_PROJECTS || "").split(",").map(id => id.trim()).filter(Boolean),
     publicReviewApiBase: e.STORYFLOW_PUBLIC_REVIEW_API_BASE || "/api",
     providers: {
+      videoModel: e.VIDEO_MODEL || undefined,
       imageBase: e.IMAGE_BASE_URL || "",
       imageKey: e.IMAGE_API_KEY || "",
       imageModel: e.IMAGE_MODEL || "gpt-image-2",

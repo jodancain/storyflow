@@ -752,14 +752,11 @@ export function compileOntology(ontology: Ontology): Compiled {
       relations: ordered(relevantRelations),
     };
     contexts.set(s.id, context);
-    const constraintMust = unique([
-      ...list<string>(s.mustShow),
-      ...context.assets.flatMap((a) => list<string>(a.mustShow)),
-    ]);
-    const constraintReject = unique([
-      ...list<string>(s.rejectIf),
-      ...context.assets.flatMap((a) => list<string>(a.rejectIf)),
-    ]);
+    // Asset constraints describe the asset's own deliverable (for example an
+    // empty set plate), not every shot using it. Whole-shot requirements belong
+    // to Shot; identity, state and medical meaning remain in entities/evidence.
+    const constraintMust = unique(list<string>(s.mustShow));
+    const constraintReject = unique(list<string>(s.rejectIf));
     prompts[s.id] = [
       s.prompt || "",
       resolveImageConsistency(ontology, s.id).promptGuard,

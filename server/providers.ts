@@ -12,16 +12,24 @@ import type {
   ImageReceipt,
 } from "../shared/types.js";
 import { validateGraphics } from "./render-overlay.js";
+import { videoProfile, sameVideoProfile, relayVideoBody } from "./video-profile.ts";
 
 export class ProviderError extends Error {
   constructor(
     message: string,
     public uncertain = false,
     public code = "provider_error",
+    public diagnostic?: ProviderHttpDiagnostic,
   ) {
     super(message);
     this.name = "ProviderError";
   }
+}
+export interface ProviderHttpDiagnostic {
+  status: number;
+  upstreamCode?: string;
+  upstreamType?: string;
+  requestId?: string;
 }
 type Prepared = (receipt: Record<string, unknown>) => Promise<void>;
 type Result = {
@@ -168,7 +176,9 @@ export class Providers {
   ) {
     this.fetchImpl = fetchImpl;
   }
+  videoSpec() { return videoProfile(this.config); }
   capabilities() {
+    const video = this.videoSpec();
     return {
       image: {
         available: !!(this.config.imageBase && this.config.imageKey),
@@ -178,10 +188,12 @@ export class Providers {
       },
       seedance: {
         available: !!(this.config.seedanceBase && this.config.seedanceKey),
-        model: this.config.seedanceModel,
+        provider: video.provider,
+        model: video.model,
+        protocol: video.protocol,
         modes: ["text-to-video", "first-frame"],
         nativeAudio: true,
-        maxSeconds: 12,
+        maxSeconds: video.maxSeconds,
       },
       lipsync: {
         available: !!this.config.falKey,
@@ -223,13 +235,7 @@ export class Providers {
     submitting = false,
   ): Promise<any> {
     const response = await this.request(url, options, submitting);
-    if (!response.ok)
-      throw new ProviderError(
-        `Provider HTTP ${response.status}`,
-        submitting &&
-          (response.status >= 500 || [408, 429].includes(response.status)),
-        `http_${response.status}`,
-      );
+    if (!response.ok) throw await this.httpError(response, "Provider", submitting);
     try {
       return JSON.parse(
         (await limitedBody(response, 8 * 1024 * 1024)).toString("utf8"),
@@ -244,6 +250,41 @@ export class Providers {
         "invalid_response",
       );
     }
+  }
+  /** A rejected response is untrusted: retain bounded identifiers, never arbitrary explanations. */
+  private async httpError(response: Response, provider: string, submitting: boolean, code = `http_${response.status}`): Promise<ProviderError> {
+    const diagnostic: ProviderHttpDiagnostic = { status: response.status };
+    const secrets = [this.config.seedanceKey, this.config.falKey, this.config.opusKey, this.config.imageKey]
+      .filter((value): value is string => typeof value === "string" && value.length >= 4)
+      .flatMap(value => [value, Buffer.from(value).toString("base64"), Buffer.from(value).toString("base64url"), Buffer.from(value).toString("hex")])
+      .map(value => value.toLowerCase());
+    const token = (value: unknown, requestId = false): string | undefined => {
+      if (!requestId && typeof value === "number" && Number.isSafeInteger(value) && value >= 0 && value <= 999999) return String(value);
+      if (typeof value !== "string" || value.length > (requestId ? 96 : 64)) return;
+      const valid = requestId
+        ? /^(?:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}|[a-f0-9]{32,64}|(?:req|request)[_-][A-Za-z0-9]{8,80})$/i.test(value)
+        : /^[A-Za-z][A-Za-z0-9_-]{0,63}$/.test(value) || /^(?:InvalidParameter|MissingParameter|ResourceNotFound|InvalidRequest|PermissionDenied|ContentPolicyViolation|InternalError)\.[A-Za-z][A-Za-z0-9]{0,40}$/.test(value);
+      if (!valid || secrets.some(secret => value.toLowerCase().includes(secret)) || /(?:^|[-_])(?:sk|key|token|bearer|basic|password|secret|credential|authorization)[-_][A-Za-z0-9]{6,}/i.test(value) || /^(?:AKIA|ASIA)[A-Z0-9]{16}$/.test(value)) return;
+      return value;
+    };
+    try {
+      // Stop reading hostile/oversized error bodies. Parsing failure never changes acceptance semantics.
+      const value: unknown = JSON.parse((await limitedBody(response, 16 * 1024)).toString("utf8"));
+      if (value && typeof value === "object" && !Array.isArray(value)) {
+        const root = value as Record<string, unknown>;
+        const error = root.error && typeof root.error === "object" && !Array.isArray(root.error) ? root.error as Record<string, unknown> : {};
+        const upstreamCode = token(error.code) || token(root.code);
+        const upstreamType = token(error.type) || token(root.type);
+        const requestId = token(root.request_id, true) || token(root.requestId, true) || token(error.request_id, true);
+        if (upstreamCode) diagnostic.upstreamCode = upstreamCode;
+        if (upstreamType) diagnostic.upstreamType = upstreamType;
+        if (requestId) diagnostic.requestId = requestId;
+      }
+    } catch { /* No raw body, parse error or nested value is copied into an exception. */ }
+    finally { if (response.body && !response.body.locked) await response.body.cancel().catch(() => {}); }
+    const details = [diagnostic.upstreamCode && `code=${diagnostic.upstreamCode}`, diagnostic.upstreamType && `type=${diagnostic.upstreamType}`, diagnostic.requestId && `request_id=${diagnostic.requestId}`].filter(Boolean);
+    // Existing job.error persistence records these safe tokens without changing scheduler error codes.
+    return new ProviderError(`${provider} HTTP ${response.status}${details.length ? ` [${details.join("; ")}]` : ""}`, submitting && (response.status >= 500 || [408,429].includes(response.status)), code, diagnostic);
   }
   /** One POST only. The complete receipt is persisted before parsing or downloading. */
   async generateImage(input: ImageInput, onPrepared: Prepared, onReceived: (body: Buffer) => Promise<void>): Promise<ImageReceipt> {
@@ -272,7 +313,7 @@ export class Providers {
       requestedCanvas:{width:input.width,height:input.height},providerSize:size};
     await onPrepared(receipt);
     const response = await this.request(`${base}/images/${references.length ? "edits" : "generations"}`,{method:"POST",headers,body,signal:AbortSignal.timeout(360000)},true);
-    if (!response.ok) throw new ProviderError(`Image provider HTTP ${response.status}`, response.status >= 500 || [408,429].includes(response.status), `http_${response.status}`);
+    if (!response.ok) throw await this.httpError(response, "Image provider", true);
     let raw: Buffer;
     try { raw = await limitedBody(response, 64 * 1024 * 1024); }
     catch { throw new ProviderError("Image response was interrupted after acceptance; do not resubmit.",true,"invalid_response"); }
@@ -305,7 +346,7 @@ export class Providers {
           assert(location && redirects<5,"Image redirect limit exceeded or missing location");
           url=new URL(location,url).toString();continue;
         }
-        assert(response.ok,`Image download HTTP ${response.status}`);
+        if (!response.ok) throw await this.httpError(response, "Image download", false, "invalid_input");
         bytes=await limitedBody(response,50 * 1024 * 1024);break;
       }
       assert(bytes,"Image download returned no content");
@@ -443,31 +484,25 @@ export class Providers {
       return handle;
     }
     assert(["video", "voice"].includes(input.purpose), "Unknown video purpose");
+    const spec = this.videoSpec(), label = spec.provider === "veo" ? "Veo" : "Seedance";
+    assert(!input.providerSpec || sameVideoProfile(input.providerSpec, spec), "Video provider configuration changed; review the frozen task before submitting");
     assert(
       this.config.seedanceKey && this.config.seedanceBase,
-      "Seedance is not configured",
+      `${label} is not configured`,
     );
-    assert(input.duration <= 12, "Split Seedance shots longer than 12 seconds");
+    assert(input.duration <= spec.maxSeconds, `Split ${label} shots longer than ${spec.maxSeconds} seconds`);
     assert(
       !input.audio,
-      "Seedance relay does not accept an external audio drive",
+      `${label} relay does not accept an external audio drive`,
     );
-    const baseUrl = clean(this.config.seedanceBase),
-      duration = Math.max(4, Math.ceil(input.duration)),
-      aspect = input.width > input.height ? "16:9" : "9:16";
-    const prompt = `${input.prompt}\n--ratio ${aspect} --duration ${duration}`;
-    const body = JSON.stringify({
-      model: this.config.seedanceModel,
-      prompt,
-      metadata: { generate_audio: true, return_last_frame: true },
-      ...(input.firstImage
-        ? { image: reference(input.firstImage, "image") }
-        : {}),
-    });
+    const baseUrl = spec.baseUrl;
+    const { body: payloadBody, prompt, duration, aspect } = relayVideoBody(spec,input,input.firstImage ? reference(input.firstImage,"image") : undefined);
+    const body = JSON.stringify(payloadBody);
     const receipt = {
-      provider: "seedance",
+      provider: spec.provider,
       baseUrl,
-      model: this.config.seedanceModel,
+      model: spec.model,
+      providerSpec: spec,
       purpose: input.purpose,
       prompt,
       requestHash: digest(body),
@@ -490,6 +525,7 @@ export class Providers {
         aspect,
         fps: input.fps,
         nativeAudioRequested: true,
+        ...(spec.provider === "veo" ? { resolution:"1080p", personGeneration:"allow_adult", resizeMode:"pad" } : {}),
       },
       preparedAt: new Date().toISOString(),
     };
@@ -510,15 +546,15 @@ export class Providers {
     const id = value.task_id || value.id;
     if (typeof id !== "string" || !id.match(/^[a-zA-Z0-9_.:-]{1,200}$/))
       throw new ProviderError(
-        "Accepted Seedance response has no valid task ID",
+        `Accepted ${label} response has no valid task ID`,
         true,
         "missing_provider_id",
       );
     return {
-      provider: "seedance",
+      provider: spec.provider,
       id,
       baseUrl,
-      model: this.config.seedanceModel,
+      model: spec.model,
       requestHash: digest(body),
       receipt: {
         ...receipt,
@@ -560,6 +596,7 @@ export class Providers {
     return url.toString();
   }
   private verifyHandle(handle: ProviderHandle) {
+    assert(["seedance", "veo", "fal"].includes(handle.provider), "Unknown accepted provider identity");
     const base = clean(
       handle.provider === "fal"
         ? this.config.falBase || "https://queue.fal.run"
@@ -577,7 +614,7 @@ export class Providers {
   recoverHandle(receipt: any, providerTaskId: string): ProviderHandle {
     assert(
       receipt &&
-        ["seedance", "fal"].includes(receipt.provider) &&
+        ["seedance", "veo", "fal"].includes(receipt.provider) &&
         typeof receipt.baseUrl === "string" &&
         typeof receipt.model === "string" &&
         /^[a-f0-9]{64}$/.test(receipt.requestHash),
@@ -596,6 +633,7 @@ export class Providers {
         receipt.model === OMNI,
         "Persisted fal model is not OmniHuman 1.5",
       );
+    if (receipt.provider === "veo") assert(videoProfile({...this.config,videoModel:receipt.model}).provider === "veo", "Persisted Veo model is unsupported");
     // Only the task ID is supplied by an operator. Origins and models always come
     // from the previously persisted intent; no arbitrary polling URL is accepted.
     const handle: ProviderHandle = {
@@ -696,7 +734,7 @@ export class Providers {
       return {
         state: "failed",
         error:
-          "Seedance reported generation failure; no fallback or resubmission performed.",
+          `${handle.provider === "veo" ? "Veo" : "Seedance"} reported generation failure; no fallback or resubmission performed.`,
       };
     let candidate =
       value.result_url ||
@@ -721,7 +759,7 @@ export class Providers {
       state: "complete",
       url: url.toString(),
       metadata: {
-        provider: "seedance",
+        provider: handle.provider,
         actualModel: actual,
         modelReported: !!actual,
         referenceMode: handle.receipt.referenceMode,
@@ -743,7 +781,11 @@ export class Providers {
       result.state === "complete" && result.url,
       "Only completed provider media can be downloaded",
     );
-    let current = result.url;
+    // The relay may return an alias hostname that requires auth. Use its documented
+    // content endpoint on the configured origin; never forward credentials to aliases.
+    let current = handle.provider === "veo"
+      ? `${handle.baseUrl}/videos/${encodeURIComponent(handle.id)}/content`
+      : result.url;
     for (let i = 0; i < 5; i++) {
       const url = await safeURL(current, this.config.allowPrivate);
       const headers: Record<string, string> = {};
@@ -772,12 +814,7 @@ export class Providers {
         current = new URL(location, url).toString();
         continue;
       }
-      if (!response.ok)
-        throw new ProviderError(
-          `Media download HTTP ${response.status}`,
-          false,
-          "download_failed",
-        );
+      if (!response.ok) throw await this.httpError(response, "Media download", false, "download_failed");
       const mime = (response.headers.get("content-type") || "video/mp4").split(
         ";",
       )[0];
@@ -841,12 +878,7 @@ export class Providers {
       },
       true,
     );
-    if (!response.ok)
-      throw new ProviderError(
-        `Anthropic HTTP ${response.status}`,
-        response.status >= 500 || [408, 429].includes(response.status),
-        `http_${response.status}`,
-      );
+    if (!response.ok) throw await this.httpError(response, "Anthropic", true);
     let raw: string;
     try {
       raw = (await limitedBody(response, 16 * 1024 * 1024)).toString("utf8");

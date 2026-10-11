@@ -36,6 +36,30 @@ export interface ImageBinding {
   fileId: string;
   sha256: string;
 }
+export interface ImageRequalificationInput {
+  artifactId: string;
+  sha256: string;
+  oldBriefHash: string;
+  newBriefHash: string;
+  note: string;
+}
+export interface ImageRequalificationRecord extends ImageRequalificationInput {
+  schema: "storyflow-image-requalification-v1";
+  scope: "unchanged-ontology-compiler-review";
+  id: string;
+  at: string;
+  baseRevision: number;
+  revision: number;
+  actionKey: string;
+  actionInputHash: string;
+  targetId: string;
+  sourceHash: string;
+  ontologyHash: string;
+  originalAdoption: Record<string, unknown>;
+  originalApproval: { accepted: true; reviewedAt: unknown; reviewNote: unknown };
+  lineage: Record<string, unknown>;
+  lineageHash: string;
+}
 export interface ImageTarget {
   assetId?: string;
   shotId?: string;
@@ -308,7 +332,7 @@ export interface Job {
   updatedAt: string;
 }
 export interface ProviderHandle {
-  provider: "seedance" | "fal";
+  provider: "seedance" | "veo" | "fal";
   id: string;
   baseUrl: string;
   model: string;
@@ -316,6 +340,7 @@ export interface ProviderHandle {
   receipt: Record<string, unknown>;
 }
 export interface VideoInput {
+  providerSpec?: VideoProviderSpec;
   prompt: string;
   duration: number;
   fps: number;
@@ -339,6 +364,7 @@ export interface ImageReceipt {
   metadata: Record<string, unknown>;
 }
 export interface ProviderConfig {
+  videoModel?: string;
   imageBase?: string;
   imageKey?: string;
   imageModel?: string;
@@ -351,6 +377,16 @@ export interface ProviderConfig {
   opusKey: string;
   opusModel: string;
   allowPrivate?: boolean;
+}
+export interface VideoProviderSpec {
+  provider: "seedance" | "veo";
+  model: string;
+  baseUrl: string;
+  protocol: "seedance-relay-v1" | "veo31-relay-v1";
+  referenceMode: "first_frame";
+  nativeAudio: true;
+  maxSeconds: number;
+  durationPolicy: "ceil-min4" | "fixed8-1080p";
 }
 export interface MediaClip {
   path: string;
