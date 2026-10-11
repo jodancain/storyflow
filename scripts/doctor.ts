@@ -115,7 +115,9 @@ await check(
   "Provider configuration",
   () => {
     const p = config.providers;
-    return `Opus: ${p.opusBase && p.opusKey ? "configured" : "missing"}; Seedance: ${p.seedanceBase && p.seedanceKey ? "configured" : "missing"}; fal: ${p.falKey ? "configured" : "missing"} (configuration only; no paid request)`;
+    const selected = p.lipsyncProvider || "fal";
+    const lipsyncConfigured = selected === "volcano-omnihuman" ? !!(p.volcanoAccessKeyId && p.volcanoSecretAccessKey) : !!p.falKey;
+    return `Opus: ${p.opusBase && p.opusKey ? "configured" : "missing"}; Seedance: ${p.seedanceBase && p.seedanceKey ? "configured" : "missing"}; lipsync (${selected}): ${lipsyncConfigured ? "configured" : "missing"} (configuration only; no paid request)`;
   },
   false,
 );

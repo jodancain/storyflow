@@ -4,6 +4,7 @@ import { Jobs } from "./jobs.ts";
 import { Providers } from "./providers.ts";
 import { createApp } from "./app.ts";
 import { acquireDataLock } from "./data-lock.ts";
+import { publicReviewMediaUrl } from "./provider-media.ts";
 loadDotEnv();
 const config = configFromEnv();
 const release = acquireDataLock(config.dataDir, "runtime");
@@ -14,7 +15,9 @@ if (config.publicReviewProjectIds.length && !store.hasPassword()) {
   store.close(); release();
   throw new Error("Publishing review projects requires an existing administrator password or STORYFLOW_ADMIN_PASSWORD.");
 }
-const jobs = new Jobs(store, new Providers(config.providers));
+const jobs = new Jobs(store, new Providers(config.providers), undefined, {
+  publicMediaUrl:(projectId, fileId) => publicReviewMediaUrl(store, config, projectId, fileId),
+});
 const app = createApp(store, jobs, { publicBaseUrl: config.publicBaseUrl, publicReviewProjectIds: config.publicReviewProjectIds, publicReviewApiBase: config.publicReviewApiBase });
 const server = app.listen(config.port, config.host, () => {
   jobs.start();

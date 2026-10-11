@@ -26,6 +26,7 @@ export class Jobs {
     public store: Store,
     public providers: Providers,
     public mediaEngine: typeof media = media,
+    private options: {publicMediaUrl?: (projectId: string, fileId: string) => string | undefined} = {},
   ) {}
   recover() {
     for (const job of this.store.jobs()) {
@@ -240,6 +241,7 @@ export class Jobs {
     const runId = randomUUID();
     const providerSpec = plans.some(t => t.kind === "video" || t.kind === "voice")
       ? this.providers.videoSpec() : undefined;
+    const lipsyncSpec = plans.some(t => t.kind === "lipsync") ? this.providers.lipsyncSpec() : undefined;
     const jobs = this.store.transaction(() => {
       const added = plans.map((t) =>
         this.store.addJob({
@@ -249,7 +251,8 @@ export class Jobs {
           shotId: t.shotId,
           dependsOn: [],
           inputHash: hash({ plan: t, shotHash: c.shotHashes[t.shotId!],
-            ...(["video", "voice"].includes(t.kind) ? {providerSpec} : {}) }),
+            ...(["video", "voice"].includes(t.kind) ? {providerSpec} : {}),
+            ...(t.kind === "lipsync" ? {lipsyncSpec} : {}) }),
           input: {
             ontology: p.ontology,
             requirements: p.requirements,
@@ -257,6 +260,7 @@ export class Jobs {
             plan: t,
             generationHash: c.shotHashes[t.shotId!],
             ...(["video", "voice"].includes(t.kind) ? {providerSpec} : {}),
+            ...(t.kind === "lipsync" ? {lipsyncSpec} : {}),
             externalArtifactIds: t.dependsOn
               .filter((d) => external[d])
               .map((d) => external[d]),
@@ -700,6 +704,9 @@ export class Jobs {
           ensure(job.input.providerSpec, "旧任务未冻结视频模型，请按当前版本重新提交", 409, "missing_provider_snapshot");
         const input = await this.videoInput(job);
         handle = await this.providers.submit(input, async (receipt) => {
+          // Public input verification can take time. A cancellation during that read
+          // must still prevent the first paid submission, not only result collection.
+          ensure(s.job(job.id).state !== "cancelled", "任务已取消，未提交供应商", 409, "cancelled");
           s.updateJob(job.id, {
             stage: "submitting",
             attempts: job.attempts + 1,
@@ -858,7 +865,7 @@ export class Jobs {
         f.projectId === job.projectId && f.sha256 === a.sha256,
         "锚图快照哈希不匹配",
       );
-      return { bytes: s.bytes(f.id), mime: f.mime, id: a.id, sha256: f.sha256 };
+      return { bytes: s.bytes(f.id), mime: f.mime, id: a.id, sha256: f.sha256, publicUrl:this.options.publicMediaUrl?.(job.projectId, f.id) };
     };
     let audio;
     if (job.kind === "lipsync") {
@@ -879,18 +886,21 @@ export class Jobs {
         mime: f.mime,
         id: f.id,
         sha256: f.sha256,
+        publicUrl:this.options.publicMediaUrl?.(job.projectId, f.id),
       };
     }
     return {
       purpose: job.kind as VideoInput["purpose"],
       providerSpec: job.input.providerSpec,
+      // Pre-upgrade lipsync jobs were fal jobs. A new environment must not redirect them.
+      lipsyncSpec:job.kind === "lipsync" ? job.input.lipsyncSpec || this.providers.lipsyncSpec("fal") : undefined,
       prompt: (job.input.plan.input.prompt as string) || shot.prompt,
       duration: (shot.endFrame - shot.startFrame) / o.spec.fps,
       fps: o.spec.fps,
       width: o.spec.width,
       height: o.spec.height,
       firstImage:
-        job.kind === "voice" ? undefined : shot.firstFrameImage ? {bytes:s.bytes(shot.firstFrameImage.fileId),mime:s.file(shot.firstFrameImage.fileId).mime,id:shot.firstFrameImage.artifactId,sha256:shot.firstFrameImage.sha256} : loadAnchor(shot.firstAnchorId),
+        job.kind === "voice" ? undefined : shot.firstFrameImage ? {bytes:s.bytes(shot.firstFrameImage.fileId),mime:s.file(shot.firstFrameImage.fileId).mime,id:shot.firstFrameImage.artifactId,sha256:shot.firstFrameImage.sha256,publicUrl:this.options.publicMediaUrl?.(job.projectId,shot.firstFrameImage.fileId)} : loadAnchor(shot.firstAnchorId),
       endImage: shot.endAnchorId
         ? (() => {
             const a = loadAnchor(shot.endAnchorId)!;

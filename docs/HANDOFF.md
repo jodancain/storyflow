@@ -1,3 +1,13 @@
+# 火山 OmniHuman 1.5 接入（2026-10-11）
+
+- 新建口型任务可通过 `LIPSYNC_PROVIDER=volcano-omnihuman` 选择火山；默认仍为 `fal`。服务端凭据为 `VOLCENGINE_ACCESS_KEY_ID`、`VOLCENGINE_SECRET_ACCESS_KEY`，需在火山即梦视觉服务开通 OmniHuman 1.5。方舟普通 API Key 不是这里的 AK/SK。
+- 固定接口为 `https://visual.volcengineapi.com`，提交 `CVSubmitTask`、查询 `CVGetResult`，`Version=2022-08-31`、签名 region `cn-north-1`、service `cv`、`req_key=jimeng_realman_avatar_picture_omni_v15`。不与 API Explorer 的另一组2024接口参数混用。请求 `output_resolution=1080`、`pe_fast_mode=false`、`seed=-1`；只发送照片、原音轨与提示词，工程 fps／像素宽高不声称已被模型使用。当前固定接口文档限制音轨小于60秒，建议15秒内，最终成片由公共后期流程统一时基。[官方参数](https://docs.volcengine.com/docs/JimengAI/CallStep3VideoGeneration?lang=zh)、[官方签名示例](https://github.com/volcengine/volc-openapi-demos/tree/main/signature)。
+- 火山输入采用 URL；当前只复用已有公开审稿白名单中的图片及已完成声音产物，不新增文件公开接口。`PUBLIC_BASE_URL` 必须是公网 HTTPS，`STORYFLOW_PUBLIC_REVIEW_API_BASE` 保留实际代理前缀；`STORYFLOW_PUBLIC_REVIEW_PROJECTS` 中的工程才可使用。私有原照、未被公开摘要引用的上传文件不会自动发布。私有项目暂待有明确授权的短期签名媒体方案，不能为生成而放开整库。
+- 提交前分别匿名 GET 两个输入并核对其字节 SHA-256，再保存持久提交意图，最后仅 POST 一次。回执记录输入 ID／哈希／URL、实际请求参数及 API 身份；没有独立模型回传时 `actualModel:null`。签名请求头及 AK/SK 不写回执、日志、公开摘要或导出包。
+- 新任务的 `lipsyncSpec` 冻结供应商与协议。升级前没有该字段的排队口型任务继续按 fal 处理；已有 fal／火山任务始终按原 handle 查询，不受当前默认供应商切换影响。切换配置不迁移旧任务、不批准音轨、不创建新任务。
+- 断线、5xx、受理响应不可读或缺少有效 task ID 保留受理不明，不自动重投；官方明确业务拒绝保留脱敏错误码。已受理任务查询或下载失败复用原 ID；`not_found/expired` 不自动新提交。下载视频不携带火山签名或其他模型凭据。现有单进程串行队列与同一已审音轨绑定保持不变。
+- 入口：`server/volcano-visual.ts`（受限签名／协议快照）、`server/providers.ts`（提交／续查）、`server/provider-media.ts`（公开范围复用）。真实账户权限、额度、生成效果与口型验收和本地模拟测试分别记录；增加适配不代表已调用或生成影片。
+
 # 显式声音裁剪（当前开发）
 
 - 管理员可调用 `POST /api/artifacts/:id/voice-trims`，提交 `{baseRevision,fileId,fileSha256,sourceHash,startMs,endMs,idempotencyKey}`。`id` 必须是当前修订的 voice 候选；起止时间是用户明确选择的整数毫秒，区间不得超出原声，成品不得长于所属镜头。没有默认裁剪区间，也不自动按镜头截断。

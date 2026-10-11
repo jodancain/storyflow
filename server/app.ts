@@ -180,6 +180,13 @@ export function createApp(
   mountVoiceTrimRoutes(app, store);
   app.get("/api/config", (_req, res) => {
     const c = jobs.providers.capabilities();
+    const lipsync = {
+      configured: c.lipsync.available,
+      provider: c.lipsync.provider,
+      model: c.lipsync.model,
+      reason: c.lipsync.reason,
+      inputRequirement: c.lipsync.inputRequirement,
+    };
     res.json({
       version,
       publicBaseUrl: canonical.href,
@@ -200,11 +207,10 @@ export function createApp(
           firstFrameOnly: true,
           maxSeconds: c.seedance.maxSeconds,
         },
-        fal: {
-          configured: c.lipsync.available,
-          model: c.lipsync.model,
-          reason: c.lipsync.reason,
-        },
+        lipsync,
+        // Older clients used `fal` as the name of the lip-sync capability.
+        // It remains an explicit alias; provider/model identify the real route.
+        fal: { ...lipsync, legacyAliasFor: "lipsync" },
         opus: {
           configured: c.opus.available,
           model: c.opus.model,

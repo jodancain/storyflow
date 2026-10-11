@@ -18,6 +18,7 @@ function provider() {
     },
     capabilities: () => ({}),
     videoSpec: () => ({provider:"seedance",model:"fixture",baseUrl:"https://provider.example",protocol:"seedance-relay-v1",referenceMode:"first_frame",nativeAudio:true,maxSeconds:12,durationPolicy:"ceil-min4"}),
+    lipsyncSpec: () => ({provider:"fal",model:"fal-ai/bytedance/omnihuman/v1.5",baseUrl:"https://queue.fal.run",protocol:"fal-queue-v1",outputResolution:1080,fastMode:false}),
     submit: async (input: any, prepared: any) => {
       await prepared({
         provider: "seedance",
@@ -68,6 +69,57 @@ async function tick(jobs: Jobs) {
   await jobs.tick();
   jobs.stopped = true;
 }
+test("new lipsync jobs freeze chosen provider while pre-upgrade fal jobs never switch to Volcano", async () => {
+  const t=setup(true);let posts=0;
+  const config:import("../shared/types.ts").ProviderConfig={lipsyncProvider:"fal",volcanoAccessKeyId:"fixture-ak",volcanoSecretAccessKey:"fixture-sk",seedanceBase:"https://relay.example",seedanceKey:"fixture",seedanceModel:"fixture",falBase:"https://queue.fal.run",falKey:"fixture-fal",opusBase:"",opusKey:"",opusModel:"",allowPrivate:true};
+  const p=new Providers(config,{fetchImpl:(async(url,options)=>{
+    if(options?.method === "POST") {
+      posts++;assert.equal(String(url),"https://queue.fal.run/fal-ai/bytedance/omnihuman/v1.5");
+      return new Response(JSON.stringify({request_id:"legacy-fal-task"}));
+    }
+    assert.match(String(url),/\/fal-ai\/bytedance\/requests\/legacy-fal-task\/status$/);
+    return new Response(JSON.stringify({status:"IN_QUEUE"}));
+  }) as typeof fetch});
+  const jobs=new Jobs(t.store,p,mockMedia());jobs.stop();
+  try {
+    const sourceHash=t.project.compiled.shotHashes.s1;
+    const file=t.store.addFile(t.project.id,"voice.wav","audio/wav",Buffer.from("reviewed audio"));
+    const voice=t.store.addArtifact({projectId:t.project.id,jobId:"imported-voice",shotId:"s1",kind:"voice",fileId:file.id,sourceHash,metadata:{}});
+    t.store.reviewArtifact(voice.id,true);
+    const original=jobs.enqueueRun(t.project.id,t.project.revision,"old-fal-frozen").jobs[0];
+    assert.equal(original.input.lipsyncSpec.provider,"fal");
+    const {lipsyncSpec:_legacyMissing,...legacyInput}=original.input;
+    t.store.updateJob(original.id,{input:legacyInput});
+    config.lipsyncProvider="volcano-omnihuman";
+    await tick(jobs);
+    assert.equal(posts,1);assert.equal(t.store.job(original.id).handle?.provider,"fal");
+    const next=jobs.enqueueRun(t.project.id,t.project.revision,"new-volcano-frozen").jobs[0];
+    assert.equal(next.input.lipsyncSpec.provider,"volcano-omnihuman");assert.notEqual(next.inputHash,original.inputHash);
+    assert.equal(posts,1);
+  } finally {jobs.stop();t.close();}
+});
+test("cancellation while Volcano checks public input bytes prevents durable intent and paid submission", async () => {
+  const t=setup(true);let posts=0;
+  let release!:()=>void, started!:()=>void;
+  const checking=new Promise<void>(resolve=>{started=resolve;});
+  const wait=new Promise<void>(resolve=>{release=resolve;});
+  const config:import("../shared/types.ts").ProviderConfig={lipsyncProvider:"volcano-omnihuman",volcanoAccessKeyId:"fixture-ak",volcanoSecretAccessKey:"fixture-sk",seedanceBase:"",seedanceKey:"",seedanceModel:"fixture",falBase:"",falKey:"",opusBase:"",opusKey:"",opusModel:"",allowPrivate:true};
+  const p=new Providers(config,{fetchImpl:(async(url,options)=>{
+    if(options?.method === "POST") {posts++;return new Response(JSON.stringify({code:10000,data:{task_id:"unexpected"}}));}
+    started();await wait;
+    return new Response(t.store.bytes(new URL(String(url)).pathname.slice(1)));
+  }) as typeof fetch});
+  const jobs=new Jobs(t.store,p,mockMedia(),{publicMediaUrl:(_project,fileId)=>`https://public.example/${fileId}`});jobs.stop();
+  try {
+    const file=t.store.addFile(t.project.id,"voice.wav","audio/wav",Buffer.from("reviewed audio"));
+    const voice=t.store.addArtifact({projectId:t.project.id,jobId:"imported-voice",shotId:"s1",kind:"voice",fileId:file.id,sourceHash:t.project.compiled.shotHashes.s1,metadata:{}});
+    t.store.reviewArtifact(voice.id,true);
+    const job=jobs.enqueueRun(t.project.id,t.project.revision,"cancel-during-media-check").jobs[0];
+    jobs.stopped=false;const running=jobs.tick();await checking;
+    jobs.cancel(job.id);release();await running;
+    assert.equal(posts,0);assert.equal(t.store.job(job.id).state,"cancelled");assert.equal(t.store.job(job.id).attempts,0);assert.equal(t.store.job(job.id).handle,undefined);
+  } finally {release();jobs.stop();t.close();}
+});
 function setup(doctor = false) {
   const t = tempStore(),
     o = fixture(doctor);

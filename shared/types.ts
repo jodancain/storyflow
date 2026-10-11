@@ -334,7 +334,7 @@ export interface Job {
   updatedAt: string;
 }
 export interface ProviderHandle {
-  provider: "seedance" | "veo" | "fal";
+  provider: "seedance" | "veo" | "fal" | "volcano-omnihuman";
   id: string;
   baseUrl: string;
   model: string;
@@ -343,14 +343,15 @@ export interface ProviderHandle {
 }
 export interface VideoInput {
   providerSpec?: VideoProviderSpec;
+  lipsyncSpec?: LipsyncProviderSpec;
   prompt: string;
   duration: number;
   fps: number;
   width: number;
   height: number;
-  firstImage?: { bytes: Buffer; mime: string; id: string; sha256: string };
+  firstImage?: { bytes: Buffer; mime: string; id: string; sha256: string; publicUrl?: string };
   endImage?: { id: string; sha256: string };
-  audio?: { bytes: Buffer; mime: string; id: string; sha256: string };
+  audio?: { bytes: Buffer; mime: string; id: string; sha256: string; publicUrl?: string };
   purpose: "video" | "voice" | "lipsync";
 }
 export interface ImageInput {
@@ -366,6 +367,9 @@ export interface ImageReceipt {
   metadata: Record<string, unknown>;
 }
 export interface ProviderConfig {
+  lipsyncProvider?: "fal" | "volcano-omnihuman";
+  volcanoAccessKeyId?: string;
+  volcanoSecretAccessKey?: string;
   videoModel?: string;
   imageBase?: string;
   imageKey?: string;
@@ -379,6 +383,14 @@ export interface ProviderConfig {
   opusKey: string;
   opusModel: string;
   allowPrivate?: boolean;
+}
+export interface LipsyncProviderSpec {
+  provider: "fal" | "volcano-omnihuman";
+  model: string;
+  baseUrl: string;
+  protocol: "fal-queue-v1" | "volcano-cv-2022-08-31";
+  outputResolution: 1080;
+  fastMode: false;
 }
 export interface VideoProviderSpec {
   provider: "seedance" | "veo";

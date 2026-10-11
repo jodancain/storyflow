@@ -23,6 +23,9 @@ services:
       SEEDANCE_API_KEY: ${SEEDANCE_API_KEY:-}
       SEEDANCE_MODEL: ${SEEDANCE_MODEL:-seedance-2-0}
       FAL_KEY: ${FAL_KEY:-}
+      LIPSYNC_PROVIDER: ${LIPSYNC_PROVIDER:-fal}
+      VOLCENGINE_ACCESS_KEY_ID: ${VOLCENGINE_ACCESS_KEY_ID:-}
+      VOLCENGINE_SECRET_ACCESS_KEY: ${VOLCENGINE_SECRET_ACCESS_KEY:-}
     volumes:
       - storyflow-data:/data/storyflow
     tmpfs:

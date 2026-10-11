@@ -12,6 +12,8 @@ export function loadDotEnv() {
 }
 export function configFromEnv() {
   const e = process.env;
+  if (e.LIPSYNC_PROVIDER && !["fal", "volcano-omnihuman"].includes(e.LIPSYNC_PROVIDER))
+    throw new Error("LIPSYNC_PROVIDER must be fal or volcano-omnihuman");
   return {
     host: e.HOST || "127.0.0.1",
     port: Number(e.PORT || 18296),
@@ -23,6 +25,9 @@ export function configFromEnv() {
     publicReviewProjectIds: (e.STORYFLOW_PUBLIC_REVIEW_PROJECTS || "").split(",").map(id => id.trim()).filter(Boolean),
     publicReviewApiBase: e.STORYFLOW_PUBLIC_REVIEW_API_BASE || "/api",
     providers: {
+      lipsyncProvider: (e.LIPSYNC_PROVIDER || "fal") as "fal" | "volcano-omnihuman",
+      volcanoAccessKeyId: e.VOLCENGINE_ACCESS_KEY_ID || "",
+      volcanoSecretAccessKey: e.VOLCENGINE_SECRET_ACCESS_KEY || "",
       videoModel: e.VIDEO_MODEL || undefined,
       imageBase: e.IMAGE_BASE_URL || "",
       imageKey: e.IMAGE_API_KEY || "",

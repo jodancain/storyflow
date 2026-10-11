@@ -33,7 +33,7 @@ type Config = {
   version: string;
   capabilities: Record<
     string,
-    { configured: boolean; model?: string; reason?: string }
+    { configured: boolean; model?: string; reason?: string; provider?: string }
   >;
 };
 type Act = <T>(
@@ -2360,7 +2360,7 @@ function VideoPanel(props: PanelProps & { config: Config | null }) {
         按审核后的输入制作，保留原片和音轨。素材与成片分别验收。
       </SectionHead>
       <div className="capabilities">
-        {Object.entries(config?.capabilities || {}).map(([key, c]) => (
+        {Object.entries(config?.capabilities || {}).filter(([key]) => key !== "fal" || !config?.capabilities.lipsync).map(([key, c]) => (
           <div key={key} className={c.configured ? "ready" : "unavailable"}>
             <span className="status-dot" />
             <div>
@@ -2368,6 +2368,7 @@ function VideoPanel(props: PanelProps & { config: Config | null }) {
                 {{
                   seedance: "故事与原声",
                   fal: "医生口型",
+                  lipsync: c.provider === "volcano-omnihuman" ? "医生口型 · 火山引擎" : "医生口型 · fal",
                   opus: "故事与后期",
                   media: "剪辑与合成",
                   image: "专属资产生图",

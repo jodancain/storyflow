@@ -13,6 +13,7 @@ import type {
 } from "../shared/types.js";
 import { validateGraphics } from "./render-overlay.js";
 import { videoProfile, sameVideoProfile, relayVideoBody } from "./video-profile.ts";
+import { lipsyncProfile, signVolcanoVisual, VOLCANO_OMNI, VOLCANO_VISUAL_BASE } from "./volcano-visual.ts";
 
 export class ProviderError extends Error {
   constructor(
@@ -177,8 +178,11 @@ export class Providers {
     this.fetchImpl = fetchImpl;
   }
   videoSpec() { return videoProfile(this.config); }
+  lipsyncSpec(provider = this.config.lipsyncProvider || "fal") { return lipsyncProfile(this.config, provider); }
   capabilities() {
     const video = this.videoSpec();
+    const lipsync = this.lipsyncSpec(), volcano = lipsync.provider === "volcano-omnihuman";
+    const lipAvailable = volcano ? !!(this.config.volcanoAccessKeyId && this.config.volcanoSecretAccessKey) : !!this.config.falKey;
     return {
       image: {
         available: !!(this.config.imageBase && this.config.imageKey),
@@ -196,9 +200,11 @@ export class Providers {
         maxSeconds: video.maxSeconds,
       },
       lipsync: {
-        available: !!this.config.falKey,
-        model: OMNI,
-        reason: this.config.falKey ? undefined : "FAL_KEY is not configured",
+        available: lipAvailable,
+        provider: lipsync.provider,
+        model: lipsync.model,
+        reason: lipAvailable ? undefined : volcano ? "Volcano visual AK/SK credentials are not configured" : "FAL_KEY is not configured",
+        ...(volcano ? {inputRequirement:"explicitly-public-image-and-reviewed-audio"} : {}),
       },
       opus: {
         available: !!(this.config.opusBase && this.config.opusKey),
@@ -254,7 +260,7 @@ export class Providers {
   /** A rejected response is untrusted: retain bounded identifiers, never arbitrary explanations. */
   private async httpError(response: Response, provider: string, submitting: boolean, code = `http_${response.status}`): Promise<ProviderError> {
     const diagnostic: ProviderHttpDiagnostic = { status: response.status };
-    const secrets = [this.config.seedanceKey, this.config.falKey, this.config.opusKey, this.config.imageKey]
+    const secrets = [this.config.seedanceKey, this.config.falKey, this.config.opusKey, this.config.imageKey, this.config.volcanoAccessKeyId, this.config.volcanoSecretAccessKey]
       .filter((value): value is string => typeof value === "string" && value.length >= 4)
       .flatMap(value => [value, Buffer.from(value).toString("base64"), Buffer.from(value).toString("base64url"), Buffer.from(value).toString("hex")])
       .map(value => value.toLowerCase());
@@ -272,10 +278,12 @@ export class Providers {
       const value: unknown = JSON.parse((await limitedBody(response, 16 * 1024)).toString("utf8"));
       if (value && typeof value === "object" && !Array.isArray(value)) {
         const root = value as Record<string, unknown>;
-        const error = root.error && typeof root.error === "object" && !Array.isArray(root.error) ? root.error as Record<string, unknown> : {};
-        const upstreamCode = token(error.code) || token(root.code);
+        const metadata = root.ResponseMetadata && typeof root.ResponseMetadata === "object" && !Array.isArray(root.ResponseMetadata) ? root.ResponseMetadata as Record<string, unknown> : {};
+        const errorValue = root.error || metadata.Error;
+        const error = errorValue && typeof errorValue === "object" && !Array.isArray(errorValue) ? errorValue as Record<string, unknown> : {};
+        const upstreamCode = token(error.code) || token(error.Code) || token(root.code);
         const upstreamType = token(error.type) || token(root.type);
-        const requestId = token(root.request_id, true) || token(root.requestId, true) || token(error.request_id, true);
+        const requestId = token(root.request_id, true) || token(root.requestId, true) || token(error.request_id, true) || token(metadata.RequestId, true);
         if (upstreamCode) diagnostic.upstreamCode = upstreamCode;
         if (upstreamType) diagnostic.upstreamType = upstreamType;
         if (requestId) diagnostic.requestId = requestId;
@@ -407,6 +415,13 @@ export class Providers {
       return `data:${value.mime};base64,${value.bytes.toString("base64")}`;
     };
     if (input.purpose === "lipsync") {
+      const frozen = input.lipsyncSpec || this.lipsyncSpec();
+      const expected = this.lipsyncSpec(frozen.provider);
+      assert(JSON.stringify(frozen) === JSON.stringify(expected), "Lipsync provider configuration changed; restore the frozen provider before submitting");
+      if (frozen.provider === "volcano-omnihuman") {
+        reference(input.firstImage, "image"); reference(input.audio, "audio");
+        return this.submitVolcano(input, onPrepared);
+      }
       assert(this.config.falKey, "FAL_KEY is not configured");
       assert(
         input.duration < 30,
@@ -426,6 +441,7 @@ export class Providers {
         baseUrl,
         purpose: input.purpose,
         requestHash: digest(body),
+        lipsyncSpec: frozen,
         image: { id: input.firstImage!.id, sha256: input.firstImage!.sha256 },
         audio: { id: input.audio!.id, sha256: input.audio!.sha256 },
         parameters: {
@@ -563,6 +579,55 @@ export class Providers {
       },
     };
   }
+  private async volcanoCall(action: "CVSubmitTask" | "CVGetResult", body: string) {
+    assert(this.config.volcanoAccessKeyId && this.config.volcanoSecretAccessKey, "Volcano visual AK/SK credentials are not configured");
+    const signed = signVolcanoVisual(action, body, {accessKeyId:this.config.volcanoAccessKeyId, secretAccessKey:this.config.volcanoSecretAccessKey});
+    const submitting = action === "CVSubmitTask";
+    const response = await this.json(signed.url, {method:"POST", headers:signed.headers, body}, submitting);
+    if (response?.code !== 10000) {
+      if (!Number.isSafeInteger(response?.code) || response.code < 0 || response.code > 999999 || (submitting && response?.data?.task_id))
+        throw new ProviderError("Volcano returned an unrecognized acceptance response; reconcile the original request.", submitting, "invalid_response");
+      // The visual API documents code != 10000 as a rejected submission, without task_id.
+      // Copy only the existing bounded diagnostic fields, never message or raw response.
+      const error = await this.httpError(new Response(JSON.stringify(response), {status:200}), "Volcano", false, "volcano_rejected");
+      error.message = error.message.replace("HTTP 200", "rejected request");
+      throw error;
+    }
+    return response;
+  }
+  private async submitVolcano(input: VideoInput, onPrepared: Prepared): Promise<ProviderHandle> {
+    assert(this.config.volcanoAccessKeyId && this.config.volcanoSecretAccessKey, "Volcano visual AK/SK credentials are not configured");
+    assert(input.duration < 60, "Volcano OmniHuman audio must be shorter than 60 seconds");
+    const mediaURL = async (media: NonNullable<VideoInput["firstImage"]>, kind: string) => {
+      assert(media.publicUrl, `Volcano ${kind} public media URL is not configured; private files are not published automatically`);
+      const url = await safeURL(media.publicUrl, this.config.allowPrivate);
+      // Verify the exact anonymously retrievable bytes; a URL or extension is not a hash binding.
+      const response = await this.request(url.toString());
+      if (!response.ok) throw await this.httpError(response, "Public input media", false, "input_media_unavailable");
+      assert(digest(await limitedBody(response, 20 * 1024 * 1024)) === media.sha256, `Public ${kind} hash does not match approved media`);
+      return url.toString();
+    };
+    const imageUrl = await mediaURL(input.firstImage!, "image"), audioUrl = await mediaURL(input.audio!, "audio");
+    const parameters = {req_key:VOLCANO_OMNI, image_url:imageUrl, audio_url:audioUrl, prompt:input.prompt, seed:-1, output_resolution:1080, pe_fast_mode:false};
+    const body = JSON.stringify(parameters);
+    const receipt = {
+      provider:"volcano-omnihuman", model:VOLCANO_OMNI, modelActual:null, baseUrl:VOLCANO_VISUAL_BASE,
+      lipsyncSpec:input.lipsyncSpec || this.lipsyncSpec(), purpose:input.purpose, requestHash:digest(body),
+      apiVersion:"2022-08-31", region:"cn-north-1", service:"cv", action:"CVSubmitTask",
+      image:{id:input.firstImage!.id, sha256:input.firstImage!.sha256, url:imageUrl},
+      audio:{id:input.audio!.id, sha256:input.audio!.sha256, url:audioUrl},
+      parameters, requestedTiming:{duration:input.duration, fps:input.fps},
+      ignoredConditions:["requested_fps_not_supported", "requested_width_height_not_sent", ...(input.endImage ? ["end_image_not_supported"] : [])],
+      preparedAt:new Date().toISOString(),
+    };
+    await onPrepared(receipt);
+    const response = await this.volcanoCall("CVSubmitTask", body), id = response.data?.task_id;
+    if (typeof id !== "string" || !/^[A-Za-z0-9_-]{1,200}$/.test(id))
+      throw new ProviderError("Accepted Volcano response has no valid task ID", true, "missing_provider_id");
+    // A response request ID is safe only after the same bounded sanitizer used by failures.
+    const diagnostic = await this.httpError(new Response(JSON.stringify({request_id:response.request_id}), {status:200}), "Volcano", false);
+    return {provider:"volcano-omnihuman", id, baseUrl:VOLCANO_VISUAL_BASE, model:VOLCANO_OMNI, requestHash:digest(body), receipt:{...receipt, requestId:diagnostic.diagnostic?.requestId}};
+  }
   private falJobURL(
     value: string,
     handle: ProviderHandle,
@@ -596,9 +661,9 @@ export class Providers {
     return url.toString();
   }
   private verifyHandle(handle: ProviderHandle) {
-    assert(["seedance", "veo", "fal"].includes(handle.provider), "Unknown accepted provider identity");
+    assert(["seedance", "veo", "fal", "volcano-omnihuman"].includes(handle.provider), "Unknown accepted provider identity");
     const base = clean(
-      handle.provider === "fal"
+      handle.provider === "volcano-omnihuman" ? VOLCANO_VISUAL_BASE : handle.provider === "fal"
         ? this.config.falBase || "https://queue.fal.run"
         : this.config.seedanceBase,
     );
@@ -610,11 +675,12 @@ export class Providers {
       /^[a-zA-Z0-9_.:-]{1,200}$/.test(handle.id),
       "Invalid accepted task identity",
     );
+    if (handle.provider === "volcano-omnihuman") assert(handle.model === VOLCANO_OMNI && /^[A-Za-z0-9_-]{1,200}$/.test(handle.id), "Invalid accepted Volcano task identity");
   }
   recoverHandle(receipt: any, providerTaskId: string): ProviderHandle {
     assert(
       receipt &&
-        ["seedance", "veo", "fal"].includes(receipt.provider) &&
+        ["seedance", "veo", "fal", "volcano-omnihuman"].includes(receipt.provider) &&
         typeof receipt.baseUrl === "string" &&
         typeof receipt.model === "string" &&
         /^[a-f0-9]{64}$/.test(receipt.requestHash),
@@ -651,6 +717,22 @@ export class Providers {
   }
   async poll(handle: ProviderHandle): Promise<Result> {
     this.verifyHandle(handle);
+    if (handle.provider === "volcano-omnihuman") {
+      const response = await this.volcanoCall("CVGetResult", JSON.stringify({req_key:VOLCANO_OMNI, task_id:handle.id}));
+      const data = response.data;
+      assert(data && typeof data === "object" && !Array.isArray(data), "Volcano returned invalid result data");
+      assert(!data.task_id || data.task_id === handle.id, "Volcano result belongs to another task");
+      if (["processing", "in_queue", "generating"].includes(data.status)) return {state:"running", metadata:{status:data.status}};
+      if (["not_found", "expired"].includes(data.status)) return {state:"failed", error:"Volcano task was not found or expired; reconcile the original task, no resubmission performed."};
+      assert(data.status === "done", "Volcano returned an unknown queue status");
+      assert(typeof data.video_url === "string", "Completed Volcano task has no video URL");
+      await safeURL(data.video_url, this.config.allowPrivate);
+      return {state:"complete", url:data.video_url, metadata:{
+        provider:"volcano-omnihuman", modelRequested:handle.model, actualModel:null, modelReported:false,
+        imageBinding:handle.receipt.image, audioBinding:handle.receipt.audio,
+        ...(typeof data.aigc_meta_tagged === "boolean" ? {aigcMetaTagged:data.aigc_meta_tagged} : {}),
+      }};
+    }
     if (handle.provider === "fal") {
       const defaultResult = `${handle.baseUrl}/${OMNI_QUEUE_APP}/requests/${handle.id}`;
       const statusUrl = this.falJobURL(
@@ -789,7 +871,7 @@ export class Providers {
     for (let i = 0; i < 5; i++) {
       const url = await safeURL(current, this.config.allowPrivate);
       const headers: Record<string, string> = {};
-      if (url.origin === new URL(handle.baseUrl).origin)
+      if (handle.provider !== "volcano-omnihuman" && url.origin === new URL(handle.baseUrl).origin)
         headers.authorization =
           handle.provider === "fal"
             ? `Key ${this.config.falKey}`
