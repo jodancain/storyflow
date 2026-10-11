@@ -25,6 +25,9 @@ import { exportReviewSnapshot, publicReviewCsp } from "./public-review.ts";
 import { ensure, AppError, boundedText, cleanError, sha } from "./util.ts";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
+const version: string = JSON.parse(
+  readFileSync(new URL("../package.json", import.meta.url), "utf8"),
+).version;
 const defaults: Requirements = {
   topic: "",
   audience: "普通公众",
@@ -100,7 +103,7 @@ export function createApp(
   });
   app.use(express.json({ limit: "5mb" }));
   app.get("/healthz", (_req, res) =>
-    res.json({ ok: true, service: "storyflow", version: "0.3.2" }),
+    res.json({ ok: true, service: "storyflow", version }),
   );
   app.use("/api", (req, _res, next) => {
     if (!["GET", "HEAD", "OPTIONS"].includes(req.method)) {
@@ -176,7 +179,7 @@ export function createApp(
   app.get("/api/config", (_req, res) => {
     const c = jobs.providers.capabilities();
     res.json({
-      version: "0.3.1",
+      version,
       publicBaseUrl: canonical.href,
       capabilities: {
         image: {

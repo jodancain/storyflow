@@ -8,6 +8,7 @@
 - URL 校验精确绑定 origin、owner/app、任务 ID 与状态/结果操作；重启恢复仍查询原任务，不增加提交。Seedance 代码未修改。
 - `node --import tsx --test tests/providers.test.ts`：13/13 通过；`node node_modules/typescript/bin/tsc --noEmit`：通过。新增 fixture 使用合成 ID 和官方回执 URL 格式；无网络调用、无真实 Key、无生产更改。
 - 完整 `npm run check`：Node 22.23.1，TypeScript、工作台/审稿双构建、127/127 核心测试通过（0失败、0跳过）。包含24/25fps及1080×1920严格60秒固定媒体合成。源码检查不代表生产已更新；真实 fal 鉴权、OmniHuman 生成、面部身份与同音轨口型验收仍须分别记录。官方依据：[URL 解析](https://github.com/fal-ai/fal-js/blob/main/libs/client/src/utils.ts)、[队列查询](https://github.com/fal-ai/fal-js/blob/main/libs/client/src/queue.ts)。
+- 后续版本标识修复：`/healthz` 与已鉴权 `/api/config` 统一读取安装包 `package.json`，路径基于 `import.meta.url`，不再使用不同的硬编码旧版本。该补丁追加 TypeScript 与7/7 API测试通过；从 `/tmp` 启动的版本接口专项1/1通过。上条127/127为 fal 修复提交 `bbadea9d` 的全量结果，不冒充追加测试后的新总数。
 
 ## v0.3.1 容器审稿页渲染修复（2026-10-10，部署验证中）
 

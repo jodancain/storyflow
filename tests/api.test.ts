@@ -86,6 +86,28 @@ async function server() {
   };
 }
 
+test("health and authenticated config report the installed package version", async () => {
+  const s = await server();
+  try {
+    const expected = JSON.parse(
+      readFileSync(new URL("../package.json", import.meta.url), "utf8"),
+    ).version;
+    const health = await s.request("/healthz");
+    assert.equal(health.status, 200);
+    assert.deepEqual(await health.json(), {
+      ok: true,
+      service: "storyflow",
+      version: expected,
+    });
+    await s.login();
+    const config = await s.request("/api/config");
+    assert.equal(config.status, 200);
+    assert.equal((await config.json()).version, expected);
+  } finally {
+    await s.shutdown();
+  }
+});
+
 test("single administrator, origin checks, revisions and bound-hash reviews", async () => {
   const s = await server();
   try {
