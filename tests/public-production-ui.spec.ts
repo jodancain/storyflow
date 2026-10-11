@@ -42,11 +42,12 @@ test("公开生产区逐候选审核，保留原有图片草稿与手机布局",
   await page.getByLabel("审核密码").fill("fixture-only-password");await page.getByRole("button",{name:"登录并继续审图",exact:true}).click();
   await page.getByLabel("S01 视频与原声审核意见").fill("动作和原声通过");
   await page.getByRole("button",{name:"通过并继续下一镜",exact:true}).click();
-  await expect(page.locator("#production-video-candidate")).toContainText("人工已通过");
+  await expect(page.locator("#production-video-candidate")).toContainText("已通过制作审核");
   expect(posts).toEqual([{id:"video-candidate",body:{accepted:true,note:"动作和原声通过",sourceHash:"source-hash",fileSha256:"video-sha"}}]);
   await page.getByRole("button",{name:"通过声音并制作口型"}).click();
   expect(posts[1].id).toBe("voice-candidate");expect(posts[1].body.fileSha256).toBe("voice-sha");
   const voiceCard=page.locator("#production-voice-candidate");
+  await expect(voiceCard).toContainText("已通过制作审核");
   await voiceCard.getByText("明确选择声音区间",{exact:true}).click();
   await expect(voiceCard.getByLabel("voice-candidate开始秒数")).toHaveValue("");await expect(voiceCard.getByLabel("voice-candidate结束秒数")).toHaveValue("");
   await expect(voiceCard.getByRole("button",{name:"裁剪为新声音候选"})).toBeDisabled();
