@@ -25,7 +25,7 @@ import type {
   ImageRequalificationInput,
   ImageRequalificationRecord,
 } from "../shared/types.ts";
-import { compileOntology, hash, imageTargetHash, imageTargetHashes } from "../shared/ontology.ts";
+import { compileOntology, hash, imageTargetHash, imageTargetHashes, shotImageInputBasis } from "../shared/ontology.ts";
 import { ensure, iso, sha } from "./util.ts";
 import { resolveImageReference } from "../shared/image-consistency.ts";
 const parse = (value: any) => JSON.parse(value);
@@ -195,10 +195,12 @@ export class Store {
           adoption.sourceHash === a.sourceHash &&
           adoption.adoptedBriefHash === targetHashes[a.assetId || a.shotId || ""] &&
           adoption.imageSha256 === this.file(a.fileId).sha256 && this.trustedImageAction(id,a,adoption,"storyflow-production-adoption-v1")) ||
-        (requalified?.scope === "unchanged-ontology-compiler-review" &&
+        ((requalified?.scope === "unchanged-ontology-compiler-review" || requalified?.scope === "explicit-review-of-unchanged-shot-inputs") &&
           requalified.sourceHash === a.sourceHash && requalified.newBriefHash === targetHashes[a.shotId || ""] &&
           requalified.sha256 === this.file(a.fileId).sha256 && requalified.lineageHash === hash(this.imageLineage(a)) &&
           this.trustedImageAction(id,a,requalified,"storyflow-image-requalification-v1") &&
+          (requalified.scope === "unchanged-ontology-compiler-review" ||
+            this.trustedImageAction(id,a,requalified.previousQualification,"storyflow-image-requalification-v1")) &&
           this.trustedImageAction(id,a,requalified.originalAdoption,"storyflow-production-adoption-v1"));
       const matches=briefMatches &&
         ((a.metadata.parentAssets || []) as any[]).every(parent=>{
@@ -657,11 +659,14 @@ export class Store {
     });
     return {adoption,project:this.project(projectId)};
   }
-  /** An explicit review of the same already-adopted bytes after compiler changes.
-   * This cannot authorize changed ontology, a different parent image or an import's
-   * historical approval. It never replaces the original generation source hash.
+  /** Explicit review of the same already-adopted bytes. The default scope requires
+   * unchanged ontology. The opt-in upstream-edit scope additionally proves the
+   * target's own inputs and previously recorded lineage remain unchanged. Neither
+   * scope accepts imported historical authority or replaces the generation hash.
    */
-  requalifyProductionImages(projectId: string, baseRevision: number, key: string, value: unknown) {
+  requalifyProductionImages(projectId: string, baseRevision: number, key: string, value: unknown,
+    scope: ImageRequalificationRecord["scope"] = "unchanged-ontology-compiler-review") {
+    ensure(["unchanged-ontology-compiler-review","explicit-review-of-unchanged-shot-inputs"].includes(scope),"图片复核作用域无效");
     ensure(Array.isArray(value) && value.length > 0 && value.length <= 52,"每次须复核1–52张已采用分镜图");
     const seen=new Set<string>();
     const items:ImageRequalificationInput[]=value.map(item=>{
@@ -673,12 +678,15 @@ export class Store {
     }).sort((a,b)=>a.artifactId.localeCompare(b.artifactId));
     ensure(Number.isInteger(baseRevision) && baseRevision >= 1,"需要有效的baseRevision");
     ensure(typeof key === "string" && key.length >= 8 && key.length <= 128,"需要有效的幂等键");
-    const inputHash=hash({kind:"image-requalification-v1",baseRevision,items});
+    const inputHash=hash({kind:"image-requalification-v1",baseRevision,items,
+      ...(scope === "unchanged-ontology-compiler-review" ? {} : {scope})});
     const prior=this.action(projectId,key,inputHash);
     if(prior) return {requalification:prior,project:this.project(projectId)};
     const requalification=this.transaction(()=>{
       const p=this.project(projectId), ontologyHash=hash(p.ontology);
       ensure(p.revision === baseRevision,"内容已更新，请刷新后复核",409,"revision_conflict");
+      if(scope === "explicit-review-of-unchanged-shot-inputs")
+        ensure(!p.compiled.issues.some(issue=>issue.severity === "error"),"本体存在错误，请先修正",422,"ontology_invalid");
       const selected=items.map(item=>{
         const a=this.artifact(item.artifactId),f=this.file(a.fileId),adoption=a.metadata.productionAdoption as any;
         ensure(a.projectId === projectId && f.projectId === projectId && a.kind === "image" && a.shotId && !a.assetId,"只可复核本工程已采用的分镜图",403);
@@ -688,7 +696,20 @@ export class Store {
         ensure(adoption.sourceHash === a.sourceHash && adoption.imageSha256 === item.sha256 && adoption.adoptedBriefHash === item.oldBriefHash,"原始采用条件不匹配",409,"requalification_snapshot_conflict");
         ensure(p.imageTargetHashes?.[a.shotId!] === item.newBriefHash && item.oldBriefHash !== item.newBriefHash,"当前制作条件已变化，请重新核对",409,"requalification_snapshot_conflict");
         const approvedRevision=this.revision(projectId,adoption.revision);
-        ensure(hash(approvedRevision.ontology) === ontologyHash,"本体内容已变化；本接口只允许同一本体在编译修复后的明确复核",409,"requalification_content_changed");
+        let inputBasis: ImageRequalificationRecord["inputBasis"], previousQualification: ImageRequalificationRecord | undefined;
+        if(scope === "unchanged-ontology-compiler-review") {
+          ensure(hash(approvedRevision.ontology) === ontologyHash,"本体内容已变化；本接口只允许同一本体在编译修复后的明确复核",409,"requalification_content_changed");
+        } else {
+          previousQualification=a.metadata.imageRequalification as ImageRequalificationRecord | undefined;
+          ensure(this.trustedImageAction(projectId,a,previousQualification,"storyflow-image-requalification-v1") &&
+            previousQualification?.sourceHash === a.sourceHash && previousQualification.sha256 === item.sha256 &&
+            previousQualification.lineageHash === hash(this.imageLineage(a)) &&
+            hash(previousQualification.originalAdoption) === hash(adoption),
+            "缺少原引用条件的本地复核证明，或真实父图条件已变化",409,"requalification_lineage_conflict");
+          const before=shotImageInputBasis(approvedRevision.ontology,a.shotId!),after=shotImageInputBasis(p.ontology,a.shotId!);
+          ensure(hash(before) === hash(after),"当前镜头自身、实体、素材、身份或直接依赖已变化，不能沿用上游变更复核",409,"requalification_content_changed");
+          inputBasis={sourceRevision:adoption.revision,before,after};
+        }
         const shot=p.ontology.shots.find(s=>s.id===a.shotId);
         ensure([shot?.reviewImage,shot?.firstFrameImage].every(b=>b?.artifactId===a.id && b.fileId===f.id && b.sha256===item.sha256),"展示图或首帧绑定已变化",409,"requalification_binding_changed");
         ensure(f.sha256===item.sha256 && sha(this.bytes(f.id))===item.sha256,"图片实际内容哈希不符",409,"image_hash_conflict");
@@ -698,14 +719,15 @@ export class Store {
           const file=this.file(parent.fileId);
           ensure(file.projectId===projectId && file.sha256===parent.sha256 && sha(this.bytes(file.id))===parent.sha256,"父图实际内容哈希不符",409,"requalification_lineage_conflict");
         }
-        return {item,a,adoption,lineage};
+        return {item,a,adoption,lineage,inputBasis,previousQualification};
       });
       const id=randomUUID(),at=iso(),nextRevision=baseRevision+1;
-      const records:ImageRequalificationRecord[]=selected.map(({item,a,adoption,lineage})=>({
-        ...item,schema:"storyflow-image-requalification-v1",scope:"unchanged-ontology-compiler-review",id,at,
+      const records:ImageRequalificationRecord[]=selected.map(({item,a,adoption,lineage,inputBasis,previousQualification})=>({
+        ...item,schema:"storyflow-image-requalification-v1",scope,id,at,
         baseRevision,revision:nextRevision,actionKey:key,actionInputHash:inputHash,targetId:a.shotId!,sourceHash:a.sourceHash,ontologyHash,
         originalAdoption:structuredClone(adoption),originalApproval:{accepted:true,reviewedAt:a.metadata.reviewedAt ?? null,reviewNote:a.metadata.reviewNote ?? null},
         lineage:structuredClone(lineage),lineageHash:hash(lineage),
+        ...(inputBasis ? {inputBasis,previousQualification:structuredClone(previousQualification!)} : {}),
       }));
       for(const [index,{a}] of selected.entries()) {
         a.metadata={...a.metadata,imageRequalification:records[index],imageRequalificationHistory:[...(Array.isArray(a.metadata.imageRequalificationHistory)?a.metadata.imageRequalificationHistory:[]),records[index]]};

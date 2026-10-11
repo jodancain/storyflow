@@ -72,9 +72,17 @@ compileOntology
 
 ### 编译修复后的原图明确复核
 
-`POST /api/projects/:id/production-images/requalify` 接收 `{baseRevision,idempotencyKey,items:[{artifactId,sha256,oldBriefHash,newBriefHash,note}]}`。该接口只复核**已在本工程批准并采用、展示和首帧绑定未变、完整本体与原采用修订完全相同**的分镜图；每项须填写明确复用意见。改过剧情、台词、父图、绑定或已撤回的图片不适用，导入的历史记录也不能授权。所有图片与父图实际字节校验通过后，事务保存独立 `storyflow-image-requalification-v1` 记录并升一修订，不创建任何生成任务。
+`POST /api/projects/:id/production-images/requalify` 接收 `{baseRevision,idempotencyKey,items:[{artifactId,sha256,oldBriefHash,newBriefHash,note}]}`。默认 `scope: "unchanged-ontology-compiler-review"` 只复核**已在本工程批准并采用、展示和首帧绑定未变、完整本体与原采用修订完全相同**的分镜图；每项须填写明确复用意见。改过剧情、台词、父图、绑定或已撤回的图片不适用默认范围，导入的历史记录也不能授权。所有图片与父图实际字节校验通过后，事务保存独立 `storyflow-image-requalification-v1` 记录并升一修订，不创建任何生成任务。
 
 记录保留原 `sourceHash`、原批准与本地采用证明、旧新图片 brief、图片和父图哈希、复用意见。只有同工程 `actions` 中完全匹配的本地记录可使其重新成为当前候选；普通工程 ZIP 中记录只作历史，完整私有数据库备份可恢复其本地证明。原素材/首帧绑定与模型回执不改写。镜头脚本仍须针对当前 `targetHash` 明确审核，再提交新任务；图片复用不批准视频或医生声音。
+
+### 仅上游剧情改变后的逐镜明确复核
+
+同一接口显式设置 `scope: "explicit-review-of-unchanged-shot-inputs"`，可复核因上游剧情变化而失效、但自身制作条件完全未变的旧图。此范围进一步要求已有可信的本工程图片复核记录，用它证明父素材、父镜头图片、身份引用与一致性契约和此前完全相同。没有既有本地引用证明的旧图不自动放行。
+
+服务端读取原采用修订与当前本体，使用同一当前编译器分别计算 `storyflow-shot-image-inputs-v1`：完整镜头审稿上下文、实体、素材、依据、锚图、非依赖关系、机位、动作、台词、时间与画面参数；只去掉递归上游剧情内容，另行保留并比较直接依赖 ID 与相关角色完整身份配置。还核对当前展示/首帧绑定、图像及父图实际字节。自身内容、角色、素材来源、父图或直接依赖任一变化都会拒绝；新的本体存在错误也拒绝。该比较是在当前编译器下重现两个版本的固有条件，不声称旧模型曾使用修复后的提示词。
+
+请求的 `oldBriefHash` 仍是原 `productionAdoption.adoptedBriefHash`；`newBriefHash` 是当前图片制作哈希。记录保存前次完整复核证明以及两份相同的固有输入依据，原图 `sourceHash`、原批准、旧记录与供应商回执均不覆盖。含父镜头引用的图片须在父图已有效后或同一原子批次复核。后续上游再次修改仍会失效并须重新明确复核；不会改写镜头生成哈希、替代当前脚本审核或自动启动制作。
 
 ## 可移植 V6 示例
 

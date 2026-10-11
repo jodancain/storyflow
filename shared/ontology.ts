@@ -1118,3 +1118,26 @@ export function imageTargetHashes(ontology: Ontology): Record<string, string> {
 export function imageTargetHash(ontology: Ontology, target: {assetId?: string;shotId?: string}): string {
   return imageTargetHashes(ontology)[target.assetId || target.shotId || ""] || hash({missingTarget:target});
 }
+
+/** Evidence for explicit reuse only; does not change generation or image hashes.
+ * Compare the target's complete review context without recursively incorporating
+ * upstream story content. Direct dependency identities and actual image lineage
+ * are still checked separately; this is never an automatic current-status rule.
+ */
+export function shotImageInputBasis(ontology: Ontology, shotId: string) {
+  const copy=structuredClone(ontology), shot=ontology.shots.find(s=>s.id===shotId);
+  const dependencyIds=unique([...(shot?.dependencies || []),...ontology.relations
+    .filter(r=>r.type === "depends_on" && r.from === shotId).map(r=>r.to)]).sort();
+  for(const s of copy.shots) {
+    s.dependencies=[];
+    delete s.reviewImage;delete s.firstFrameImage;delete s.imageAttempt;
+  }
+  copy.relations=copy.relations.filter(r=>r.type !== "depends_on");
+  const identity=resolveImageConsistency(ontology,shotId);
+  const characterIds=new Set(identity.desiredReferences.map(r=>r.characterId));
+  return {schema:"storyflow-shot-image-inputs-v1",shotId,
+    contextHash:compileOntology(copy).targetHashes[shotId] || hash({missingShot:shotId}),dependencyIds,
+    identity:ontology.imageConsistency ? {version:ontology.imageConsistency.version,
+      enforceApprovedIdentity:ontology.imageConsistency.enforceApprovedIdentity,
+      characters:ontology.imageConsistency.characters.filter(c=>characterIds.has(c.characterId))} : null};
+}

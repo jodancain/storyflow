@@ -289,7 +289,7 @@ export function createApp(
     res.json(store.adoptProductionImages(String(req.params.id), revision(req.body.baseRevision), key(req.body.idempotencyKey), req.body.items)),
   );
   app.post("/api/projects/:id/production-images/requalify", (req, res) =>
-    res.json(store.requalifyProductionImages(String(req.params.id), revision(req.body.baseRevision), key(req.body.idempotencyKey), req.body.items)),
+    res.json(store.requalifyProductionImages(String(req.params.id), revision(req.body.baseRevision), key(req.body.idempotencyKey), req.body.items, req.body.scope)),
   );
   app.put("/api/projects/:id/reviews", (req, res) => {
     const id = String(req.params.id),

@@ -45,7 +45,7 @@ export interface ImageRequalificationInput {
 }
 export interface ImageRequalificationRecord extends ImageRequalificationInput {
   schema: "storyflow-image-requalification-v1";
-  scope: "unchanged-ontology-compiler-review";
+  scope: "unchanged-ontology-compiler-review" | "explicit-review-of-unchanged-shot-inputs";
   id: string;
   at: string;
   baseRevision: number;
@@ -59,6 +59,8 @@ export interface ImageRequalificationRecord extends ImageRequalificationInput {
   originalApproval: { accepted: true; reviewedAt: unknown; reviewNote: unknown };
   lineage: Record<string, unknown>;
   lineageHash: string;
+  inputBasis?: { sourceRevision: number; before: Record<string,unknown>; after: Record<string,unknown> };
+  previousQualification?: ImageRequalificationRecord;
 }
 export interface ImageTarget {
   assetId?: string;
