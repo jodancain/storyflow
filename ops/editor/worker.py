@@ -1,6 +1,6 @@
 """Single-process durable Claude Code editor queue. Python stdlib, no app DB."""
 import argparse
-from contextlib import contextmanager
+from contextlib import contextmanager, ExitStack
 import fcntl
 import hashlib
 import json
@@ -16,6 +16,7 @@ import tempfile
 import time
 import uuid
 from sandbox import scoped
+from image_bridge import ImageBridge
 
 MODEL = "ezr/claude-opus-5-5"
 DEFAULT_PROFILE = "9router-native"
@@ -224,7 +225,9 @@ class Worker:
     def command(self, spec, state, work, inputs, session_dir, base, key):
         profile = self.profile(); model = profile["model"]
         if base != profile["base"]: raise ValueError("profile command base drift")
-        mcp = {"mcpServers": {"editor": {"command": "/usr/bin/python3", "args": ["/opt/editor/mcp_server.py"], "env": {"EDITOR_TASK_WORK": str(work), "EDITOR_TASK_INPUT": str(inputs)}}}}
+        mcp = {"mcpServers": {"editor": {"command": "/usr/bin/python3", "args": ["/opt/editor/mcp_server.py"], "env": {
+            "EDITOR_TASK_WORK": str(work), "EDITOR_TASK_INPUT": str(inputs),
+            "EDITOR_IMAGE_MAX_BYTES": str(96 * 1024 if profile["name"] == "9router-native" else 8 * 1024 * 1024)}}}}
         cmd = ["claude", "--print", "--output-format", "stream-json", "--verbose", "--model", model,
                "--tools", "", "--allowedTools", ",".join(TOOLS), "--permission-mode", "dontAsk",
                "--strict-mcp-config", "--mcp-config", json.dumps(mcp), "--setting-sources", "", "--disable-slash-commands",
@@ -264,13 +267,13 @@ class Worker:
                         if total > 100 * 1024 * 1024 or len(pending) > 16 * 1024 * 1024: raise ValueError("stream_limit")
                         while b"\n" in pending:
                             line, pending = pending.split(b"\n", 1)
-                            cleaned = redact(line.decode("utf-8", "replace"), (env["ANTHROPIC_API_KEY"],))
+                            cleaned = redact(line.decode("utf-8", "replace"), (env["ANTHROPIC_API_KEY"], *getattr(self, "_capture_secrets", ())))
                             log.write(cleaned + "\n"); log.flush()
                             try: event = json.loads(cleaned)
                             except ValueError: continue
                             if isinstance(event, dict): on_event(event)
                 if pending:
-                    cleaned = redact(pending.decode("utf-8", "replace"), (env["ANTHROPIC_API_KEY"],))
+                    cleaned = redact(pending.decode("utf-8", "replace"), (env["ANTHROPIC_API_KEY"], *getattr(self, "_capture_secrets", ())))
                     log.write(cleaned + "\n")
                     try: event = json.loads(cleaned)
                     except ValueError: event = None
@@ -372,6 +375,7 @@ class Worker:
         attempt = state["attempts"] + 1; attempt_dir = d / "attempts" / f"{attempt:03d}"
         intent = {"attempt": attempt, "jobId": job_id, "sessionId": state["sessionId"], "requestedModel": profile["model"], "cliVersion": VERSION, "apiBase": base,
                   "providerProfile": profile["name"], "messagesEndpoint": base + "/v1/messages",
+                  "imageCompatibility": "private_loopback_tool_result_lift_v1" if profile["name"] == "9router-native" else None,
                   "submittedAt": time.time(), "resume": state.get("resume"), "outputHashesBefore": before}
         # State moves out of queued BEFORE spawning. Any crash after this is ambiguous.
         state.update(status="submitting", attempts=attempt)
@@ -444,7 +448,19 @@ class Worker:
                   (state["resume"]["prompt"] if state.get("resume") else spec["prompt"]))
         try:
             state["status"] = "running"; save(d / "state.json", state)
-            code = self.capture(cmd, env, prompt, work, attempt_dir / "stream.ndjson", spec["timeoutSeconds"], event)
+            bridge = None
+            try:
+                self._capture_secrets = (key,)
+                with ExitStack() as stack:
+                    if profile["name"] == "9router-native":
+                        bridge = stack.enter_context(ImageBridge(base, key))
+                        # Only the CLI talks to loopback. Upstream secret stays in
+                        # this worker; logs still record the actual fixed origin.
+                        env = dict(env, ANTHROPIC_BASE_URL=bridge.base, ANTHROPIC_API_KEY=bridge.token)
+                    code = self.capture(cmd, env, prompt, work, attempt_dir / "stream.ndjson", spec["timeoutSeconds"], event)
+            finally:
+                self._capture_secrets = ()
+                if bridge: save(attempt_dir / "image-bridge.json", bridge.evidence())
             if code != 0 or not result or result.get("is_error") or result.get("subtype") != "success" or after_result:
                 state.update(status="needs_reconcile", reason="CLI_did_not_finish_with_single_success")
             elif not observed or any(m not in profile["acceptedReportedModels"] for m in observed):

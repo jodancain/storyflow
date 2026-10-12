@@ -7,7 +7,7 @@
 - Node `22.23.1` Debian bookworm slim；Claude Code npm 包及所有平台包固定 `2.1.258`，`package-lock.json` 保存 registry integrity。主包 SHA-512：`Zis1AYrHuCcK4V1tXJUkzJdklFsTvvqIcj7gk4K8lyEeJOW99ZoQH/E+WxugMqDEO7xncYZ41gydxlkSTmj/2Q==`。容器启动任务前核对 CLI 版本。
 - apt通过Docker ARG明确固定本轮已安装版本：`python3=3.11.2-1+b1`（含 `wave`、`audioop`）、`ffmpeg=7:5.1.9-0+deb12u1`（含FFprobe）、`chromium=154.0.8037.92-1~deb12u1`、`fonts-noto-cjk=1:20220127+repack1-1`。仓库缺少精确版本时构建失败，须人工明确调整ARG并重做运行与媒体验收，不自动升版或去掉固定。编译器、系统库与apt传递依赖未做完整快照固定。当前 MCP 仅允许 Python、Node、FFmpeg、FFprobe 执行；**Chromium 已安装，但浏览器渲染未开放，也未因此宣称可用**。
 - 默认 profile `9router-native`：Claude Code 原生 Messages 端点为 `https://router.yundongyl.cn/v1/messages`，base配置为 `https://router.yundongyl.cn`，请求 wire 模型为 `ezr/claude-opus-5-5`，不用 `/auto`。显式旧选项 `ezr-direct` 使用 `https://ezr.sh` 和 `claude-opus-5-5`；不自动切换profile。CLI 参数固定 `--print --output-format stream-json --verbose --model`，禁用普通 Bash、内置工具、自动模型切换、外部 MCP 自动发现、项目设置、更新及无关遥测。模型有多次正常工具轮次，任务不是单个 HTTP 请求；不把 CLI 启动次数当作供应商计费请求数。
-- 私有 API Key 只从 `/run/secrets/anthropic_api_key` 读取，在创建 CLI 子进程时放入其 `ANTHROPIC_API_KEY`。不放在 Compose environment、命令参数、任务 JSON、日志或镜像中。其他供应商/OAuth/代理环境不继承。
+- 私有 API Key 只从 `/run/secrets/anthropic_api_key` 读取。默认9Router profile使用下述容器内图片桥接，真实key仅在worker内存并发送给固定HTTPS上游；CLI的 `ANTHROPIC_API_KEY` 只含本轮随机loopback token。显式ezr-direct才将真实key交给CLI。均不放在Compose environment、命令参数、任务JSON、日志或镜像中。其他供应商/OAuth/代理环境不继承。
 - 无公开端口、Docker socket、生产 DB 或宿主工程挂载。UID/GID `10001`；只读根文件系统、去除全部 capabilities、`no-new-privileges`；2 CPU、3 GiB 内存、128 PID。输入 bind mount 只读；state、work、sessions 使用三个独立 named volumes。
 - 模型通过本地 stdio MCP 读取文字/图片、写本任务文件、执行后期脚本。脚本使用固定解释器和参数数组，`shell=false`。Landlock 将文件访问限制为本任务工作区、声明并校验 SHA 的输入快照和系统库；seccomp 禁网络、ptrace 等，不允许读取 `/proc`、会话卷、任务状态或 secret。子进程清空模型/API 环境。MCP 文件操作逐层使用目录 fd 与 O_NOFOLLOW，原子写入不跟随可并发替换的符号链接。
 - Linux 至少需要启用 Landlock 的 5.13 内核；5.15 的 ABI 1 没有 truncate 权限，额外 seccomp 阻断 truncate/ftruncate 及只读 O_TRUNC 绕过。不支持或烟雾失败则 `waiting_configuration`，不退回无沙箱执行。MCP入口不提供Unix shell或Chromium。ELF动态加载器的精确amd64/arm64路径另外获得内核所需EXEC权限；任意脚本仍可能借加载器运行系统程序，因此固定工具入口不是完整ELF执行隔离，安全边界依靠继承的文件、网络和进程限制。
@@ -29,6 +29,8 @@ docker run --rm --user 10001:10001 --cap-drop ALL --security-opt no-new-privileg
 使用BuildKit；npm安装复用 `id=storyflow-editor-npm,target=/root/.npm,sharing=locked` 下载缓存，包仍按锁文件integrity验证，缓存不包含模型凭据。Node slim 基础层可能尚无 CA 证书，首次 apt 镜像采用 HTTP（与默认 Debian 源一致）或提前安装 CA，不能用关闭 TLS 验证来绕过。后续 npm 与模型 API 使用 HTTPS。Docker 默认 seccomp 必须允许 Landlock 系统调用；若受阻先审精确系统调用，不使用 privileged 或关闭整个 seccomp。
 
 上述测试不访问模型。Linux 烟雾验证真实 Python 写文件与 FFmpeg 执行，以及 secret、`/proc/1/environ`、输入写入、网络、truncate、脱离进程组和进程信号均被拒绝。Mac 只能运行单元/协议测试，不能用其结果代替 Linux 沙箱测试。
+
+构建上下文采用 `.dockerignore` 的默认全排除＋逐文件白名单。`test_build_context.py`读取真实Dockerfile的所有本地COPY输入，验证文件存在、不是链接且已被白名单放行；新增脚本必须同时更新COPY与白名单。回归夹具重现遗漏 `image_bridge.py` 和文件缺失，均要求报错。该检查有意只支持当前的精确文件策略，遇到通配符/动态COPY或新的ignore语义会明确失败，要求复核，不能静默漏检。它不代替真实Docker构建与Linux运行检查。
 
 ## Compose 配置
 
@@ -77,7 +79,19 @@ docker compose -f ops/editor/compose.yaml exec -T editor \
 
 提交即授权执行该冻结任务，应只在已有用户授权范围内使用。相同规范 JSON 返回同一 jobId；同一幂等键配不同内容直接拒绝。幂等索引在任务可运行前持久预约；中断后相同提交补齐同一快照，调度时再次核对索引。`maxBudgetUsd` 可作为可选 CLI 估算上限，但不是硬性供应商账单封顶，不能代替既有授权范围。
 
-图片工具 `read_image` 返回真实 PNG/JPEG imageContent，上限8MiB、1600万像素；视频先经FFmpeg提帧。当前不提供音频听觉工具；可用FFprobe、wave样本/声学统计辅助编辑，人耳听审仍单列。
+图片工具 `read_image` 返回真实 PNG/JPEG imageContent。默认9router-native profile的检查图硬上限为96KiB，工具描述和超限错误明确要求先用FFmpeg另存不超过64KiB的JPEG缩略图、核对文件尺寸后再读，小批检查；不跳过实际看图，不覆盖原图，最终视频仍可1080p。显式ezr-direct保持原8MiB上限。由worker根据固定profile向MCP注入仅含数字的 `EDITOR_IMAGE_MAX_BYTES`，不是任务可修改的参数，不包含密钥。两种模式仍保留1600万像素及原有格式/路径检查；视频先经FFmpeg提帧。当前不提供音频听觉工具；可用FFprobe、wave样本/声学统计辅助编辑，人耳听审仍单列。
+
+### 9Router工具图片兼容
+
+2026-10-13只读核对运行中的9Router `0.5.30`，其Claude→OpenAI转换器对`tool_result.content`只提取文字；纯图结果退回`JSON.stringify`，使base64变成大量文本，文字与图片混合时则丢掉图片。顶层user图片已有正确的`image_url`分支。实际剪辑任务也在首次成功返回图片后发生`prompt_too_long`；此前超尺寸图片失败与该问题分开记录。当前官方转换器已采用单独提取工具图片的方式，但本轮不修改生产9Router。
+
+`image_bridge.py`仅在9router-native的单次attempt期间监听容器内`127.0.0.1`随机端口，无公开映射；CLI以随机本地token鉴权。它把工具结果中的图片移到紧随完整工具结果消息之后的独立user消息，保留图片字节、原有文字、全部tool ID/error字段及顶层图片，并标明图片对应的工具。多个并行工具结果保持相邻，不在中间插图。不会改写模型、提示词、工具定义或响应模型字段。
+
+上游固定为`https://router.yundongyl.cn`，仅允许`POST /v1/messages`与`POST /v1/messages/count_tokens`（兼容SDK的`?beta=true`）；模型仍固定`ezr/claude-opus-5-5`。请求最多32MiB、单图8MiB；TLS验证保持开启，拒绝重定向，不重试、不切模型。HTTP错误与SSE字节透传；不记录body、key或上游异常内容。工具脚本的网络禁用仍有效。关闭CLI后关闭监听，原attempt日志不变；恢复旧会话时每次请求中的历史嵌套图片同样转换。
+
+intent继续记录真实上游base与Messages端点，另记录兼容模式；`image-bridge.json`仅记录请求/图片数量、状态码与错误计数，不记录本地token或图片内容。新增离线协议与worker测试证明转换与转发行为，不代表真实模型已看懂画面；部署后由主执行者以真实工具图像往返及画面描述验收。
+
+首次实际桥接恢复消除了原图片引发的HTTP400，但随后出现自动压缩上下文循环。只读核实该运行版本的 `usageTracking.js:338–347` 用 `ceil(JSON.stringify(body).length / 4)` 估算输入，图片base64也被计入；`stream.js:316–325`在结束包缺少有效usage时可把此估算回传。源码可确认这条风险路径，但没有逐请求上游原始usage，不能断言每次循环都由同一分支触发。MCP缩略图字节限制用于避免单图估算暴涨，不改写SSE用量或谎报模型上下文。原准备任务两次attempt保留为未完成，不自动继续；后续完整剪辑任务需独立冻结并真正读取小图。
 
 ## 持久状态与人工恢复
 
@@ -108,10 +122,12 @@ docker compose -f ops/editor/compose.yaml exec -T editor \
 
 ## 本轮验证范围
 
-本地45项单元/模拟子进程测试通过，覆盖幂等冲突、intent先写、文件实证、输入漂移、模型名漂移、末包错误、重启未知不重投、已完成哈希恢复、显式同会话resume、全局锁、路径/链接隔离与并发换链、索引预约断电恢复、孤立attempt、后代清理、日志脱敏、imageContent及真实本地MCP stdio初始化/读写、profile匹配、wire别名、合法去前缀回传和恢复历史隔离。测试没有模型调用。
+本地62项单元/模拟子进程测试通过，覆盖幂等冲突、intent先写、文件实证、输入漂移、模型名漂移、末包错误、重启未知不重投、已完成哈希恢复、显式同会话resume、全局锁、路径/链接隔离与并发换链、索引预约断电恢复、孤立attempt、后代清理、日志脱敏、imageContent及真实本地MCP stdio初始化/读写、profile匹配、wire别名、合法去前缀回传和恢复历史隔离，以及图片桥接的图文混合、多工具对应、SSE/HTTP错误不改写、无重试、固定路由、重定向拒绝、私有鉴权、Docker COPY源文件/构建白名单检查，以及profile图片大小限制、明确超限提示和原图保全。测试没有模型调用。
 
 主执行者于2026-10-12记录真实运行验收：Linux镜像、Landlock/seccomp烟雾、CLI 2.1.258与5项MCP工具接通；经9Router原生Messages完成真实模型工具闭环，回传 `claude-opus-5-5`，7次成功工具、2次实际Python执行；生成1秒、25帧H.264/AAC MP4，并通过独立媒体检查。原ezr直连403历史保留，没有自动补投或替换证明。该回传名称仍不能独立证明底层供应商身份。
 
-正式声音任务已交主执行者运行，声音内容与听感仍待审；本worker尚未执行正式视频制作。以上运行证据与45项本地源码测试分开，不把烟雾成功视为完整声音或影片批准。私有日志、会话标识、内部地址和产物哈希保留在私有报告，不写入此文。不改核心应用、原工程审核或生产数据库。本次补充版本固定与构建缓存仅改变下次构建，不重启正在执行的声音任务；新版Dockerfile仍由主执行者后续构建验证。
+2026-10-13，用户明确要求直接制作视频，沿用此前的完整60秒声音。新版镜像已实际构建、完成Linux沙箱烟雾并运行正式剪辑任务：Claude Code真实读取12张检查图，编写并执行后期程序，完成36段剪辑、字幕及五段新医生口型的拼接。原图桥接准备任务的两次未完成attempt保留；正式任务为单独冻结任务，发生一次正常上下文压缩后完成。没有重复提交口型或重新合成声音。
+
+正式任务自己发现首个封装结果音频只有59.264秒，修正FFmpeg结束条件后再输出。最终独立验证为60秒、1500帧、25fps、1080×1920、H.264/AAC，完整解码通过；13段声音及最后一句均与获准母带0毫秒偏移，34条字幕保留446字。五段医生使用的446个实际画面帧另做逐帧源匹配，起点误差均在20毫秒以内。上述媒体证据与62项源码测试分开；无配乐/音效，沿用素材仍存在礼物厚度和部分动作连续性差异，成片作为可播放审片版交付，不表示内容、医学或主观口型自然度已经定稿。私有日志、会话标识、内部地址和产物哈希保留在私有报告，不写入此文。核心应用、原工程审核与生产数据库未修改。
 
 官方参考：[CLI参数](https://code.claude.com/docs/en/cli-reference)、[环境变量](https://code.claude.com/docs/en/env-vars)、[Linux Landlock](https://docs.kernel.org/userspace-api/landlock.html)。2.1.258不支持的后续新增参数不作为本实现前提。

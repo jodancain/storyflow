@@ -3,6 +3,7 @@
 !package.json
 !package-lock.json
 !worker.py
+!image_bridge.py
 !sandbox.py
 !mcp_server.py
 !sandbox-exec.c

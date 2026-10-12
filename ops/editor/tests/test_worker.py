@@ -234,6 +234,32 @@ class WorkerTests(unittest.TestCase):
         self.assertNotIn("/auto",intent["messagesEndpoint"])
         self.assertEqual(result["executionEvidence"]["modelIdentityEvidence"],"gateway_report_only_not_independent_upstream_identity")
 
+    def test_native_capture_uses_private_bridge_but_intent_keeps_real_origin(self):
+        state=self.worker.submit(self.spec)
+        original=self.good_capture
+        def capture(cmd,env,*args):
+            self.assertTrue(env["ANTHROPIC_BASE_URL"].startswith("http://127.0.0.1:"))
+            self.assertNotEqual(env["ANTHROPIC_API_KEY"],"synthetic-private-key")
+            self.assertEqual(env["ANTHROPIC_MODEL"],MODEL)
+            return original(cmd,env,*args)
+        self.worker.capture=capture; result=self.worker.tick()
+        attempt=self.worker.directory(state["jobId"])/"attempts/001"
+        self.assertEqual(result["status"],"completed")
+        self.assertEqual(read(attempt/"intent.json")["apiBase"],"https://router.yundongyl.cn")
+        self.assertEqual(read(attempt/"image-bridge.json")["forwardedRequests"],0)
+        self.assertNotIn("synthetic-private-key",(attempt/"image-bridge.json").read_text())
+
+    def test_profile_sets_mcp_inspection_byte_limit_without_credential(self):
+        state=self.worker.submit(self.spec)
+        for profile,limit in [("9router-native",98304),("ezr-direct",8388608)]:
+            self.worker.env["EDITOR_ROUTE_PROFILE"]=profile
+            config=self.worker.profile()
+            cmd,_=self.worker.command(normalize(self.spec),state,self.root,self.inputs,self.root,config["base"],"synthetic-secret")
+            mcp=json.loads(cmd[cmd.index("--mcp-config")+1])["mcpServers"]["editor"]["env"]
+            self.assertEqual(mcp["EDITOR_IMAGE_MAX_BYTES"],str(limit))
+            self.assertEqual(set(mcp),{"EDITOR_TASK_WORK","EDITOR_TASK_INPUT","EDITOR_IMAGE_MAX_BYTES"})
+            self.assertNotIn("synthetic-secret",json.dumps(mcp))
+
     def test_ezr_direct_is_explicit_and_no_automatic_profile_fallback(self):
         self.worker.env.update(EDITOR_ROUTE_PROFILE="ezr-direct",ANTHROPIC_BASE_URL="https://ezr.sh",EDITOR_MODEL="claude-opus-5-5")
         base,_=self.worker.credentials(); self.assertEqual(base,"https://ezr.sh")
@@ -298,6 +324,15 @@ class WorkerTests(unittest.TestCase):
         events=[]
         code=self.worker.capture([sys.executable,"-c",script],{"ANTHROPIC_API_KEY":"synthetic-private-key"},"prompt",work,log,5,events.append)
         self.assertEqual(code,0); self.assertNotIn("synthetic-private-key",log.read_text()); self.assertEqual(events[-1]["subtype"],"success")
+
+    def test_bridge_capture_redacts_upstream_echo_and_local_token(self):
+        work=self.root/"capture"; work.mkdir(); log=self.root/"private-log"
+        self.worker._capture_secrets=("synthetic-upstream-value",)
+        script="import sys;sys.stdout.write('synthetic-upstream-');sys.stdout.flush();sys.stdout.write('value local-token\\n');sys.stdout.write('{\\\"type\\\":\\\"result\\\",\\\"error\\\":\\\"synthetic-upstream-value\\\"}');sys.stdout.flush()"
+        events=[]
+        self.worker.capture([sys.executable,"-c",script],{"ANTHROPIC_API_KEY":"local-token"},"prompt",work,log,5,events.append)
+        self.assertNotIn("synthetic-upstream-value",log.read_text()); self.assertNotIn("local-token",log.read_text())
+        self.assertEqual(events[-1]["error"],"[REDACTED]")
 
 class SandboxTests(unittest.TestCase):
     def setUp(self):
@@ -370,7 +405,37 @@ class SandboxTests(unittest.TestCase):
         (self.inputs/"fake.png").write_text("not an image")
         with self.assertRaises(ValueError): self.box.image("input","fake.png")
 
+    def test_native_image_cap_rejects_without_modifying_source_direct_still_accepts(self):
+        import base64
+        from sandbox import ImageReadLimitError, NATIVE_IMAGE_BYTES
+        png=base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScLbtAAAAABJRU5ErkJggg==')
+        large=png+b"\0"*(100*1024)
+        file=self.inputs/"large.png"; file.write_bytes(large); before=sha_file(file)
+        native=Sandbox(self.work,self.inputs,image_max_bytes=NATIVE_IMAGE_BYTES)
+        with self.assertRaisesRegex(ImageReadLimitError,"96 KiB.*FFmpeg.*64 KiB"): native.image("input","large.png")
+        self.assertEqual(sha_file(file),before)
+        self.assertEqual(base64.b64decode(self.box.image("input","large.png")["data"]),large)
+        (self.inputs/"small.png").write_bytes(png)
+        self.assertEqual(base64.b64decode(native.image("input","small.png")["data"]),png)
+
 class MCPProtocolTests(unittest.TestCase):
+    def test_native_stdio_size_error_is_actionable_and_no_image_returned(self):
+        import subprocess
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp); work=root/"work"; inputs=root/"inputs"; work.mkdir(); inputs.mkdir()
+            file=inputs/"large.png"; file.write_bytes(b"x"*(96*1024+1))
+            requests=[{"jsonrpc":"2.0","id":1,"method":"tools/list"},
+                      {"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"read_image","arguments":{"area":"input","path":"large.png"}}}]
+            result=subprocess.run([sys.executable,str(Path(__file__).resolve().parents[1]/"mcp_server.py")],
+                input="".join(json.dumps(r)+"\n" for r in requests),capture_output=True,text=True,check=True,timeout=10,
+                env={"EDITOR_TASK_WORK":str(work),"EDITOR_TASK_INPUT":str(inputs),"EDITOR_IMAGE_MAX_BYTES":"98304"})
+            replies=[json.loads(line)["result"] for line in result.stdout.splitlines()]
+            description=next(t["description"] for t in replies[0]["tools"] if t["name"]=="read_image")
+            self.assertIn("96 KiB",description); self.assertIn("64 KiB",description)
+            self.assertTrue(replies[1]["isError"]);self.assertEqual(replies[1]["content"][0]["type"],"text")
+            self.assertIn("FFmpeg",replies[1]["content"][0]["text"]); self.assertIn("64 KiB",replies[1]["content"][0]["text"])
+            self.assertNotIn('"data":',result.stdout);self.assertEqual(file.stat().st_size,96*1024+1)
+
     def test_actual_stdio_initialize_list_read_write(self):
         import subprocess
         with tempfile.TemporaryDirectory() as temp:

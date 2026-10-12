@@ -12,6 +12,15 @@ import secrets
 from contextlib import contextmanager
 
 MAX_TEXT = 1024 * 1024
+MAX_IMAGE_BYTES = 8 * 1024 * 1024
+NATIVE_IMAGE_BYTES = 96 * 1024
+
+class FileSizeLimitError(ValueError):
+    pass
+
+class ImageReadLimitError(ValueError):
+    """A safe, constant-only hint that the MCP server may show to the model."""
+    pass
 
 def scoped(root, relative, must_exist=False):
     root = Path(root).resolve()
@@ -60,17 +69,21 @@ def read_scoped(root, relative, limit):
         fd = os.open(name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK | os.O_CLOEXEC, dir_fd=directory)
         try:
             st = os.fstat(fd)
-            if not stat.S_ISREG(st.st_mode) or st.st_nlink != 1 or st.st_size > limit:
+            if not stat.S_ISREG(st.st_mode) or st.st_nlink != 1:
                 raise ValueError("regular bounded non-linked file required")
+            if st.st_size > limit: raise FileSizeLimitError("file exceeds read limit")
             with os.fdopen(fd, "rb", closefd=False) as file: data = file.read(limit + 1)
-            if len(data) > limit: raise ValueError("file grew beyond limit")
+            if len(data) > limit: raise FileSizeLimitError("file grew beyond limit")
             return data
         finally: os.close(fd)
 
 class Sandbox:
-    def __init__(self, work, inputs, executable="/usr/local/bin/editor-sandbox-exec"):
+    def __init__(self, work, inputs, executable="/usr/local/bin/editor-sandbox-exec", image_max_bytes=MAX_IMAGE_BYTES):
         self.work, self.inputs = Path(work).resolve(), Path(inputs).resolve()
         self.executable = executable
+        if type(image_max_bytes) is not int or image_max_bytes not in (NATIVE_IMAGE_BYTES, MAX_IMAGE_BYTES):
+            raise ValueError("invalid image byte policy")
+        self.image_max_bytes = image_max_bytes
 
     def path(self, area, path, exists=False):
         if area not in ("work", "input"):
@@ -107,7 +120,12 @@ class Sandbox:
         return {"path": path, "bytes": len(data)}
 
     def image(self, area, path):
-        data = read_scoped(self.area_root(area), path, 8 * 1024 * 1024)
+        try:
+            data = read_scoped(self.area_root(area), path, self.image_max_bytes)
+        except FileSizeLimitError:
+            if self.image_max_bytes == NATIVE_IMAGE_BYTES:
+                raise ImageReadLimitError("read_image exceeds the 96 KiB inspection-image limit. Use FFmpeg to create a separate JPEG at most 64 KiB (for example width 640 with lower JPEG quality), verify its file size, then read that JPEG. Keep the original image and final 1080p video unchanged; do not skip actual image inspection.") from None
+            raise ImageReadLimitError("read_image exceeds the 8 MiB limit. Use FFmpeg to create a separate smaller inspection image, then read it. Keep the original unchanged.") from None
         if data.startswith(b"\x89PNG\r\n\x1a\n") and len(data) >= 24 and data[12:16] == b"IHDR":
             width, height = struct.unpack(">II", data[16:24]); mime = "image/png"
         elif data.startswith(b"\xff\xd8"):
@@ -189,6 +207,14 @@ TOOLS = [
     {"name": "list_files", "description": "List files in this task only.", "inputSchema": {"type": "object", "properties": {"area": {"enum": ["input", "work"]}}, "required": ["area"], "additionalProperties": False}},
     {"name": "run", "description": "Execute a workspace Python/Node script, or ffmpeg/ffprobe, with no network and no secret/session access. For scripts, args[0] is workspace-relative. EDITOR_INPUT_DIR/EDITOR_WORK_DIR are available. FFmpeg may use these absolute paths. No shell; fixed executable; max 600s.", "inputSchema": {"type": "object", "properties": {"program": {"enum": ["python", "node", "ffmpeg", "ffprobe"]}, "args": {"type": "array", "items": {"type": "string"}}, "timeout": {"type": "integer", "minimum": 1, "maximum": 600}}, "required": ["program", "args"], "additionalProperties": False}},
 ]
+
+def tools_for(box):
+    tools = [dict(tool) for tool in TOOLS]
+    if box.image_max_bytes == NATIVE_IMAGE_BYTES:
+        for tool in tools:
+            if tool["name"] == "read_image":
+                tool["description"] = "View an actual PNG/JPEG inspection image from task input/work. Hard limit 96 KiB. First use FFmpeg to create separate JPEG thumbnails at most 64 KiB (e.g. width 640, lower JPEG quality); verify file size before reading. Inspect small batches. Preserve original media and final 1080p output. Actual image inspection is required, not replaced by metadata."
+    return tools
 
 def dispatch(box, name, a):
     if name == "read_image": return box.image(a["area"], a["path"])
