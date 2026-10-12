@@ -1,0 +1,45 @@
+name: storyflow-editor
+services:
+  editor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: storyflow-editor:claude-2.1.258
+    init: true
+    restart: unless-stopped
+    user: "10001:10001"
+    read_only: true
+    cpus: 2
+    mem_limit: 3g
+    memswap_limit: 3g
+    pids_limit: 128
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,noexec,size=128m,mode=1777
+    environment:
+      EDITOR_ROUTE_PROFILE: ${EDITOR_ROUTE_PROFILE:-9router-native}
+      ANTHROPIC_BASE_URL: ${EDITOR_ANTHROPIC_BASE_URL:-https://router.yundongyl.cn}
+      EDITOR_MODEL: ${EDITOR_MODEL:-ezr/claude-opus-5-5}
+      EDITOR_API_KEY_FILE: /run/secrets/anthropic_api_key
+    volumes:
+      - type: bind
+        source: ${EDITOR_INPUT_DIR:?Set a dedicated read-only task input directory}
+        target: /input
+        read_only: true
+      - editor_state:/state
+      - editor_work:/work
+      - editor_sessions:/sessions
+    secrets:
+      - anthropic_api_key
+    # No ports, Docker socket, application DB, or old project checkout mounted.
+    logging:
+      driver: local
+      options: {max-size: "5m", max-file: "2"}
+secrets:
+  anthropic_api_key:
+    file: ${EDITOR_API_KEY_FILE:?Set a private file readable by container UID 10001}
+volumes:
+  editor_state:
+  editor_work:
+  editor_sessions:

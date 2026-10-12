@@ -1,0 +1,9 @@
+*
+!Dockerfile
+!package.json
+!package-lock.json
+!worker.py
+!sandbox.py
+!mcp_server.py
+!sandbox-exec.c
+!sandbox_smoke.py
