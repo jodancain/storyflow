@@ -157,3 +157,20 @@ jobs:
           rm -f /tmp/storyflow-ci-project.json
           docker rm -f storyflow-ci
           docker volume rm storyflow-ci-data
+  editor-container:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the separate pinned editor image
+        run: docker build -t storyflow-editor:ci ops/editor
+      - name: Run actual Linux sandbox with no credentials or network
+        run: |
+          docker run --rm --name storyflow-editor-ci --network none \
+            --user 10001:10001 --read-only --cap-drop ALL \
+            --security-opt no-new-privileges --cpus 1 --memory 768m --pids-limit 128 \
+            --tmpfs /tmp:rw,nosuid,nodev,noexec,size=128m,mode=1777 \
+            storyflow-editor:ci python3 /opt/editor/sandbox_smoke.py
+      - name: Cleanup
+        if: always()
+        run: docker rm -f storyflow-editor-ci 2>/dev/null || true

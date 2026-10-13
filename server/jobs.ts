@@ -743,11 +743,15 @@ export class Jobs {
       );
       const sourcePath = s.filePath(source.id);
       const info = await this.mediaEngine.probe(sourcePath);
+      // Media inspection/extraction can outlive a cancellation. Preserve the
+      // terminal state before publishing a candidate or starting another stage.
+      if (s.job(job.id).state === "cancelled") return;
       let fileId = source.id,
         audio: Artifact | undefined;
       if (job.kind === "voice") {
         const output = join(workDir, "voice.wav");
         await this.mediaEngine.extractAudio(sourcePath, output);
+        if (s.job(job.id).state === "cancelled") return;
         const f = s.addFile(
           job.projectId,
           `${job.shotId}-voice.wav`,

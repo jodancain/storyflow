@@ -183,6 +183,43 @@ test("review gate, durable idempotency and cancel prevent unintended submission"
   }
 });
 
+for (const stage of ["probe", "extractAudio"] as const) {
+  test(`cancellation during ${stage} stays terminal and publishes no candidate`, async () => {
+    const t = setup(stage === "extractAudio"), fake = provider(), engine = mockMedia();
+    let entered!: () => void, release!: () => void;
+    const started = new Promise<void>(resolve => { entered = resolve; });
+    const pending = new Promise<void>(resolve => { release = resolve; });
+    const original = engine[stage];
+    engine[stage] = async (...args: any[]) => {
+      entered();
+      await pending;
+      return original(...args);
+    };
+    const jobs = new Jobs(t.store, fake as any, engine);
+    jobs.stop();
+    try {
+      const job = jobs.enqueueRun(t.project.id, t.project.revision, `cancel-media-${stage}`).jobs[0];
+      assert.equal(job.kind, stage === "extractAudio" ? "voice" : "video");
+      jobs.stopped = false;
+      const running = jobs.tick();
+      await started;
+      assert.equal(jobs.cancel(job.id).state, "cancelled");
+      release();
+      await running;
+      assert.equal(t.store.job(job.id).state, "cancelled");
+      assert.equal(t.store.job(job.id).stage, "cancelled");
+      assert.equal(t.store.artifacts(t.project.id).length, 0);
+      assert.equal(fake.submits, 1, "Only the already-accepted provider task was submitted");
+      await tick(jobs);
+      assert.equal(fake.submits, 1, "Cancellation must not queue a replacement request");
+    } finally {
+      release();
+      jobs.stop();
+      t.close();
+    }
+  });
+}
+
 test("accepted task resumes polling after restart and does not POST again", async () => {
   const t = setup();
   try {

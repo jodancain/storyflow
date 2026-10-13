@@ -28,6 +28,7 @@ import type {
 import { compileOntology, hash, imageTargetHash, imageTargetHashes, shotImageInputBasis } from "../shared/ontology.ts";
 import { ensure, iso, sha } from "./util.ts";
 import { resolveImageReference } from "../shared/image-consistency.ts";
+import { assertNoInterruptedRestore } from "./restore-journal.ts";
 const parse = (value: any) => JSON.parse(value);
 export interface ProductionImageInput {
   artifactId: string;
@@ -37,6 +38,7 @@ export class Store {
   db: DatabaseSync;
   constructor(public directory: string) {
     this.directory = resolve(directory);
+    assertNoInterruptedRestore(this.directory);
     mkdirSync(this.directory, { recursive: true });
     mkdirSync(join(this.directory, "files"), { recursive: true });
     mkdirSync(join(this.directory, "work"), { recursive: true });

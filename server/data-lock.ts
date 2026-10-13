@@ -3,11 +3,12 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { hostname } from "node:os";
 import { randomUUID } from "node:crypto";
+import { assertNoInterruptedRestore } from "./restore-journal.ts";
 
 /** Process mutex: SQLite releases this lock even after SIGKILL. Never unlink its DB. */
 export function acquireDataLock(
   directory: string,
-  role: "runtime" | "backup" | "restore",
+  role: "runtime" | "backup" | "restore" | "restore-recovery",
 ): () => void {
   const root = resolve(directory);
   mkdirSync(root, { recursive: true, mode: 0o700 });
@@ -20,6 +21,7 @@ export function acquireDataLock(
       "PRAGMA busy_timeout=0; PRAGMA journal_mode=DELETE; CREATE TABLE IF NOT EXISTS mutex(id INTEGER PRIMARY KEY); BEGIN EXCLUSIVE",
     );
     held = true;
+    if (role !== "restore-recovery") assertNoInterruptedRestore(root);
     writeFileSync(
       marker,
       JSON.stringify({

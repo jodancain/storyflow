@@ -7,17 +7,20 @@ import {
   readFileSync,
   rmSync,
   existsSync,
+  readdirSync,
+  symlinkSync,
 } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { createHash } from "node:crypto";
-import { spawn, execFileSync } from "node:child_process";
+import { spawn, spawnSync, execFileSync } from "node:child_process";
 import { once } from "node:events";
 import { Store } from "../server/store.ts";
 import { acquireDataLock } from "../server/data-lock.ts";
 import { backup } from "../scripts/backup.ts";
-import { restore } from "../scripts/restore.ts";
-import { archive } from "../scripts/maintenance.ts";
+import { restore, recoverRestore } from "../scripts/restore.ts";
+import { archive, cliArgs } from "../scripts/maintenance.ts";
+import { RESTORE_JOURNAL } from "../server/restore-journal.ts";
 
 function fixture() {
   const root = mkdtempSync(join(tmpdir(), "storyflow-maint-")),
@@ -164,6 +167,110 @@ test("tampered backup fails before replacing existing database", async () => {
   } finally {
     f.clean();
   }
+});
+
+function killRestore(data: string, input: string, point: string) {
+  const code = `import fs from 'node:fs';import {syncBuiltinESMExports} from 'node:module';import path from 'node:path';
+const data=${JSON.stringify(data)},point=${JSON.stringify(point)},orig=fs.renameSync;
+fs.renameSync=function(a,b){orig(a,b);const old=String(a)===path.join(data,'storyflow.sqlite');
+const fresh=String(a).includes('/.restore-') && !String(a).includes('/.before-restore-');
+if((point==='old-db' && old)||(point==='new-db' && fresh && String(b)===path.join(data,'storyflow.sqlite'))||(point==='new-files' && fresh && String(b)===path.join(data,'files')))process.kill(process.pid,'SIGKILL');};
+syncBuiltinESMExports();const {restore}=await import(${JSON.stringify(new URL("../scripts/restore.ts", import.meta.url).href)});await restore(data,${JSON.stringify(input)},true);`;
+  const result = spawnSync(process.execPath, ["--import", "tsx", "--input-type=module", "-e", code], { encoding: "utf8", timeout: 20_000 });
+  assert.equal(result.signal, "SIGKILL", result.stderr);
+  assert.equal(result.error, undefined);
+}
+
+test("real SIGKILL at three restore rename windows blocks startup and explicit rollback preserves original bytes", async () => {
+  for (const point of ["old-db", "new-db", "new-files"]) {
+    const f = fixture();
+    try {
+      const input = join(f.root, "snapshot.tar");
+      await backup(f.data, input);
+      const original = readFileSync(join(f.data, "storyflow.sqlite"));
+      killRestore(f.data, input, point);
+      assert.ok(existsSync(join(f.data, RESTORE_JOURNAL)));
+      const before = readdirSync(f.data).sort();
+      assert.throws(() => new Store(f.data), (e: any) => e.code === "RESTORE_INCOMPLETE");
+      assert.deepEqual(readdirSync(f.data).sort(), before, "Store must not create missing DB/files/work");
+      for (const role of ["runtime", "backup", "restore"] as const)
+        assert.throws(() => acquireDataLock(f.data, role), (e: any) => e.code === "RESTORE_INCOMPLETE");
+      // Exercise the real CLI rather than only calling the recovery function.
+      const result = JSON.parse(execFileSync(process.execPath, ["--import", "tsx", "scripts/restore.ts", "--recover", "rollback", "--data-dir", f.data], { encoding: "utf8" }));
+      assert.equal(result.recovered, true);
+      assert.deepEqual(readFileSync(join(f.data, "storyflow.sqlite")), original);
+      assert.deepEqual(readFileSync(join(f.data, "files", f.sha256)), f.bytes);
+      assert.ok(existsSync(join(result.preservedReplacement, "storyflow.sqlite")));
+      assert.ok(existsSync(join(result.preservedReplacement, "files", f.sha256)));
+      assert.ok(existsSync(join(result.preservedReplacement, "recovery-journal.json")));
+      assert.equal(existsSync(join(f.data, RESTORE_JOURNAL)), false);
+      const db = new Store(f.data);
+      assert.equal(db.setting("test"), "preserved");
+      assert.equal((db.db.prepare("SELECT count(*) AS n FROM sessions").get() as any).n, 1, "rollback preserves original session state");
+      db.close();
+    } finally { f.clean(); }
+  }
+});
+
+test("interrupted restore rejects changed evidence, journal hash/path tampering and symlinks without deleting copies", async () => {
+  for (const kind of ["changed", "hash", "path", "link"]) {
+    const f = fixture();
+    try {
+      const input = join(f.root, "snapshot.tar"); await backup(f.data, input);
+      killRestore(f.data, input, "new-db");
+      const journalPath = join(f.data, RESTORE_JOURNAL), bytes = readFileSync(journalPath);
+      const envelope = JSON.parse(bytes.toString()), j = envelope.payload;
+      const oldDb = join(f.data, j.rollback, "storyflow.sqlite"), oldBytes = readFileSync(oldDb);
+      if (kind === "changed") writeFileSync(join(f.data, "storyflow.sqlite"), "changed installed database");
+      if (kind === "hash") writeFileSync(journalPath, JSON.stringify({ ...envelope, sha256: "0".repeat(64) }));
+      if (kind === "path") {
+        j.stage = "../outside"; envelope.sha256 = createHash("sha256").update(JSON.stringify(j)).digest("hex");
+        writeFileSync(journalPath, JSON.stringify(envelope));
+      }
+      if (kind === "link") { rmSync(journalPath); const target = join(f.root, "journal.json"); writeFileSync(target, bytes); symlinkSync(target, journalPath); }
+      assert.throws(() => recoverRestore(f.data));
+      assert.throws(() => new Store(f.data), (e: any) => e.code === "RESTORE_INCOMPLETE");
+      assert.deepEqual(readFileSync(oldDb), oldBytes);
+      assert.deepEqual(readFileSync(join(f.data, envelope.payload.rollback, "files", f.sha256)), f.bytes);
+      assert.ok(existsSync(journalPath));
+    } finally { f.clean(); }
+  }
+});
+
+test("explicit rollback interrupted by a second SIGKILL resumes from evidence without losing either tree", async () => {
+  for (const point of ["save-replacement", "restore-original"]) {
+    const f = fixture();
+    try {
+      const input = join(f.root, "snapshot.tar"); await backup(f.data, input);
+      const original = readFileSync(join(f.data, "storyflow.sqlite"));
+      killRestore(f.data, input, "new-files");
+      const code = `import fs from 'node:fs';import {syncBuiltinESMExports} from 'node:module';import path from 'node:path';
+const data=${JSON.stringify(f.data)},point=${JSON.stringify(point)},orig=fs.renameSync;
+fs.renameSync=function(a,b){orig(a,b);if((point==='save-replacement'&&String(a)===path.join(data,'storyflow.sqlite'))||(point==='restore-original'&&String(a).includes('/.before-restore-')&&String(b)===path.join(data,'storyflow.sqlite')))process.kill(process.pid,'SIGKILL');};syncBuiltinESMExports();
+const {recoverRestore}=await import(${JSON.stringify(new URL("../scripts/restore.ts", import.meta.url).href)});recoverRestore(data);`;
+      const crash = spawnSync(process.execPath, ["--import", "tsx", "--input-type=module", "-e", code], { encoding: "utf8", timeout: 20_000 });
+      assert.equal(crash.signal, "SIGKILL", crash.stderr);
+      assert.throws(() => new Store(f.data), (e: any) => e.code === "RESTORE_INCOMPLETE");
+      const result = recoverRestore(f.data);
+      assert.deepEqual(readFileSync(join(f.data, "storyflow.sqlite")), original);
+      assert.deepEqual(readFileSync(join(f.data, "files", f.sha256)), f.bytes);
+      assert.ok(existsSync(join(result.preservedReplacement, "storyflow.sqlite")));
+      assert.ok(existsSync(join(result.preservedReplacement, "files", f.sha256)));
+      const db = new Store(f.data); assert.equal(db.setting("test"), "preserved"); db.close();
+    } finally { f.clean(); }
+  }
+});
+
+test("legacy interrupted replacement cannot silently initialize an empty Store; recovery arguments stay explicit", () => {
+  const f = fixture();
+  try {
+    const rollback = join(f.data, ".before-restore-legacy"); mkdirSync(rollback);
+    execFileSync(process.execPath, ["-e", "require('fs').renameSync(process.argv[1],process.argv[2])", join(f.data, "storyflow.sqlite"), join(rollback, "storyflow.sqlite")]);
+    assert.throws(() => new Store(f.data), /legacy restore rollback/);
+    assert.equal(existsSync(join(f.data, "storyflow.sqlite")), false);
+    assert.equal(cliArgs(["--recover", "rollback", "--data-dir", f.data]).recover, "rollback");
+    assert.throws(() => cliArgs(["--recover"]), /Missing value/);
+  } finally { f.clean(); }
 });
 
 test("archive extraction rejects traversal and symlinks", async () => {
