@@ -92,13 +92,15 @@ class Acceptance:
         require(owner.stdout.strip() == self.name, "Refuse to remove a container not owned by this QA run")
         self.docker("rm", "-f", name)
 
-    def limited(self):
-        return ["--cpus", "1", "--memory", "1g", "--memory-swap", "1g", "--pids-limit", "128",
+    def limited(self, pids=128):
+        return ["--cpus", "1", "--memory", "1g", "--memory-swap", "1g", "--pids-limit", str(pids),
                 "--cap-drop", "ALL", "--security-opt", "no-new-privileges:true",
                 "--read-only", "--tmpfs", "/tmp:rw,nosuid,nodev,noexec,size=128m,mode=1777"]
 
     def start_app(self, name, volume, port):
-        self.create_container(name, [*self.limited(), "-p", f"127.0.0.1:{port}:18296",
+        # Chromium's processes and threads exceed 128 on the tested Linux
+        # image; cap the app at 256, while non-browser jobs/editor keep 128.
+        self.create_container(name, [*self.limited(pids=256), "-p", f"127.0.0.1:{port}:18296",
                                     "-v", f"{volume}:/data/storyflow",
                                     "-e", f"PUBLIC_BASE_URL=http://127.0.0.1:{port}"], self.args.app_image)
         self.docker("start", name)
@@ -188,7 +190,7 @@ print(json.dumps(rows))
         state = json.loads(self.docker("container", "inspect", "--format", fmt, container).stdout)
         require(state["user"] == "node" and state["memoryBytes"] == 1024 ** 3 and state["nanoCpus"] == 10 ** 9,
                 "Candidate user or resource isolation differs from the requested constraints")
-        require(state["pidsLimit"] == 128 and state["readOnlyRootfs"] and "ALL" in state["capDrop"], "Candidate sandbox constraints missing")
+        require(state["pidsLimit"] == 256 and state["readOnlyRootfs"] and "ALL" in state["capDrop"], "Candidate sandbox constraints missing")
         require("no-new-privileges:true" in state["securityOpt"], "Candidate privilege restriction missing")
         require(all(binding["HostIp"] == "127.0.0.1" for bindings in state["portBindings"].values() for binding in bindings),
                 "Candidate unexpectedly exposes a non-loopback port")
@@ -282,9 +284,12 @@ print(json.dumps(rows))
         self.stage("container-sigkill-recreate", status="passed", exitCode=137, sameSession=True, identity=recovered)
         state_before = self.runtime_state(app_name)
         self.stage("candidate-runtime-isolation", status="passed", evidence=self.isolation_state(app_name), state=state_before)
-        doctor = self.docker("exec", app_name, "npm", "--silent", "run", "doctor", "--", "--json", timeout=180)
+        doctor = self.docker("exec", app_name, "npm", "--silent", "run", "doctor", "--", "--json", timeout=180, check=False)
         doctor_result = json.loads(doctor.stdout)
-        require(doctor_result["ok"] and any(check["name"] == "Chromium rendering" and check["ok"] for check in doctor_result["checks"]),
+        if doctor.returncode or not doctor_result["ok"]:
+            self.stage("runtime-doctor-chromium", status="failed", evidence=doctor_result)
+            raise AssertionError("Doctor returned a failed required check; see recorded evidence")
+        require(any(check["name"] == "Chromium rendering" and check["ok"] for check in doctor_result["checks"]),
                 "Doctor did not verify real Chromium drawing")
         self.stage("runtime-doctor-chromium", status="passed", evidence=doctor_result)
         media = self.docker("exec", app_name, "node", "--import", "tsx", "scripts/qa/container-media.ts", timeout=900)
