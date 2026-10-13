@@ -23,7 +23,7 @@ RUN gcc -O2 -Wall -Wextra sandbox-exec.c -lseccomp -o /usr/local/bin/editor-sand
     && groupadd --gid 10001 editor && useradd --uid 10001 --gid 10001 --no-create-home editor \
     && mkdir -p /state /work /sessions /input \
     && chown editor:editor /state /work /sessions
-COPY worker.py sandbox.py mcp_server.py sandbox_smoke.py image_bridge.py ./
+COPY worker.py sandbox.py mcp_server.py sandbox_smoke.py image_bridge.py final_lip_review.py ./
 ENV PATH=/usr/local/bin:/usr/bin:/bin LANG=C.UTF-8 \
     EDITOR_STATE_DIR=/state EDITOR_WORK_DIR=/work EDITOR_SESSION_DIR=/sessions EDITOR_INPUT_DIR=/input \
     EDITOR_API_KEY_FILE=/run/secrets/anthropic_api_key EDITOR_ROUTE_PROFILE=9router-native ANTHROPIC_BASE_URL=https://router.yundongyl.cn \

@@ -4,6 +4,7 @@
 !package-lock.json
 !worker.py
 !image_bridge.py
+!final_lip_review.py
 !sandbox.py
 !mcp_server.py
 !sandbox-exec.c

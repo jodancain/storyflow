@@ -508,6 +508,76 @@ class Worker:
             save(d / "state.json", state)
             return state
 
+    def _delivery_check(self, job_id, review_file, timeline_file=None):
+        """Independent operator gate; never infer human approval from CLI success."""
+        from final_lip_review import check
+        d, spec, state = self.load(job_id)
+        if state["status"] != "completed":
+            raise ValueError("technical output validation is not complete")
+        review = Path(review_file)
+        if review.is_symlink() or review.resolve() != d / "final-lip-review.json":
+            raise ValueError("review must be in the operator-owned job state directory")
+        work = self.work / job_id / "workspace"
+        receipt = read(d / "attempts" / f'{state["attempts"]:03d}' / "outputs.json")
+        if self.outputs(spec, work) != receipt:
+            raise ValueError("completed output drift; rerender and review again")
+        result = check(review, timeline_file)
+        film = Path(result["film"]["path"])
+        declared = next((o for o in spec["outputs"]
+                         if o.get("media", {}).get("kind") == "video"
+                         and scoped(work, o["path"], True) == film), None)
+        if not declared:
+            raise ValueError("review is not for this job's validated video output")
+        timeline = read(timeline_file or read(review)["timelinePath"])
+        if declared["media"].get("fps") != timeline["fps"] or declared["media"].get("frames") != timeline["totalFrames"]:
+            raise ValueError("review timeline must match the validated output frame clock")
+        # The final master must come from the frozen input list, not a replacement
+        # voice silently created by the editor. Voice approval remains a prior gate.
+        input_hashes = {i["sha256"] for i in spec["inputs"]}
+        if result["audio"]["sha256"] not in input_hashes:
+            raise ValueError("final master audio is not a frozen job input")
+        if any(s["audio"] and s["audio"]["sha256"] not in input_hashes for s in timeline["segments"]):
+            raise ValueError("segment driving audio is not a frozen job input")
+        return {**result, "jobId": job_id, "reviewSha256": sha_file(review),
+                "boundary": "final_mouth_review_only_not_medical_or_publication_approval"}
+
+    def delivery_check(self, job_id, review_file, timeline_file=None):
+        with lock(self.state / "worker.lock", False):
+            return self._delivery_check(job_id, review_file, timeline_file)
+
+    def export_reviewed(self, job_id, review_file, destination, timeline_file=None):
+        """Copy only the reviewed film to a new local handoff, never publish it."""
+        with lock(self.state / "worker.lock", False):
+            result = self._delivery_check(job_id, review_file, timeline_file)
+            if not result["ok"]:
+                raise ValueError("final lip review is pending or needs repair")
+            target = Path(destination).absolute()
+            # Do not clobber a previous handoff or place one in a model workspace.
+            for private in (self.state, self.work, self.sessions, self.inputs):
+                try: target.resolve().relative_to(private)
+                except ValueError: continue
+                raise ValueError("delivery destination must be outside editor roots")
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.mkdir(exist_ok=False, mode=0o700)
+            try:
+                film = Path(result["film"]["path"])
+                output = target / ("film" + film.suffix.lower())
+                shutil.copyfile(film, output)
+                if sha_file(output) != result["film"]["sha256"]:
+                    raise ValueError("film changed during export")
+                verified = self._delivery_check(job_id, review_file, timeline_file)
+                if verified != result:
+                    raise ValueError("review changed during export")
+                # No names, dialogue, private paths, comments or source media leave.
+                manifest = {"schema": "storyflow-reviewed-film-export-v1", "film": output.name,
+                            "sha256": result["film"]["sha256"], "reviewSha256": result["reviewSha256"],
+                            "finalLipReview": "passed", "publiclyPublished": False}
+                save(target / "DELIVERY.json", manifest)
+                return manifest
+            except Exception:
+                shutil.rmtree(target)
+                raise
+
 def main():
     os.umask(0o077)
     parser = argparse.ArgumentParser()
@@ -516,12 +586,21 @@ def main():
     status = sub.add_parser("status"); status.add_argument("job_id")
     sub.add_parser("once"); sub.add_parser("serve")
     resume = sub.add_parser("resume"); resume.add_argument("job_id"); resume.add_argument("--session-id", required=True); resume.add_argument("--prompt-file", required=True); resume.add_argument("--authorization-ref", required=True)
+    for name in ("delivery-check", "export-reviewed"):
+        p = sub.add_parser(name); p.add_argument("job_id"); p.add_argument("--review-file", required=True); p.add_argument("--timeline-file")
+        if name == "export-reviewed": p.add_argument("--destination", required=True)
     args = parser.parse_args()
     w = Worker(os.environ.get("EDITOR_STATE_DIR", "/state"), os.environ.get("EDITOR_WORK_DIR", "/work"), os.environ.get("EDITOR_SESSION_DIR", "/sessions"), os.environ.get("EDITOR_INPUT_DIR", "/input"))
     try:
         if args.command == "submit": result = w.submit(read(args.file))
         elif args.command == "status": result = w.load(args.job_id)[2]
         elif args.command == "resume": result = w.resume(args.job_id, args.session_id, Path(args.prompt_file).read_text(), args.authorization_ref)
+        elif args.command == "delivery-check":
+            result = w.delivery_check(args.job_id, args.review_file, args.timeline_file)
+            print(json.dumps(result, ensure_ascii=False)); return 0 if result["ok"] else 2
+        elif args.command == "export-reviewed":
+            result = w.export_reviewed(args.job_id, args.review_file, args.destination, args.timeline_file)
+            print(json.dumps(result, ensure_ascii=False)); return 0
         elif args.command == "once": result = w.tick()
         else:
             while True:

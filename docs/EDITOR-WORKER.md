@@ -1,6 +1,6 @@
 # 独立 Claude Code 编辑 worker
 
-这是一项独立、私有的后期执行服务，不复用 StoryFlow 的数据库、审核状态或生产容器。代码在 `ops/editor/`。只有操作者明确提交 JSON 任务时才运行模型；部署或编译镜像本身不会创建编辑任务。生成成功只表示程序及产物校验完成，不表示声音、医学内容或影片已获人工批准。
+这是一项独立、私有的后期执行服务，不复用 StoryFlow 的数据库、审核状态或生产容器。代码在 `ops/editor/`。只有操作者明确提交 JSON 任务时才运行模型；部署或编译镜像本身不会创建编辑任务。生成成功只表示程序及产物校验完成，不表示声音、医学内容或影片已获人工批准。最终合成后还须完成独立的逐段口型复核；待审或返修片段不能随 `completed` 状态被当成已通过成片发布。
 
 ## 固定环境与边界
 
@@ -119,6 +119,70 @@ docker compose -f ops/editor/compose.yaml exec -T editor \
 ```
 
 `resume`只对needs_reconcile/failed_validation/artifact_invalid开放。无授权字符串、错session、重复resume、已完成任务均拒绝。没有自动退回新会话的路径。resume保留已正确完成的文件，原哈希写入intent供审计，不要求每个输出都变化。仍须本次真实工具执行和完整产物约束通过，不能通过一句模型“已完成”绕过文件校验。旧的孤立attempt目录保留并标needs_reconcile；人工核对后续接使用新序号，不覆盖旧历史。
+
+## 最终口型复核与返修
+
+worker 的 `completed` 是执行合同完成，最终口型审核另行保存，不回写为模型已经替人批准。操作者在合成后冻结最终影片、已获审母带、逐段计划及驱动音轨哈希，按 [声音先行工作流](VOICE-FIRST-WORKFLOW.md#最后再对一遍嘴型) 逐段人工检查。全部声音段落都应列入，包括内心独白和画外音；不能只列认为正确的医生片段。
+
+先以1倍速看听完整成片，再核对每段首中尾、开闭口、停顿、切点两侧、角色和台词。检查源片入点、实际速度、声音绑定以及字幕、裁切或动作遮嘴。必要时降速／逐帧定位。FFprobe、源帧与音频时钟匹配不能证明主观嘴形自然，也不能代替人工意见。
+
+每段须有明确通过、返修或不适用及其理由。只有内心独白／画外声确实无可见说话口部时才可不适用；明显张嘴的女主旧画面配内心独白属于返修，意外遮嘴不能作为通过依据。不通过时记录具体帧区间，再根据已授权范围调整剪辑或用该段最终获审声音重做口型；照片＋音频生成的新片段不等于保持原视频动作的局部嘴部修复。
+
+返修必须产生新候选，重新合成后再复核。最终文件或任一绑定输入哈希变化时，旧通过记录只作历史；不得用相同文件名继承批准。任何待审、返修、缺失输入、范围不完整或哈希不符均阻止本版口型通过，之后还需内容审片和公开许可。复核工具不自动调用模型，不自动部署、提交网页任务或发布影片；当前主应用与独立编辑器仍是人工冻结交接。
+
+### 私有逐段记录
+
+`final_lip_review.py` 是操作者运行的确定性工具，不使用模型或自动判断嘴形。时间线 schema 为 `storyflow-final-lip-timeline-v1`：`fps` 为24或25，`totalFrames` 为总帧数；`film`、`audio` 各含相对 `path` 与实际 `sha256`。`segments` 按帧完整、连续、无重叠地覆盖全片，每段保存 `id`、`startFrame`、`endFrame`、`mode`、`speakerId`、`text`、`sourceVideo` 文件引用、`sourceInFrame`、`sourceFps`、`speed: {numerator, denominator}`、`audio` 文件引用和 `audioInFrame`。区间从0起算，含 `startFrame`、不含 `endFrame`；`audioInFrame` 使用项目 `fps`，`sourceInFrame` 使用 `sourceFps`。无声段须令 `speakerId`、`text` 为空字符串、`audio` 为 `null`、`audioInFrame` 为0，其余说话段必须有角色、台词和音频引用。文件引用相对时间线目录，不接受URL或越界路径。
+
+`mode` 区分 `visible_speech`、`voiceover` 与 `silent`。可见说话段只能以人工 `pass` 通过；画外声／内心独白及无声段必须逐段确认 `not_applicable` 并说明理由。时间线分类本身仍需人工核对：把明显说话画面填作 `voiceover` 不能证明画面合格。`change` 与尚未审核的 `pending` 均阻止通过。
+
+为独立 worker 审核时，时间线放在 `/work/<jobId>/final-lip-timeline.json`，可引用 `workspace/result.mp4`、`inputs/master.wav` 和冻结源片。审核文件必须位于操作者控制的 `/state/jobs/<jobId>/final-lip-review.json`，不接受模型工作区中的“自我批准”。该目录不在模型可读写的 MCP 工作范围内。先填写并检查时间线，随后执行：
+
+```sh
+JOB_ID='<实际jobId>'
+docker compose -f ops/editor/compose.yaml exec -T editor \
+  python3 /opt/editor/final_lip_review.py init \
+  --timeline "/work/$JOB_ID/final-lip-timeline.json" \
+  --review "/state/jobs/$JOB_ID/final-lip-review.json"
+
+# 只有人实际检查本段后才记录；版本号使用上次返回的 revision。
+docker compose -f ops/editor/compose.yaml exec -T editor \
+  python3 /opt/editor/final_lip_review.py record \
+  --timeline "/work/$JOB_ID/final-lip-timeline.json" \
+  --review "/state/jobs/$JOB_ID/final-lip-review.json" \
+  --expected-revision 1 --segment S01 --status pass \
+  --reviewer '实际审核人' --note '实际逐段检查结论'
+
+docker compose -f ops/editor/compose.yaml exec -T editor \
+  python3 /opt/editor/final_lip_review.py check \
+  --timeline "/work/$JOB_ID/final-lip-timeline.json" \
+  --review "/state/jobs/$JOB_ID/final-lip-review.json"
+```
+
+`init` 创建 revision 1、所有段落 `pending` 的记录，拒绝覆盖已有文件；`record` 以 `--expected-revision` 防止覆盖并发意见，状态可选 `pass`、`change`、`not_applicable`。工具绑定时间线原始文件 SHA 及全部被引用文件的实际 SHA；文件、排布或绑定改变后拒绝沿用记录，须保留旧记录并为新候选建立新审核。`check` 输出 JSON 的 `ok`、`state` 和 `revision`；未完成退出2，格式、哈希或并发错误退出1，全部通过才退出0。它校验记录完整性，不自动测量嘴形或确认最终音轨逐句对齐；审核人姓名是操作者的审计记录，不是身份认证，也不查证此前声音批准的真实性。
+
+### 交付门槛与导出
+
+先将复核与 worker 的技术产物关联，再导出到新的私有交接目录：
+
+```sh
+docker compose -f ops/editor/compose.yaml exec -T editor \
+  python3 /opt/editor/worker.py delivery-check "$JOB_ID" \
+  --timeline-file "/work/$JOB_ID/final-lip-timeline.json" \
+  --review-file "/state/jobs/$JOB_ID/final-lip-review.json"
+
+# /handoff 须先配置为 UID 10001 可写的独立私有持久挂载。
+# 默认 Compose 没有此挂载；/tmp 只适合临时检查，不能当成交付存储。
+docker compose -f ops/editor/compose.yaml exec -T editor \
+  python3 /opt/editor/worker.py export-reviewed "$JOB_ID" \
+  --timeline-file "/work/$JOB_ID/final-lip-timeline.json" \
+  --review-file "/state/jobs/$JOB_ID/final-lip-review.json" \
+  --destination /handoff/new-film-review
+```
+
+两条命令的 `--timeline-file` 可省略，此时读取审核文件记录的原时间线位置。门槛要求任务技术状态为 `completed`、当前输出匹配该次 `outputs.json` 回执并通过既有媒体检查、影片是合同中声明的视频、时间线帧率／帧数匹配、母带及每段驱动音轨哈希均属于冻结任务输入，且当前逐段复核通过。未通过不能导出；模型在其工作区写一个“通过”JSON无法替代私有人工记录。
+
+导出目的目录必须尚不存在，并位于 `/state`、`/work`、`/sessions`、`/input` 等编辑器根目录之外。只复制 `film.mp4`（保留原扩展名）及脱敏 `DELIVERY.json`，再次核对复制后哈希与当前复核；不包含审核人姓名、台词、意见、私有路径、源片或程序。`DELIVERY.json` 的 `finalLipReview: "passed"` 只代表此次逐段口型门槛，`publiclyPublished` 始终为 `false`；不替代医学／内容批准或公开许可，也不会上传公网。
 
 ## 本轮验证范围
 
