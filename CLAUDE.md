@@ -2,6 +2,8 @@
 
 遵循本目录 `AGENTS.md`。先阅读 README、开发交接和本体方法文档。
 
+v0.4.0 先读 `docs/VOICE-FIRST-WORKFLOW.md`：脚本／资产审核、完整声音人审、同音轨医生口型、人工冻结输入后交给 `ops/editor/` 的Docker Claude Code实际后期，独立检查再审片。工作台还没有自动对接该独立编辑器。原生9Router请求 `ezr/claude-opus-5-5`，无auto/fallback；应用结构化输出与编辑器受限代码执行是两条边界。跨机器交付见 `docs/SOURCE-RELEASE.md`；源码ZIP从同一Git提交产生，不能携带原照、密钥、日志、会话或旧片授权。
+
 Node 22／React 19／TypeScript；`npm ci` 后用 `npm run check` 验证。服务端 `npm start`，UI 开发另开 `npm run dev:ui`。媒体依赖用 `npm run doctor` 检查。数据路径由 `STORYFLOW_DATA_DIR` 配置，不写入仓库。
 
 本项目为独立源码交付。未配置供应商时可完成本体编译、审稿和导入已有媒体流程。不得编造真实模型调用成功、自动重投受理不明任务、默认新增旁白或自行部署生产。

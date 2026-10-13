@@ -1,3 +1,13 @@
+# v0.4.0 完整模块交接（2026-10-13）
+
+- 用户认可当前工作流，更新完整应用源包与私有仓库；不重部署、不新生成。本版整合此前已提交的火山口型和独立Docker后期能力，补全跨Mac的制作方法、空白交接单及确定性打包工具。
+- 从 [声音先行框图](VOICE-FIRST-WORKFLOW.md) 开始，按需求／本体／脚本、声音批准、同轨口型、冻结、后期、独立检查、审片推进。**目前由操作者交接应用与编辑器**，未新增主应用公共编辑API。
+- `ops/editor/` 与应用分别使用Docker配置和持久目录。原生9Router请求 `ezr/claude-opus-5-5`；编辑器只能读取声明哈希的输入，通过隔离MCP执行程序。构建、部署、任务提交、主观审片是分开的步骤，见 [编辑器指南](EDITOR-WORKER.md)。
+- 修正根Compose遗漏 `VIDEO_MODEL`：新部署明确选择Veo时与原生开发一致。诊断工具显示实际配置的视频模型。该修复不更改历史任务的冻结供应商/参数，不解除审核门禁，不执行生成。
+- 完整包使用 `scripts/package-source.py` 读取某个Git提交的全部合法tracked blobs，逐文件记录SHA；参考 [发布检查](SOURCE-RELEASE.md)。包含已有授权AI图例，不带原始医生照片、原始资料、真实影片和私有运行记录。
+- 主应用CI继续验证测试、前端、主Docker构建和卷恢复；编辑器CI目前只有离线单元/协议/构建输入检查，真实Linux镜像与沙箱运行来自已记录的2026-10-13实测。没有宣称Apple Silicon Docker完成实机验收。
+- 新版本最终提交、ZIP哈希、全新解压与GitHub CI结果以同版本Release外置 `ACCEPTANCE.json` 为准。验收后的生产应用版本不因源码Release而变化。
+
 # 火山 OmniHuman 1.5 接入（2026-10-11）
 
 - 新建口型任务可通过 `LIPSYNC_PROVIDER=volcano-omnihuman` 选择火山；默认仍为 `fal`。服务端凭据为 `VOLCENGINE_ACCESS_KEY_ID`、`VOLCENGINE_SECRET_ACCESS_KEY`，需在火山即梦视觉服务开通 OmniHuman 1.5。方舟普通 API Key 不是这里的 AK/SK。

@@ -39,6 +39,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Compose preserves explicit video model choice
+        run: |
+          VIDEO_MODEL=veo-3.1-generate-001 docker compose config --format json > /tmp/storyflow-compose.json
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import {readFileSync} from 'node:fs';
+          const compose=JSON.parse(readFileSync('/tmp/storyflow-compose.json','utf8'));
+          assert.equal(compose.services.storyflow.environment.VIDEO_MODEL,'veo-3.1-generate-001');
+          JS
       - run: docker build -t storyflow:ci .
       - name: Container health, media dependencies, dedicated volume persistence
         run: |
