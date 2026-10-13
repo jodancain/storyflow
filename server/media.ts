@@ -268,8 +268,6 @@ export async function renderGraphic({
       "2:a:0",
       "-t",
       String(duration),
-      "-frames:v",
-      String(frames),
       "-c:v",
       "libx264",
       "-preset",
@@ -444,7 +442,7 @@ export async function composeMedia({
     "Video sequence does not cover its total frame count",
   );
   const plan = {
-    renderer: "storyflow-media-v1",
+    renderer: "storyflow-media-v2-pcm-clock",
     spec: ontology.spec,
     clips: descriptors.map(({ clip, videoHash, audioHash }) => ({
       startFrame: clip.startFrame,
@@ -477,35 +475,28 @@ export async function composeMedia({
     join(directory, "manifest.json"),
     JSON.stringify(plan, null, 2),
   );
-  const segments: string[] = [];
+  const segments: string[] = [], audioSegments: string[] = [];
+  const sampleRate = 48000, totalSamples = totalFrames * sampleRate / fps;
   for (const [i, { clip, audioPath }] of descriptors.entries()) {
     const frames = clip.endFrame - clip.startFrame,
       duration = frames / fps,
-      segment = join(directory, `segment-${String(i).padStart(4, "0")}.mp4`);
+      samples = frames * sampleRate / fps,
+      segment = join(directory, `segment-${String(i).padStart(4, "0")}.mp4`),
+      audioSegment = join(directory, `audio-${String(i).padStart(4, "0")}.wav`);
     segments.push(segment);
+    audioSegments.push(audioSegment);
     const args = ["-v", "error", "-nostdin", "-y", "-i", clip.path];
-    let audioIndex = 0;
-    if (audioPath && audioPath !== clip.path) {
-      args.push("-i", audioPath);
-      audioIndex = 1;
-    } else if (!audioPath) {
-      args.push("-f", "lavfi", "-i", "anullsrc=r=48000:cl=stereo");
-      audioIndex = 1;
-    }
     // Sample using the original source timebase first; resetting a trimmed 24 fps clock
     // before conversion to 25 fps can lose a frame at the end of the selected window.
     const sourceStart = Math.round(clip.sourceInSeconds * fps),
       sourceEnd = sourceStart + frames;
     const video = `[0:v:0]fps=${fps},trim=start_frame=${sourceStart}:end_frame=${sourceEnd},setpts=PTS-STARTPTS,scale=${width}:${height}:force_original_aspect_ratio=decrease,pad=${width}:${height}:(ow-iw)/2:(oh-ih)/2:color=black,setsar=1,format=yuv420p[v]`;
-    const audioStart = audioPath ? clip.sourceInSeconds : 0;
-    const audio = `[${audioIndex}:a:0]atrim=start=${audioStart}:duration=${duration},asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo,apad=whole_dur=${duration},atrim=duration=${duration}[a]`;
     args.push(
       "-filter_complex",
-      video + ";" + audio,
+      video,
       "-map",
       "[v]",
-      "-map",
-      "[a]",
+      "-an",
       "-frames:v",
       String(frames),
       "-t",
@@ -518,14 +509,6 @@ export async function composeMedia({
       "18",
       "-pix_fmt",
       "yuv420p",
-      "-c:a",
-      "aac",
-      "-b:a",
-      "192k",
-      "-ar",
-      "48000",
-      "-ac",
-      "2",
       "-video_track_timescale",
       String(fps * 1000),
       "-movflags",
@@ -538,14 +521,36 @@ export async function composeMedia({
       check.video.frames === frames,
       `Clip ${i + 1} produced fewer frames than required`,
     );
+    // FFmpeg 5.x stops audio early when a mixed output reaches -frames:v.
+    // Decode each approved source independently onto an exact sample clock;
+    // PCM also avoids adding AAC priming/padding at every edit boundary.
+    const audioArgs = ["-v", "error", "-nostdin", "-y"];
+    if (audioPath) audioArgs.push("-i", audioPath);
+    else audioArgs.push("-f", "lavfi", "-i", "anullsrc=r=48000:cl=stereo");
+    const audioStartSample = audioPath ? Math.round(clip.sourceInSeconds * sampleRate) : 0;
+    audioArgs.push("-map", "0:a:0", "-vn", "-af",
+      `aresample=${sampleRate},atrim=start_sample=${audioStartSample}:end_sample=${audioStartSample + samples},asetpts=N/SR/TB,aformat=channel_layouts=stereo`,
+      "-c:a", "pcm_s16le", "-ar", String(sampleRate), "-ac", "2", audioSegment);
+    await run(ffmpeg(), audioArgs);
+    const audioCheck = await probe(audioSegment);
+    const decodedSamples = Number(audioCheck.audio?.duration_ts);
+    requireValue(!audioPath || decodedSamples >= samples,
+      `Bound audio for clip ${i + 1} is too short after decoding; missing ${samples - decodedSamples} samples (${((samples - decodedSamples) / sampleRate).toFixed(6)} seconds). No silence padding is allowed.`);
+    requireValue(Number(audioCheck.audio?.sample_rate) === sampleRate &&
+      decodedSamples === samples,
+      `Clip ${i + 1} did not produce its exact PCM sample count`);
   }
-  const concat = join(directory, "concat.txt");
+  const concat = join(directory, "concat.txt"), audioConcat = join(directory, "concat-audio.txt");
   await writeFile(
     concat,
     segments.map((p) => `file '${p.replace(/'/g, "'\\''")}'`).join("\n"),
   );
+  await writeFile(audioConcat,
+    audioSegments.map((p) => `file '${p.replace(/'/g, "'\\''")}'`).join("\n"));
   const cleanVideo = join(directory, "clean.mp4");
-  // Re-encode AAC once after concatenation to align packet priming on one final clock.
+  // Pure video segments and exact-length PCM use independent clocks. Encode AAC
+  // only once, and let both finite streams finish: -frames:v here can truncate
+  // queued audio on FFmpeg 5.x even when -t requests the complete duration.
   await run(ffmpeg(), [
     "-v",
     "error",
@@ -557,20 +562,24 @@ export async function composeMedia({
     "0",
     "-i",
     concat,
+    "-f",
+    "concat",
+    "-safe",
+    "0",
+    "-i",
+    audioConcat,
     "-map",
     "0:v:0",
     "-map",
-    "0:a:0",
+    "1:a:0",
     "-c:v",
     "copy",
     "-af",
-    `aresample=48000:async=1:first_pts=0,apad=whole_dur=${totalFrames / fps},atrim=duration=${totalFrames / fps}`,
+    `atrim=end_sample=${totalSamples},asetpts=N/SR/TB`,
     "-c:a",
     "aac",
     "-b:a",
     "192k",
-    "-frames:v",
-    String(totalFrames),
     "-t",
     String(totalFrames / fps),
     "-movflags",
@@ -608,8 +617,8 @@ export async function composeMedia({
         "[v]",
         "-map",
         "0:a:0",
-        "-frames:v",
-        String(totalFrames),
+        "-t",
+        String(totalFrames / fps),
         "-r",
         String(fps),
         "-c:v",

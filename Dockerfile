@@ -21,6 +21,8 @@ ENV NODE_ENV=production \
     STORYFLOW_DATA_DIR=/data/storyflow \
     PYTHON=/opt/storyflow-venv/bin/python \
     CHROMIUM_PATH=/usr/bin/chromium \
+    XDG_CONFIG_HOME=/tmp/storyflow-config \
+    XDG_CACHE_HOME=/tmp/storyflow-cache \
     FFMPEG=/usr/bin/ffmpeg \
     FFPROBE=/usr/bin/ffprobe
 COPY package.json package-lock.json tsconfig.json ./

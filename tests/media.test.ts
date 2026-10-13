@@ -127,6 +127,59 @@ for (const fps of [24, 25] as const)
     },
   );
 
+for (const fps of [24, 25] as const) {
+  test(
+    `five long AAC-derived clips retain every cut and final audio window at ${fps}fps`,
+    { timeout: 180000 },
+    async () => {
+      const dir = await mkdtemp(join(tmpdir(), "storyflow-aac-cuts-"));
+      try {
+        const source = join(dir, "source-aac.mp4"), output = join(dir, "final.mp4");
+        // A changing phase/frequency makes shifts and inserted silence visible;
+        // a constant sine alone can match again after a whole-period offset.
+        await exec(ffmpeg, ["-v", "error", "-nostdin", "-y", "-f", "lavfi", "-i",
+          "color=c=0x24405c:s=160x96:r=24:d=61", "-f", "lavfi", "-i",
+          "aevalsrc=0.2*sin(2*PI*(180*t+11*t*t)):s=44100:d=61", "-c:v", "libx264",
+          "-preset", "ultrafast", "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k",
+          "-t", "61", source], { timeout: 30000, maxBuffer: 2e6 });
+        const options = {
+          clips: Array.from({ length: 5 }, (_, i) => ({ path: source,
+            startFrame: i * 12 * fps, endFrame: (i + 1) * 12 * fps, sourceInSeconds: i * 12 })),
+          ontology: project(fps), output, workDir: join(dir, "work"),
+        };
+        const rendered = await composeMedia(options), media = await probe(output);
+        assert.equal(media.video.frames, fps * 60);
+        assert.equal(media.video.fps, fps);
+        assert.equal(Number(media.video.start_time), 0);
+        assert.equal(Number(media.video.duration), 60);
+        assert.equal(Number(media.audio.start_time), 0);
+        assert.equal(Number(media.audio.sample_rate), 48000);
+        assert.equal(Number(media.audio.duration_ts), 60 * 48000);
+        assert.equal(Number(media.audio.duration), 60);
+        const decode = async (path: string) => (await exec(ffmpeg, ["-v", "error", "-nostdin",
+          "-i", path, "-map", "0:a:0", "-ac", "2", "-ar", "48000", "-f", "f32le", "-"],
+          { encoding: "buffer", maxBuffer: 25e6, timeout: 30000 })).stdout;
+        const expected = await decode(source), actual = await decode(output);
+        assert(actual.length >= 60 * 48000 * 2 * 4, "No last AAC frame may be dropped");
+        // Compare at zero offset on both sides of every cut and the last 40 ms.
+        // PCM segment length alone would not catch silence inserted at edit points.
+        for (const second of [0.04, 11.96, 12, 23.96, 24, 35.96, 36, 47.96, 48, 59.82, 59.96]) {
+          const start = Math.round(second * 48000);
+          let aa = 0, bb = 0, ab = 0;
+          for (let sample = start; sample < start + 1920; sample++) {
+            const a = expected.readFloatLE(sample * 8), b = actual.readFloatLE(sample * 8);
+            aa += a * a; bb += b * b; ab += a * b;
+          }
+          assert(ab / Math.sqrt(aa * bb) > 0.98, `Approved audio shifted or missing at ${second}s`);
+          assert(bb / aa > 0.8 && bb / aa < 1.2, `Audio was padded or lost at ${second}s`);
+        }
+        assert.equal(rendered.checks.fullDecode, true);
+        assert.equal((await composeMedia(options)).sha256, rendered.sha256);
+      } finally { await rm(dir, { recursive: true, force: true }); }
+    },
+  );
+}
+
 test(
   "real 1080x1920 60 second vertical composition has exactly 1500 frames, Chinese overlay and synchronized audio",
   { timeout: 600000 },
@@ -333,6 +386,27 @@ test("short source, source audio and coverage gaps fail instead of padding video
   } finally {
     await rm(dir, { recursive: true, force: true });
   }
+});
+
+test("bound audio missing 20 ms after source trim is rejected instead of padded", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "storyflow-short-audio-"));
+  try {
+    const source = await fixture(dir, 2), audio = join(dir, "short-voice.wav");
+    await exec(ffmpeg, ["-v", "error", "-nostdin", "-y", "-f", "lavfi", "-i",
+      "sine=frequency=880:sample_rate=48000:duration=1.38", "-c:a", "pcm_s16le", audio]);
+    const output = join(dir, "rejected.mp4"), options = {
+      clips: [{ path: source, audioPath: audio, startFrame: 0, endFrame: 25, sourceInSeconds: 0.4 }],
+      ontology: project(25, 1), output, workDir: join(dir, "work"),
+    };
+    // The old 25 ms metadata allowance admits this file. Real PCM sample count
+    // must reject the 960 missing samples rather than synthesize approved speech.
+    await assert.rejects(() => composeMedia(options), /too short after decoding; missing 960 samples/);
+    await assert.rejects(() => readFile(output), { code: "ENOENT" });
+    const muted = await composeMedia({ ...options, output: join(dir, "muted.mp4"),
+      clips: [{ path: source, muted: true, startFrame: 0, endFrame: 25, sourceInSeconds: 0.4 }] });
+    assert.equal(muted.audioBindings[0].silence, true);
+    assert.equal(Number((await probe(muted.path)).audio.duration), 1);
+  } finally { await rm(dir, { recursive: true, force: true }); }
 });
 
 test(

@@ -66,7 +66,7 @@ class Acceptance:
         rows = []
         fmt = '{{json .Id}} {{json .State.StartedAt}} {{json .RestartCount}} {{json .State.Status}}'
         for name in self.args.protected_container:
-            result = self.docker("inspect", "--format", fmt, name, check=False)
+            result = self.docker("container", "inspect", "--format", fmt, name, check=False)
             require(result.returncode == 0, f"Explicit protected container is missing or unreadable: {name}")
             rows.append({"name": name, "state": result.stdout.strip(), "found": result.returncode == 0})
         return rows
@@ -80,13 +80,13 @@ class Acceptance:
 
     def create_container(self, name, options, image, command=()):
         require(name.startswith(self.name + "-"), "Container outside QA namespace")
-        require(self.docker("inspect", name, check=False).returncode != 0, "QA container already exists")
+        require(self.docker("container", "inspect", name, check=False).returncode != 0, "QA container already exists")
         self.docker("create", "--name", name, "--label", self.label, *options, image, *command)
         self.containers.append(name)
         return name
 
     def remove_container(self, name):
-        owner = self.docker("inspect", "--format", '{{index .Config.Labels "storyflow.qa.run"}}', name, check=False)
+        owner = self.docker("container", "inspect", "--format", '{{index .Config.Labels "storyflow.qa.run"}}', name, check=False)
         if owner.returncode:
             return
         require(owner.stdout.strip() == self.name, "Refuse to remove a container not owned by this QA run")
@@ -155,7 +155,7 @@ class Acceptance:
             options += ["--user", "0:0", "--cap-add", "CHOWN"]
         self.create_container(name, options, self.args.app_image, command)
         result = self.docker("start", "-a", name, timeout=180, check=False)
-        status = self.docker("inspect", "--format", '{{.State.ExitCode}}', name).stdout.strip()
+        status = self.docker("container", "inspect", "--format", '{{.State.ExitCode}}', name).stdout.strip()
         require(result.returncode == 0 and status == "0", f"Maintenance failed: {result.stderr[-1000:]} {result.stdout[-2000:]}")
         self.remove_container(name)
         return result.stdout
@@ -174,11 +174,31 @@ print(json.dumps(rows))
         require(rows, "Node RSS samples unavailable")
         return {"elapsed": round(time.monotonic() - self.soak_start, 3), "nodeRssKiB": sum(row["rssKiB"] for row in rows)}
 
+    def runtime_state(self, container):
+        # A narrow query avoids ever reading Config.Env or another container's
+        # logs. Capture real Docker state, not assumptions from HTTP responses.
+        fmt = '{"id":{{json .Id}},"startedAt":{{json .State.StartedAt}},"running":{{json .State.Running}},"oomKilled":{{json .State.OOMKilled}},"restartCount":{{json .RestartCount}},"health":{{json .State.Health.Status}}}'
+        state = json.loads(self.docker("container", "inspect", "--format", fmt, container).stdout)
+        require(state["running"] and not state["oomKilled"] and state["restartCount"] == 0,
+                "Candidate exited, OOM-killed, or restarted unexpectedly")
+        return state
+
+    def isolation_state(self, container):
+        fmt = '{"user":{{json .Config.User}},"image":{{json .Image}},"memoryBytes":{{json .HostConfig.Memory}},"nanoCpus":{{json .HostConfig.NanoCpus}},"pidsLimit":{{json .HostConfig.PidsLimit}},"readOnlyRootfs":{{json .HostConfig.ReadonlyRootfs}},"capDrop":{{json .HostConfig.CapDrop}},"securityOpt":{{json .HostConfig.SecurityOpt}},"portBindings":{{json .HostConfig.PortBindings}}}'
+        state = json.loads(self.docker("container", "inspect", "--format", fmt, container).stdout)
+        require(state["user"] == "node" and state["memoryBytes"] == 1024 ** 3 and state["nanoCpus"] == 10 ** 9,
+                "Candidate user or resource isolation differs from the requested constraints")
+        require(state["pidsLimit"] == 128 and state["readOnlyRootfs"] and "ALL" in state["capDrop"], "Candidate sandbox constraints missing")
+        require("no-new-privileges:true" in state["securityOpt"], "Candidate privilege restriction missing")
+        require(all(binding["HostIp"] == "127.0.0.1" for bindings in state["portBindings"].values() for binding in bindings),
+                "Candidate unexpectedly exposes a non-loopback port")
+        return state
+
     def soak(self, base, container, cookie, project_id, file_id, file_bytes):
+        project, _ = self.json_request(base, f"/api/projects/{project_id}", cookie=cookie)
         self.soak_start = time.monotonic()
         calls, memories = [], []
-        next_request, next_memory, next_progress = self.soak_start, 0, 60
-        project, _ = self.json_request(base, f"/api/projects/{project_id}", cookie=cookie)
+        next_request, next_memory, next_progress = self.soak_start + 1.05, 0, 60
         while time.monotonic() - self.soak_start < self.args.soak_seconds:
             time.sleep(max(0, next_request - time.monotonic()))
             started = time.monotonic()
@@ -253,16 +273,27 @@ print(json.dumps(rows))
         require(before["jobs"] == 0, "Fixture unexpectedly enqueued a model job")
         self.stage("synthetic-project-upload", status="passed", identity=before)
         self.docker("kill", "--signal", "KILL", app_name)
-        killed = json.loads(self.docker("inspect", "--format", '{{json .State}}', app_name).stdout)
+        killed = json.loads(self.docker("container", "inspect", "--format", '{{json .State}}', app_name).stdout)
         require(killed["ExitCode"] == 137 and not killed["OOMKilled"], "Container was not stopped by deliberate SIGKILL")
         self.remove_container(app_name)
         base = self.start_app(app_name, main_volume, self.args.port)
         recovered = self.identity(base, cookie, project["id"], file_id, png)
         require(before == recovered, "Data or existing session did not survive container replacement")
         self.stage("container-sigkill-recreate", status="passed", exitCode=137, sameSession=True, identity=recovered)
+        state_before = self.runtime_state(app_name)
+        self.stage("candidate-runtime-isolation", status="passed", evidence=self.isolation_state(app_name), state=state_before)
+        doctor = self.docker("exec", app_name, "npm", "--silent", "run", "doctor", "--", "--json", timeout=180)
+        doctor_result = json.loads(doctor.stdout)
+        require(doctor_result["ok"] and any(check["name"] == "Chromium rendering" and check["ok"] for check in doctor_result["checks"]),
+                "Doctor did not verify real Chromium drawing")
+        self.stage("runtime-doctor-chromium", status="passed", evidence=doctor_result)
         media = self.docker("exec", app_name, "node", "--import", "tsx", "scripts/qa/container-media.ts", timeout=900)
         self.stage("actual-compose-media", status="passed", evidence=json.loads(media.stdout))
         self.soak(base, app_name, cookie, project["id"], file_id, png)
+        state_after = self.runtime_state(app_name)
+        require(state_after["id"] == state_before["id"] and state_after["startedAt"] == state_before["startedAt"] and state_after["health"] == "healthy",
+                "Candidate identity changed or healthcheck failed during bounded runtime acceptance")
+        self.stage("candidate-runtime-continuity", status="passed", before=state_before, after=state_after)
         before_backup = self.identity(base, cookie, project["id"], file_id, png)
         self.docker("stop", "--time", "25", app_name)
         self.maintenance(f"{self.name}-backup-init", main_volume, backup_volume,
@@ -282,12 +313,12 @@ print(json.dumps(rows))
         require(before_backup == after_backup, "New-volume restore changed project revision, ontology or asset bytes")
         self.stage("backup-new-volume-restore", status="passed", sessionsCleared=True, identity=after_backup)
         editor_name = f"{self.name}-editor-smoke"
-        self.create_container(editor_name, [*self.limited(), "--network", "none"], self.args.editor_image,
+        self.create_container(editor_name, [*self.limited(), "--network", "none", "-e", "ANTHROPIC_API_KEY=synthetic-qa-canary-not-a-real-key"], self.args.editor_image,
                               ["python3", "/opt/editor/sandbox_smoke.py"])
         editor = self.docker("start", "-a", editor_name, timeout=60, check=False)
-        exit_code = self.docker("inspect", "--format", '{{.State.ExitCode}}', editor_name).stdout.strip()
+        exit_code = self.docker("container", "inspect", "--format", '{{.State.ExitCode}}', editor_name).stdout.strip()
         require(editor.returncode == 0 and exit_code == "0", f"Editor sandbox failed: {editor.stdout} {editor.stderr[-2000:]}")
-        self.stage("editor-linux-sandbox", status="passed", evidence=json.loads(editor.stdout), network="none", modelCalls=0)
+        self.stage("editor-linux-sandbox", status="passed", evidence=json.loads(editor.stdout), network="none", modelCalls=0, environmentCanary="synthetic, not a real credential")
         protected_after = self.production_snapshot()
         self.report["protectedAfter"] = protected_after
         require(protected_before == protected_after, "Protected production containers changed during QA; investigate separately")

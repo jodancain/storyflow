@@ -3,7 +3,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ARG DEBIAN_MIRROR=http://deb.debian.org
 ARG PYTHON3_VERSION=3.11.2-1+b1
 ARG FFMPEG_VERSION=7:5.1.9-0+deb12u1
-ARG CHROMIUM_VERSION=154.0.8037.92-1~deb12u1
+ARG CHROMIUM_VERSION=155.0.8059.39-1~deb12u1
 ARG FONTS_NOTO_CJK_VERSION=1:20220127+repack1-1
 RUN sed -i "s|http://deb.debian.org|${DEBIAN_MIRROR}|g" /etc/apt/sources.list.d/debian.sources \
     && apt-get update && apt-get install -y --no-install-recommends \
